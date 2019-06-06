@@ -71,6 +71,7 @@ radio, for other models this may be another one hostname).
     - The link of the share has to start with `NEXTCLOUD` in `/data/Config.php`.
     - The share must not have a password.
     - There is no support for subfolders in shares.
+- The list of episodes is cached for 20 minutes.
 
 
 ## Other
