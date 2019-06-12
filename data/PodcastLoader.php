@@ -55,6 +55,10 @@ class PodcastLoader {
 
 		$eid = 1;
 
+		if( isset( $data['channel']['item']['enclosure'] ) ){ // one item is like "item" : { ... }, but should be like "item" : [ { ... } ]
+			$data['channel']['item'] = array( $data['channel']['item'] );
+		}
+
 		foreach( $data['channel']['item'] as $item ){
 			if( !empty( $item['enclosure'] ) ){
 			
