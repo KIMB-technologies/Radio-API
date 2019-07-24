@@ -29,6 +29,9 @@ radio, for other models this may be another one hostname).
     - Change the DNS server in the configuration of your radio to your DNS resolver
     - *Not everybody has to setup a own DNS resolver, some routers provide such features.
       The radio just has to send its http request to the server with this API.*
+    - If there is a DynDNS Hostname for the local network [this](https://hub.docker.com/r/kimbtechnologies/radio_dns)
+      Docker Container provides a DNS Server altering all requests to `*.wifiradiofrontier.com` and only
+      answering request from the given DynDNS Hostname.
 2. Copy this repository to a server with PHP support, the server the radio queries.
     - Setup some type of URL rewrite
         - URL shall be readable in `$_GET['uri']`, other get paramters have to work as usual.
