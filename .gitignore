@@ -1,3 +1,4 @@
 /php/data/log.txt
 /php/data/cache/*.json
+/data/
 .DS_Store

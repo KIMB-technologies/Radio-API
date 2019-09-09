@@ -52,13 +52,13 @@ class Config{
 	 */
 	public static function checkAccess(){
 		if( self::ALLOWED_DOMAIN != 'all' ){
-			if( is_file( __DIR__ . '/ip_ok.txt' ) && filemtime( __DIR__ . '/ip_ok.txt' ) + self::CACHE_EXPIRE > time() ){
-				$ip_ok = file_get_contents( __DIR__ . '/ip_ok.txt' );
+			if( is_file( __DIR__ . '/../data/ip_ok.txt' ) && filemtime( __DIR__ . '/../data/ip_ok.txt' ) + self::CACHE_EXPIRE > time() ){
+				$ip_ok = file_get_contents( __DIR__ . '/../data/ip_ok.txt' );
 			}
 			else {
 				$ip_ok = gethostbyname( self::ALLOWED_DOMAIN );
 				if( filter_var( $ip_ok, FILTER_VALIDATE_IP ) !== false ){
-					file_put_contents( __DIR__ . '/ip_ok.txt', $ip_ok );
+					file_put_contents( __DIR__ . '/../data/ip_ok.txt', $ip_ok );
 				}
 				else{
 					$ip_ok = '';
@@ -80,9 +80,9 @@ class Config{
 	 */
 	public static function getMyStreamsList() : array {
 		if( self::OWN_STREAM ){
-			if( is_file( __DIR__ . '/streamlist.json' )
-				&& filemtime( __DIR__ . '/streamlist.json' ) + self::CACHE_EXPIRE > time() ){
-				$list = json_decode(file_get_contents( __DIR__ . '/streamlist.json'), true );
+			if( is_file( __DIR__ . '/../data/streamlist.json' )
+				&& filemtime( __DIR__ . '/../data/streamlist.json' ) + self::CACHE_EXPIRE > time() ){
+				$list = json_decode(file_get_contents( __DIR__ . '/../data/streamlist.json'), true );
 			}
 			else if( !empty($_ENV['CONF_own_stream_json']) ){
 				$data = file_get_contents( $_ENV['CONF_own_stream_json'] );
@@ -96,7 +96,7 @@ class Config{
 							} 
 						}
 						if( $ok ){
-							file_put_contents(  __DIR__ . '/streamlist.json', json_encode( $list, JSON_PRETTY_PRINT ) );
+							file_put_contents(  __DIR__ . '/../data/streamlist.json', json_encode( $list, JSON_PRETTY_PRINT ) );
 						}
 						else{
 							$list = array("NoKey" => array( "name" => "JSON invalid array form" ));

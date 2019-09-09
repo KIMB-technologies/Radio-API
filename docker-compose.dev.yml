@@ -1,0 +1,19 @@
+version: "2"
+
+services:
+  radio_api:
+    build:
+      context: .
+    container_name: radio_api_dev
+    ports:
+      - "8080:80"
+    volumes:
+      - ./data/:/php-code/data/
+    environment:
+      - CONF_DOMAIN=http://localhost:8080/
+      - CONF_ALLOWED_DOMAIN=all
+      - CONF_CACHE_EXPIRE=1200
+      - CONF_NEXTCLOUD=http://172.19.0.1:8081/cloudproxy/
+      - CONF_OWN_STREAM=true
+      - CONF_own_stream_json=http://172.19.0.1:8081/list.json
+      - CONF_own_stream_url=http://172.19.0.1:8081/?key=

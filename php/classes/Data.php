@@ -6,9 +6,9 @@ class Data {
 	private $radio, $stream, $podcasts, $table; 
 
 	public function __construct(){
-		$this->radio = json_decode(file_get_contents( __DIR__ . '/radios.json' ), true);
+		$this->radio = json_decode(file_get_contents( __DIR__ . '/../data/radios.json' ), true);
 		$this->stream = $this->loadStreams();
-		$this->podcasts = json_decode(file_get_contents( __DIR__ . '/podcasts.json' ), true);
+		$this->podcasts = json_decode(file_get_contents( __DIR__ . '/../data/podcasts.json' ), true);
 
 		$this->constructTable();
 	}

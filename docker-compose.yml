@@ -9,8 +9,9 @@ services:
       - "8080:80"
     volumes:
       - ./data/:/php-code/data/
+      #- ./media/:/php-code/media/:ro # directory to add images for stations
     environment:
-      - CONF_DOMAIN=http://radio.example.com # the domain where the system is hosted
+      - CONF_DOMAIN=http://radio.example.com/ # the domain where the system is hosted
       - CONF_ALLOWED_DOMAIN=all # allowed ip for access, DynDNS Domain, or 'all' to allow all
       - CONF_CACHE_EXPIRE=1200 # time in seconds for cache of ips, podcasts, ...
       - CONF_NEXTCLOUD=http://radio.example.com/cloudproxy/ # the non ssl domain to nextcloud (used for nextcloud streams)
