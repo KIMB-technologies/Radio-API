@@ -15,44 +15,76 @@ can be added. This redirect is possible by manipulating the DNS queries.
 
 ## Setup
 
-The alternative API has to be placed on an webserver with PHP support. It must be possible to connect
-without SSL.  
-Also the server has to answer requests for the hostname `hama.wifiradiofrontier.com` (`hama` is the vendor of my
-radio, for other models this may be another one hostname).
+The entire API is bundled in a Docker Image.
 
 1. Redirect the HTTP request of the radio to your server.
-    - Setup a DNS resolver, e.g. bind9
-    - Point the IP of `hama.wifiradiofrontier.com` to your server
-    - Bing9 config files:
-      [named.conf.local](https://github.com/KIMB-technologies/Radio-API/blob/master/data/config/named.conf.local),
-      [db.hama.wifiradiofrontier.com](https://github.com/KIMB-technologies/Radio-API/blob/master/data/config/db.hama.wifiradiofrontier.com)
-    - Change the DNS server in the configuration of your radio to your DNS resolver
+    - This is done by altering the DNS queries.
+    - There is a [Docker Container](https://hub.docker.com/r/kimbtechnologies/radio_dns)
+      which provides a DNS Server altering all requests to `*.wifiradiofrontier.com`.
+        - It has a feature to define an `ALLOWED_DOMAIN`, only requests from the corresponding IP address will be answered.
+	  - Use a DynDNS hostname as your `ALLOWED_DOMAIN`.
+	  - If hosted in the local network `ALLOWED_DOMAIN` can be `all`.
     - *Not everybody has to setup a own DNS resolver, some routers provide such features.
-      The radio just has to send its http request to the server with this API.*
-    - If there is a DynDNS Hostname for the local network [this](https://hub.docker.com/r/kimbtechnologies/radio_dns)
-      Docker Container provides a DNS Server altering all requests to `*.wifiradiofrontier.com` and only
-      answering request from the given DynDNS Hostname.
-2. Copy this repository to a server with PHP support, the server the radio queries.
-    - Setup some type of URL rewrite
-        - URL shall be readable in `$_GET['uri']`, other get paramters have to work as usual.
-        - `/data/` and `gui/core/` should not be accessible 
-        - Nginx config file: [nginx.conf](https://github.com/KIMB-technologies/Radio-API/blob/master/data/config/nginx.conf)
-    - The directory `/data/cache` and the files `/data/podcasts.json`, `/data/radios.json` should be writeable by PHP.
-3. Change the configuration file `/data/Config.php`
-    - Set `DOMAIN` to the real server domain, could be `hama.wifiradiofrontier.com`, but a domain
-      under your control would be better e.g. `radio.example.com`
-    - If you would like to use the Nextcloud share podcasts, then `NEXTCLOUD` has to be a prefix of a domain of
-      a nextcloud instance. This can be a reverse proxy, to allow connections without SSL e.g. `radio.example.com/cloudproxy/`
-    - Change the function `checkAccess()`, it will be always called before the contents are served. If it ends the script, no
-      access is granted.
-    - Change `getMyStreamsList()` and `myStreamsListGetURL()` to add custom streams, the first has to give an
-      array of streams, the second translates a key of a stream to a domain, where the audio file is. 
+      The radio just has to send its http request to the server where this repositories Docker-Image is running.*
+    - Change the DNS server in the configuration of your radio to the IP of your DNS resolver.
+2. Run this Docker-Image.
+    - See [docker-compose.yml](https://github.com/KIMB-technologies/Radio-API/blob/master/docker-compose.yml) and [nginx.conf](#nginx-load-balancer)
+    - It is recommended to save the folder `/php-code/data/` als volume, because all stations and podcasts are stored there
+    - Configure the Image
+        - `CONF_DOMAIN` The domain where the system is hosted, add `/` at the end!
+        - `CONF_ALLOWED_DOMAIN` Like `ALLOWED_DOMAIN` in the DNS Image, only requests from the corresponding IP address will be answered. Use DynDNS.
+        - `CONF_CACHE_EXPIRE` Time in seconds for cache of ips, podcasts to expire
+        - `CONF_NEXTCLOUD` The system can load audiofiles from nextcloud shares. This is the url to the nextcloud instance.
+            The urls of the share have to look like `CONF_NEXTCLOUD/s/<token>/`. All files in the shared folder will be show in the radio.
+            It is not possible to share only files or folders of folders or to set a password.
+        - `CONF_OWN_STREAM` Fetch a list of own streams `true/ false`.
+        - `CONF_own_stream_json` URL where the list of own stream can be fetched. JSON like `{ "key" : { name : "Test 1" }, ... }`
+        - `CONF_own_stream_url` URL where each audiofile can be found, the `key` will be appended
 4. Done
     - Start the radio and open `Internet Radio`
-    - There should be a list with three points `Radio, Stream, Podcasts`
+    - There should be a list with three points `Radio, Podcasts, (Streams)`
+    - The GUI to define the list of stations and podcasts can be found at `CONF_DOMAIN/gui`. 
 >
 > The API can be placed outside of the local network as well as inside.
 >
+
+### Nginx Load Balancer
+
+An example file to use the image with an nginx load balancer.
+
+```nginx
+
+server {
+	server_name radio.example.com hama.wifiradiofrontier.com;
+
+	location / {
+		set $url "${scheme}${request_uri}";
+		if ( $url ~* "^http/gui.*$" ){ # reqwite gui to ssl
+			return 301 https://radio.example.com$request_uri;
+		}
+
+		proxy_pass http://127.0.0.1:8080/;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_http_version 1.1;
+		proxy_read_timeout 3m;
+		proxy_send_timeout 3m;
+		proxy_set_header Host $host;
+		proxy_set_header X-Forwarded-Proto $scheme;
+	}
+
+	location /cloudproxy/ {
+		proxy_pass https://cloud.example.com/;
+	}
+
+	listen 80; # needed by radio
+	listen [::]:80;	
+
+	listen [::]:443 ssl; # add for gui
+	listen 443 ssl;
+	# more ssl setup ....
+}
+
+```
 
 ## Usage
 - Start the radio and open `Internet Radio`
@@ -63,19 +95,18 @@ radio, for other models this may be another one hostname).
 - The list can be changed using the GUI at `radio.example.com/gui/`.
 - A radio station should be URL to some MP3, M3U.
 
-### Stream
-- This is a list of custom streams.
-- They are defined using `getMyStreamsList()` and `myStreamsListGetURL()` in `/data/Config.php`.
-
 ### Podcasts
 - This is a list of podcasts.
 - The list can be changed using the GUI at `radio.example.com/gui/`.
 - The URL can be an Atom RSS link or a link of a nextcloud fileshare.
-    - The link of the share has to start with `NEXTCLOUD` in `/data/Config.php`.
+    - The link of the share has to start with `CONF_NEXTCLOUD`
     - The share must not have a password.
     - There is no support for subfolders in shares.
-- The list of episodes is cached for 20 minutes.
+- The list of episodes is cached for `CONF_CACHE_EXPIRE` minutes.
 
+### Stream
+- This is a list of custom streams.
+- They are using the given URL.
 
 ## Other
 - This is a private project and has no connections to Silicone-Frontier
