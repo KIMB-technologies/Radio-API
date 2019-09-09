@@ -25,7 +25,7 @@ if(isset( $_GET['radios'] ) && isset( $_POST['name'] )){
 			);
 		}
 	}
-	file_put_contents( __DIR__ . '/../../data/radios.json', json_encode($radios, JSON_PRETTY_PRINT));
+	file_put_contents( __DIR__ . '/../data/radios.json', json_encode($radios, JSON_PRETTY_PRINT));
 }
 else if(isset( $_GET['podcasts'] ) && isset( $_POST['name'] ) ){
 	echo '<span style="color:green;">Podcasts geändert!</span>';
@@ -39,15 +39,15 @@ else if(isset( $_GET['podcasts'] ) && isset( $_POST['name'] ) ){
 			);
 		}
 	}
-	file_put_contents( __DIR__ . '/../../data/podcasts.json', json_encode($podcasts, JSON_PRETTY_PRINT));
+	file_put_contents( __DIR__ . '/../data/podcasts.json', json_encode($podcasts, JSON_PRETTY_PRINT));
 }
 
 //load in unloaded
 if( !isset($radios) ){
-	$radios = json_decode( file_get_contents( __DIR__ . '/../../data/radios.json' ), true);
+	$radios = json_decode( file_get_contents( __DIR__ . '/../data/radios.json' ), true);
 }
 if(!isset( $podcasts )){
-	$podcasts = json_decode( file_get_contents( __DIR__ . '/../../data/podcasts.json' ), true);
+	$podcasts = json_decode( file_get_contents( __DIR__ . '/../data/podcasts.json' ), true);
 }
 ?>
 

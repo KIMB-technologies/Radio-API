@@ -2,7 +2,7 @@
 define('HAMA-Radio', 'Radio');
 error_reporting(0);
 
-require_once( __DIR__ . '/../data/Config.php' );
+require_once( __DIR__ . '/../classes/Config.php' );
 Config::checkAccess();
 ?>
 <!DOCTYPE HTML>
@@ -41,8 +41,8 @@ Config::checkAccess();
 		<title>Radio API &ndash; Backend</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
-		<script src="/gui/load/jquery.min.js"></script>
-		<script src="/gui/load/viewer.js"></script>
+		<script src="jquery.min.js"></script>
+		<script src="viewer.js"></script>
 	</head>
 	<body>
 		<h1>
@@ -52,7 +52,7 @@ Config::checkAccess();
 		<h2>Podcasts &amp; Radiosender</h2>
 		
 		<?php
-			require_once(  __DIR__ . '/core/inner.php');
+			require_once(  __DIR__ . '/../classes/inner.php');
 
 			echo '<script> var serverurl = "http'. ( empty($_SERVER['HTTPS']) ? '' : 's' ) .':'. substr(Config::DOMAIN, strpos(Config::DOMAIN, '//')) .'"; </script>';
 		?>
@@ -68,7 +68,7 @@ Config::checkAccess();
 
 		<center>
 			<small>
-				<a href="https://github.com/KIMB-technologies/Radio-API" target="_blank">Radio API by KIMB-trechnologies</a>
+				<a href="https://github.com/KIMB-technologies/Radio-API" target="_blank">Radio API by KIMB-technologies</a>
 				&ndash;
 				<a href="https://www.gnu.org/licenses/gpl-3.0.txt" target="_blank">GPLv3</a>
 			</small>

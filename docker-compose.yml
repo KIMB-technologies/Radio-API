@@ -1,0 +1,19 @@
+version: "2"
+
+services:
+  radio_api:
+    image: kimbtechnologies/radio_api:latest
+    container_name: radio_api
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - ./data/:/php-code/data/
+    environment:
+      - CONF_DOMAIN=http://radio.example.com # the domain where the system is hosted
+      - CONF_ALLOWED_DOMAIN=all # allowed ip for access, DynDNS Domain, or 'all' to allow all
+      - CONF_CACHE_EXPIRE=1200 # time in seconds for cache of ips, podcasts, ...
+      - CONF_NEXTCLOUD=http://radio.example.com/cloudproxy/ # the non ssl domain to nextcloud (used for nextcloud streams)
+      - CONF_OWN_STREAM=true # fetch own streams at domain below? (true/ false)
+      - CONF_own_stream_json=http://stream.example.com/list.json # url to fetch own streams, json array { "key" : { name : "Test 1" }, ... }
+      - CONF_own_stream_url=http://stream.example.com/?key= # url prefix to open own stream, key gets appended

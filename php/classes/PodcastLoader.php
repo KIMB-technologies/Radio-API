@@ -94,7 +94,7 @@ class PodcastLoader {
 		if( isset( self::$memstore[sha1($url)] ) ){
 			return self::$memstore[sha1($url)];
 		}
-		else if( is_file( $cachefile ) && filemtime($cachefile) >= time() - 1200 ){
+		else if( is_file( $cachefile ) && filemtime($cachefile) >= time() - Config::CACHE_EXPIRE ){
 			return json_decode( file_get_contents( $cachefile ), true);	
 		}
 

@@ -1,3 +1,3 @@
-data/log.txt
-data/cache/*.json
+/php/data/log.txt
+/php/data/cache/*.json
 .DS_Store

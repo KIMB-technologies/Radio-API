@@ -15,14 +15,16 @@ class Data {
 
 	private function loadStreams() : array{
 		$stream = array();
-		$mydata = Config::getMyStreamsList();
-		if( !empty($mydata) ) {
-			$stream = array();
-			foreach( $mydata as $key => $val){
-				$stream[] = array(
-					'name' => $key . ( empty( $val['name'] ) ? '' : ' - ' . $val['name'] ),
-					'url' => Config::myStreamsListGetURL( $key )
-				);
+		if( Config::OWN_STREAM ){
+			$mydata = Config::getMyStreamsList();
+			if( !empty($mydata) ) {
+				$stream = array();
+				foreach( $mydata as $key => $val){
+					$stream[] = array(
+						'name' => $key . ( empty( $val['name'] ) ? '' : ' - ' . $val['name'] ),
+						'url' => Config::myStreamsListGetURL( $key )
+					);
+				}
 			}
 		}
 		return $stream;
@@ -33,13 +35,15 @@ class Data {
 		$this->table = array();
 		$this->table['categories'] = array(
 			1 => 'Radio',
-			2 => 'Stream',
 			3 => 'Podcast'
 		);
 
 		$this->table['items'] = array();
 		$this->addCategoryToTable( 1, $this->radio );
-		$this->addCategoryToTable( 2, $this->stream );
+		if( Config::OWN_STREAM ){
+			$this->table['categories'][2] = 'Stream';
+			$this->addCategoryToTable( 2, $this->stream );
+		}
 		$this->addCategoryToTable( 3, $this->podcasts );
 	}
 
@@ -71,7 +75,7 @@ class Data {
 	}
 
 	/**
-	 * Gete data of one item by his id.
+	 * Get data of one item by his id.
 	 */
 	public function getById( int $id ) : array {
 		if( !isset( $this->table['items'][$id] ) ){

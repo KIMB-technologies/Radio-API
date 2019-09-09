@@ -5,12 +5,12 @@ error_reporting(0);
 /**
  * Loading
  */
-require_once( __DIR__ . '/data/Config.php' );
+require_once( __DIR__ . '/classes/Config.php' );
 Config::checkAccess();
 //error_reporting(E_ALL);
-require_once( __DIR__ . '/data/Output.php' );
-require_once( __DIR__ . '/data/PodcastLoader.php' );
-require_once( __DIR__ . '/data/Data.php' );
+require_once( __DIR__ . '/classes/Output.php' );
+require_once( __DIR__ . '/classes/PodcastLoader.php' );
+require_once( __DIR__ . '/classes/Data.php' );
 
 
 /**

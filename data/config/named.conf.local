@@ -1,4 +1,0 @@
-zone "hama.wifiradiofrontier.com" {
-    type master;
-    file "/etc/bind/zones/db.hama.wifiradiofrontier.com";
-};
