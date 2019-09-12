@@ -8,6 +8,7 @@ error_reporting(0);
 require_once( __DIR__ . '/classes/Config.php' );
 Config::checkAccess();
 //error_reporting(E_ALL);
+require_once( __DIR__ . '/classes/Helper.php' );
 require_once( __DIR__ . '/classes/Output.php' );
 require_once( __DIR__ . '/classes/PodcastLoader.php' );
 require_once( __DIR__ . '/classes/Data.php' );
@@ -52,12 +53,13 @@ else if( isset( $_GET['sSearchtype'] ) && $_GET['sSearchtype'] == 5 ){ // only o
 	if( preg_match('/^(\d+)X(\d+)$/', $id, $parts ) === 1 ){
 		$ed = PodcastLoader::getEpisodeData( $parts[1], $parts[2], $data );
 		if( $ed != array() ){
+			$url = $ed['finalurl'] ? Helper::getFinalUrl($ed['episode']['url']) : $ed['episode']['url'];
 			$out->addEpisode(
 				$parts[1],
 				$parts[2],
 				$ed['title'],
 				$ed['episode']['title'],
-				$ed['episode']['url'],
+				$url,
 				$ed['episode']['desc'],
 				$ed['logo']
 			);

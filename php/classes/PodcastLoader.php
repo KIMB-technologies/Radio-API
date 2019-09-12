@@ -117,7 +117,8 @@ class PodcastLoader {
 			return array(
 				'episode' => $poddata['episodes'][$eid],
 				'title' => $poddata['title'],
-				'logo' =>  $poddata['logo']
+				'logo' =>  $poddata['logo'],
+				'finalurl' => !empty($pod['finalurl'])
 			);
 		} 
 		else{

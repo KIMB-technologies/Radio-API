@@ -35,7 +35,8 @@ else if(isset( $_GET['podcasts'] ) && isset( $_POST['name'] ) ){
 		if( !empty($name) ){
 			$podcasts[] = array(
 				'name' => filterName( $name ),
-				'url' => filterURL( $_POST['url'][$id] )
+				'url' => filterURL( $_POST['url'][$id] ),
+				'finalurl' => isset($_POST['finalurl'][$id]) && $_POST['finalurl'][$id] == 'yes'
 			);
 		}
 	}
@@ -83,12 +84,14 @@ if(!isset( $podcasts )){
 		$id = ($key+3000);
 		echo '<tr><th>'. $id .'</th><td></td><td></td></tr>';
 		echo '<tr><td></td><td>Name</td><td><input type="text" delid="d'.$id.'" value="'.$pod['name'].'" name="name[]"/></td></tr>';
-		echo '<tr><td></td><td>URL</td><td><input type="text" delid="d'.$id.'" value="'.$pod['url'].'" name="url[]"/></td><td><button class="del" delid="d'.$id.'" type="button" title="Löschen.">&cross;</button></td></tr>';
+		echo '<tr><td></td><td>URL</td><td><input type="text" delid="d'.$id.'" value="'.$pod['url'].'" name="url[]"/></td><td></tr>';
+		echo '<tr><td></td><td>FinalURL</td><td><input type="checkbox" delid="d'.$id.'" value="yes" name="finalurl[]" '. ( $pod['finalurl'] ? 'checked="checked"' : '' ) .' />Follow all redirects on audio urls</td><td><button class="del" delid="d'.$id.'" type="button" title="Löschen.">&cross;</button></td></tr>';
 	}
 ?>
 	<tr><th>New</th><td></td><td></td></tr>
 	<tr><td></td><td>Name</td><td><input type="text" placeholder="Name" name="name[]"/></td></tr>
 	<tr><td></td><td>URL</td><td><input type="text" placeholder="URL (RSS Atom, Nextcloud Share [no SSL, no password] ...)" name="url[]"/></td></tr>
+	<tr><td></td><td>FinalURL</td><td><input type="checkbox" name="finalurl[]" value="yes"/> Follow all redirects on audio urls</td></tr>
 </table>
 <input type="submit" value="Sichern">
 </form>
