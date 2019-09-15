@@ -4,7 +4,14 @@ error_reporting(0);
 
 require_once( __DIR__ . '/../classes/Config.php' );
 require_once(  __DIR__ . '/../classes/Inner.php');
+require_once( __DIR__ . '/../classes/Id.php' );
 Config::checkAccess();
+
+/**
+ * 
+ * ADD ID CHECK
+ * 
+ */
 
 $inner = new Inner();
 $inner->checkPost();

@@ -12,6 +12,7 @@ require_once( __DIR__ . '/classes/Helper.php' );
 require_once( __DIR__ . '/classes/Output.php' );
 require_once( __DIR__ . '/classes/PodcastLoader.php' );
 require_once( __DIR__ . '/classes/Data.php' );
+require_once( __DIR__ . '/classes/Id.php' );
 
 
 /**
@@ -24,8 +25,15 @@ if( $uri == '/setupapp/hama/asp/BrowseXML/loginXML.asp' && !isset( $_GET['mac'] 
 	die(); //will never be reached
 }
 
+try{
+	$radioid = new Id($_GET['mac']);
+}
+catch(Exception $e){
+	Output::sendAnswer('<Error>No MAC!</Error>');
+	die(); //will never be reached
+}
 $out = new Output();
-$data = new Data();
+$data = new Data($radioid->getId());
 
 //Normal Pages
 if( isset( $_GET['sSearchtype'] ) && $_GET['sSearchtype'] == 3 ){ // only one station (play this)
@@ -113,6 +121,8 @@ else{ // list of categories (startpage)
 	foreach( $data->getCategories() as $cid => $name ){
 		$out->addDir( $name, Config::DOMAIN . 'cat?cid=' . $cid );
 	}
+	// add code (for gui)
+	$out->addDir( 'GUI-Code: ' . $radioid->getCode(), Config::DOMAIN . '?go=inital' );
 
 	// Log unknown
 	if( $uri != '/setupapp/hama/asp/BrowseXML/loginXML.asp' ){
