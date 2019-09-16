@@ -3,6 +3,10 @@ defined('HAMA-Radio') or die('Invalid Endpoint');
 
 class Helper {
 	
+	/**
+	 * Follow all 30x heades and return final url dest.
+	 * @param $link the url to follow its redirects
+	 */
 	public static function getFinalUrl( string $link ) : string {
 		$ch = curl_init();
 		
@@ -21,8 +25,5 @@ class Helper {
 		
 		return $url;
 	}
-
 }
-
-
 ?>

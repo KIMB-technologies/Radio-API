@@ -11,7 +11,7 @@ class Id {
 	// types form
 	const ID_PREG = '/^[0-9]{1,4}$/',
 		MAC_PREG = '/^[0-9a-f]{28,40}$/',
-		CODE_PREG = '/^[0-9A-Za-z]{5}$/';
+		CODE_PREG = '/^Z[0-9A-Za-z]{4}$/';
 
 	private static function checkValue($val, $preg){
 		return is_string($val) && preg_match( $preg, $val ) === 1;

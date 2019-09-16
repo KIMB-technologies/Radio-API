@@ -1,5 +1,7 @@
 $(function (){
-	loadPage( serverurl, 'div#apiviewer' );
+	if( typeof serverurl !== "undefined" ){
+		loadPage( serverurl, 'div#apiviewer' );
+	}
 });
 
 function loadPage( url, elem, play ){

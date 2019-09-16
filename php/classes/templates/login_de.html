@@ -1,0 +1,23 @@
+%%ADD_HTML%%
+
+<h3>Radiosender</h3>
+	<form action="?login" method="post">
+		<table>
+			<tr>
+				<td>Code</td>
+				<td><input type="text" value="Z" name="code" pattern="^Z[0-9A-Za-z]{4}$"></td>
+			</tr>
+			<tr>
+					<td></td>
+					<td><input type="submit" value="Login"></td>
+				</tr>
+		</table>
+	</form>
+
+	<div class="note">
+		Der Code wird im Menü des Radios angezeigt (Internetradio &rarr; Senderliste).
+		Jedes Radio muss zuerst einmalig die Senderliste aufgerufen und einen Code angzeigt haben,
+		bevor ein Login hier möglich ist.
+		Jedes Radio hat eine eigene Senderliste und eine eigene Liste an Podcasts.
+		Die Liste der Stream ist für den Server fest vorgegeben.
+	</div>

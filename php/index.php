@@ -5,18 +5,11 @@ error_reporting(0);
 /**
  * Loading
  */
-require_once( __DIR__ . '/classes/Config.php' );
+require_once( __DIR__ . '/classes/autoload.php' );
 Config::checkAccess();
-//error_reporting(E_ALL);
-require_once( __DIR__ . '/classes/Helper.php' );
-require_once( __DIR__ . '/classes/Output.php' );
-require_once( __DIR__ . '/classes/PodcastLoader.php' );
-require_once( __DIR__ . '/classes/Data.php' );
-require_once( __DIR__ . '/classes/Id.php' );
-
 
 /**
- * Radio Requests
+ * Radio Server Test Requests
  */
 $uri = !empty( $_GET['uri'] ) ? $_GET['uri'] : 'none';
 // Login
@@ -25,6 +18,9 @@ if( $uri == '/setupapp/hama/asp/BrowseXML/loginXML.asp' && !isset( $_GET['mac'] 
 	die(); //will never be reached
 }
 
+/**
+ * Radio ID/ Mac Login
+ */
 try{
 	$radioid = new Id($_GET['mac']);
 }
@@ -35,6 +31,9 @@ catch(Exception $e){
 $out = new Output();
 $data = new Data($radioid->getId());
 
+/**
+ * Page Handling
+ */
 //Normal Pages
 if( isset( $_GET['sSearchtype'] ) && $_GET['sSearchtype'] == 3 ){ // only one station (play this)
 	$out->prevUrl(Config::DOMAIN . '?go=inital');

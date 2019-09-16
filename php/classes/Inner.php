@@ -46,25 +46,7 @@ class Inner {
 		}
 	}
 
-	public function addForm(){
-		$this->html[] = '<h3>Radiosender</h3>';
-		$this->html[] = '<form action="?radios" method="post">';
-		$this->html[] = '<table>';
-		$this->html[] = $this->radioForm();
-		$this->html[] = '</table>';
-		$this->html[] = '<input type="submit" value="Sichern">';
-		$this->html[] = '</form>';
-
-		$this->html[] = '<h3>Podcasts</h3>';
-		$this->html[] = '<form action="?podcasts" method="post">';
-		$this->html[] = '<table>';
-		$this->html[] = $this->podcastForm();
-		$this->html[] = '</table>';
-		$this->html[] = '<input type="submit" value="Sichern">';
-		$this->html[] = '</form>';
-	}
-
-	private function radioForm(){
+	public function radioForm(){
 		$head .= '<tr><th>ID</th><td></td><td style="width: 500px; max-width:60%; "></td></tr>';
 		$rows = array();
 		$count = 0;
@@ -91,7 +73,7 @@ class Inner {
 		} , $rows ) );
 	}
 
-	private function podcastForm(){
+	public function podcastForm(){
 		$head = '<tr><th>ID</th><td></td><td style="width: 500px; max-width:60%;"></td></tr>';
 		$rows = array();
 		$count = 0;
@@ -120,7 +102,7 @@ class Inner {
 		} , $rows ) );
 	}
 
-	public function getHTML() : string {
+	public function getAdditionalHTML() : string {
 		$this->html[] = '<script>
 		$(function (){
 			$("button.del").click( function (){
