@@ -4,14 +4,15 @@ defined('HAMA-Radio') or die('Invalid Endpoint');
 class Inner {
 
 	private $html = array();
-	private $radios, $podcasts;
+	private $radios, $podcasts, $data;
 
-	public function __construct(){
-		$this->radios = json_decode( file_get_contents( __DIR__ . '/../data/radios.json' ), true);
-		$this->podcasts = json_decode( file_get_contents( __DIR__ . '/../data/podcasts.json' ), true);
+	public function __construct(int $id){
+		$this->data = new Data($id);
+		$this->radios = $this->data->getRadioList();
+		$this->podcasts = $this->data->getPodcastList();
 	}
 
-	public function checkPost() {
+	public function checkPost() : void {
 		if(isset( $_GET['radios'] ) && isset( $_POST['name'] )){
 			$this->html[] = '<span style="color:green;">Radiosender geändert!</span>';
 		
@@ -26,8 +27,7 @@ class Inner {
 					);
 				}
 			}
-
-			
+			$this->data->setRadioList($this->radios, false);
 		}
 		else if(isset( $_GET['podcasts'] ) && isset( $_POST['name'] ) ){
 			$this->html[] = '<span style="color:green;">Podcasts geändert!</span>';
@@ -42,11 +42,11 @@ class Inner {
 					);
 				}
 			}
-			
+			$this->data->setPodcastList($this->podcasts, false);
 		}
 	}
 
-	public function radioForm(){
+	public function radioForm() : string {
 		$head .= '<tr><th>ID</th><td></td><td style="width: 500px; max-width:60%; "></td></tr>';
 		$rows = array();
 		$count = 0;
@@ -73,7 +73,7 @@ class Inner {
 		} , $rows ) );
 	}
 
-	public function podcastForm(){
+	public function podcastForm() : string {
 		$head = '<tr><th>ID</th><td></td><td style="width: 500px; max-width:60%;"></td></tr>';
 		$rows = array();
 		$count = 0;
@@ -102,22 +102,8 @@ class Inner {
 		} , $rows ) );
 	}
 
-	public function getAdditionalHTML() : string {
-		$this->html[] = '<script>
-		$(function (){
-			$("button.del").click( function (){
-				var id = $(this).attr("delid");
-				$("input[delid="+ id +"]").val("");
-			});
-		});
-		</script>';
-
+	public function getMessages() : string {
 		return implode(PHP_EOL, $this->html);
-	}
-
-	public function __destruct(){
-		file_put_contents( __DIR__ . '/../data/radios.json', json_encode($this->radios, JSON_PRETTY_PRINT));
-		file_put_contents( __DIR__ . '/../data/podcasts.json', json_encode($this->podcasts, JSON_PRETTY_PRINT));
 	}
 
 	// ==== //

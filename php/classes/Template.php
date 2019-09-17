@@ -33,7 +33,7 @@ class Template{
 	 * see $allLangs for list
 	 * @param lang the lang to use
 	 */
-	public static function setLanguage( $lang ){
+	public static function setLanguage( string $lang ) : void {
 		if( in_array( $lang, self::$allLangs ) ){
 			self::$lang = $lang;
 		}
@@ -46,7 +46,7 @@ class Template{
 	 * 		./templates/<name>_<lang>.html
 	 */
 	public function __construct( $name ){
-		if( Utilities::checkFileName( $name ) ) {
+		if( Helper::checkFileName( $name ) ) {
 			$this->filename = $name;
 			if( !is_file( __DIR__ . '/templates/' . $this->filename .  '_' . self::$lang . '.html' ) ){
 				throw new Exception('Kann Template nicht finden!');
@@ -78,7 +78,7 @@ class Template{
 	 * 		//...
 	 * 	)
 	 */
-	public function setMultipleContent($name, $content){
+	public function setMultipleContent($name, $content) : bool {
 		if( isset( $this->multiples[$name] ) ){
 			$mults = array();
 			foreach( $content as $data){
@@ -106,7 +106,7 @@ class Template{
 	 * @param $key placeholder
 	 * @param $value html value
 	 */
-	public function setContent($key, $value){
+	public function setContent(string $key, string $value) : bool {
 		$key = "%%".str_replace("%%", "", $key)."%%";
 		if( isset( $this->placeholder[$key] ) ){
 			$this->placeholder[$key] = $value;
@@ -122,7 +122,7 @@ class Template{
 	 * 	put in %%INNERCONTAINER%%)
 	 * @param $template the template object to include
 	 */
-	public function includeTemplate( $template ){
+	public function includeTemplate( Template $template ) : bool {
 		if( get_class( $template ) === 'Template' ){
 			$this->inner = $template;
 			return true;
@@ -134,8 +134,8 @@ class Template{
 	 * Change the loaded Template file
 	 * (only the html is changed, uses the first json)
 	 */
-	public function loadOtherTemplate($name) {
-		if( Utilities::checkFileName( $name ) ) {
+	public function loadOtherTemplate(string $name) : void {
+		if( Helper::checkFileName( $name ) ) {
 			if( is_file( __DIR__ . '/templates/' . $name .  '_' . self::$lang . '.html' ) ){
 				$this->filename = $name;
 			}
@@ -151,7 +151,7 @@ class Template{
 	/**
 	 * Getting the output of this template (incl. included ones)
 	 */
-	public function getOutputString(){
+	public function getOutputString() : string {
 		$htmldata = file_get_contents( __DIR__ . '/templates/' . $this->filename .  '_' . self::$lang . '.html' );
 
 		foreach( $this->multiples as $name => $val ){
@@ -174,7 +174,8 @@ class Template{
 			$htmldata = $a[0] . $middle . $b[1];
 		}
 
-		$this->placeholder['%%SITEURL%%'] = Config::url;
+		$this->placeholder['%%SERVERURL%%'] = 'http'. ( empty($_SERVER['HTTPS']) ? '' : 's' ) .':'. substr(Config::DOMAIN, strpos(Config::DOMAIN, '//'));
+		
 
 		if( $this->inner !== null ){
 			$this->placeholder['%%INNERCONTAINER%%'] = $this->inner->getOutputString();

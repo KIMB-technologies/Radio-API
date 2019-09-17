@@ -3,67 +3,28 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="robots" content="none">
-		<style>
-		body{
-			font-family:Ubuntu,sans-serif;
-			font-size:100%;
-			background-color:#fff;
-		}
-		h1{
-			color:black;
-			border-bottom: 1px solid #5d7;
-			text-align:center;
-			font-size:2em;
-			font-type: bold;
-		}
-		h2{
-			color:black;
-			border-bottom: 1px solid #5d7;
-			text-align:left;
-			font-size:1.5em;
-			font-type: bold;
-		}
-		input[type=text]{
-			width:95%;
-			max-width:500px;
-		}
-		div#apiviewer a{
-			text-decoration: none;
-		}
-		div.achtung {
-			border: 2px solid red;
-			padding: 5px;
-			border-radius: 4px;
-			background-color: orange;
-		}
-		div.note {
-			border: 2px solid darkblue;
-			padding: 5px;
-			border-radius: 4px;
-			background-color: lightblue;
-		}
-		</style>
-		<title>Radio API &ndash; %%TITLE%%</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		
-		<script src="jquery.min.js"></script>
+		<title>Radio API &ndash; %%TITLE%%</title>
+
+		<link rel="stylesheet" type="text/css" href="%%SERVERURL%%gui/style.css">
+		<script src="%%SERVERURL%%gui/jquery.min.js"></script>
 		%%MOREHEADER%%
 	</head>
 	<body>
-		<h1>Radio API &ndash; Backend &ndash; %%TITLE%%</h1>
+		<div id="main">
+			<h1>Radio API &ndash; Backend &ndash; %%TITLE%%</h1>
+				<h2>%%TITLE%%</h2>
 
-		<h2>%%TITLE%%</h2>
-
-		%%INNERCONTAINER%%
-
-		<h1></h1>
-
-		<center>
-			<small>
-				<a href="https://github.com/KIMB-technologies/Radio-API" target="_blank">Radio API by KIMB-technologies</a>
-				&ndash;
-				<a href="https://www.gnu.org/licenses/gpl-3.0.txt" target="_blank">GPLv3</a>
-			</small>
-		</center>
+				%%INNERCONTAINER%%
+		</div>
+		<div id="footer">
+			<center>
+				<small>
+					<a href="https://github.com/KIMB-technologies/Radio-API" target="_blank">Radio API by KIMB-technologies</a>
+					&ndash;
+					<a href="https://www.gnu.org/licenses/gpl-3.0.txt" target="_blank">GPLv3</a>
+				</small>
+			</center>
+		</div>
 	</body>
 </html>

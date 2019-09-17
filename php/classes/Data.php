@@ -6,15 +6,15 @@ class Data {
 	private $id;
 	private $radio, $stream, $podcasts, $table; 
 
-	public function __construct($id){
-		$this->$id = $id;
+	public function __construct(int $id){
+		$this->id = $id;
 
-		$this->radio = is_file( __DIR__ . '/../data/radios_'. $this->$id .'.json' ) ?
+		$this->radio = is_file( __DIR__ . '/../data/radios_'. $this->id .'.json' ) ?
 			$this->radio = json_decode(
-				file_get_contents( __DIR__ . '/../data/radios_'. $this->$id .'.json' ), true) : array();
-		$this->podcasts = is_file( __DIR__ . '/../data/podcasts_'. $this->$id .'.json'  ) ?
+				file_get_contents( __DIR__ . '/../data/radios_'. $this->id .'.json' ), true) : array();
+		$this->podcasts = is_file( __DIR__ . '/../data/podcasts_'. $this->id .'.json'  ) ?
 			$this->radio = json_decode(
-				file_get_contents( __DIR__ . '/../data/podcasts_'. $this->$id .'.json'  ), true) : array();
+				file_get_contents( __DIR__ . '/../data/podcasts_'. $this->id .'.json'  ), true) : array();
 
 		$this->stream = $this->loadStreams();
 
@@ -90,6 +90,30 @@ class Data {
 			return array();
 		}
 		return $this->table['items'][$id];
+	}
+
+	/**
+	 * Backend Raw Access
+	 */
+	public function getRadioList() : array {
+		return $this->radio;
+	}
+	public function getPodcastList() : array {
+		return $this->podcasts;
+	}
+	public function setRadioList(array $radios, bool $recalcList = true) : void {
+		$this->radio = $radios;
+		file_put_contents( __DIR__ . '/../data/radios_'. $this->id .'.json', json_encode($this->radio, JSON_PRETTY_PRINT));
+		if($recalcList){
+			$this->constructTable();
+		}
+	}
+	public function setPodcastList(array $pods, bool $recalcList = true) : void {
+		$this->podcasts = $pods;
+		file_put_contents( __DIR__ . '/../data/podcasts_'. $this->id .'.json', json_encode($this->podcasts, JSON_PRETTY_PRINT));
+		if($recalcList){
+			$this->constructTable();
+		}
 	}
 }
 ?>

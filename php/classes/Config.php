@@ -50,7 +50,7 @@ class Config{
 	 * Checks if access allowed (for this request)
 	 * 	Has to end the script, if not allowed!
 	 */
-	public static function checkAccess(){
+	public static function checkAccess() : void {
 		if( self::ALLOWED_DOMAIN != 'all' ){
 			if( is_file( __DIR__ . '/../data/ip_ok.txt' ) && filemtime( __DIR__ . '/../data/ip_ok.txt' ) + self::CACHE_EXPIRE > time() ){
 				$ip_ok = file_get_contents( __DIR__ . '/../data/ip_ok.txt' );

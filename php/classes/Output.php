@@ -26,7 +26,7 @@ class Output {
 	 * Add a station
 	 */
 	public function addStation( int $id, string $name, string $url,
-						$light = false, string $desc = '', string $logo = ''){
+						$light = false, string $desc = '', string $logo = '') : void {
 		$a = array(
 			'ItemType' => 'Station',
 			'StationId' => $id,
@@ -54,7 +54,7 @@ class Output {
 	/**
 	 * Add a podcast
 	 */
-	public function addPodcast( int $podcastid, string $name, string $url ){
+	public function addPodcast( int $podcastid, string $name, string $url ) : void {
 		$this->items[] = array(
 			'ItemType' => 'ShowOnDemand',
 			'ShowOnDemandID' => $podcastid,
@@ -69,7 +69,7 @@ class Output {
 	 * Add a podcast episode
 	 */
 	public function addEpisode( int $podcastid, int $episodeid, string $podcastname, string $episodename,
-						string $url, string $desc = '', string $logo = '' ){
+						string $url, string $desc = '', string $logo = '' ) : void {
 		$logo = empty($logo) || substr($logo, 0, 4) != 'http' ? Config::DOMAIN . 'media/default.png' : $logo;
 		$this->items[] = array(
 			'ItemType' => 'ShowEpisode',
@@ -90,7 +90,7 @@ class Output {
 	/**
 	 * Add a folder
 	 */
-	public function addDir(string $name, string $url){
+	public function addDir(string $name, string $url) : void {
 		$this->items[] = array(
 			'ItemType' => 'Dir',
 			'Title' => self::cleanText($name),
@@ -102,7 +102,7 @@ class Output {
 	/**
 	 * Set or override a Previous (<- Back URL)
 	 */
-	public function prevUrl(string $url){
+	public function prevUrl(string $url) : void {
 		$this->prevurl = self::cleanUrl($url);
 	}
 

@@ -1,13 +1,11 @@
 $(function (){
-	if( typeof serverurl !== "undefined" ){
-		loadPage( serverurl, 'div#apiviewer' );
-	}
+	loadPage( serverurl + '?', 'div#apiviewer' );
 });
 
 function loadPage( url, elem, play ){
 	play = play || false;
 	var html = "<ul>";
-	$.get( url, (data) => { 
+	$.get( url + '&mac=' + radiomac , (data) => { 
 		var xml = $( $.parseXML( data.replace(/&/g, '&amp;') ) );
 
 		xml.find('Item').each( (k,v) => {

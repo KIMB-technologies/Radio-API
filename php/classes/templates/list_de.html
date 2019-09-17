@@ -1,7 +1,12 @@
 %%ADD_HTML%%
 
+<div style="float:right;">
+Eingeloggt als %%LOGIN_CODE%%,
+<a href="%%SERVERURL%%gui/?login">Logout</a>
+</div>
+
 <h3>Radiosender</h3>
-	<form action="?radios" method="post">
+	<form action="%%SERVERURL%%gui/?radios" method="post">
 		<table>
 			%%RADIO_FORM%%
 		</table>
@@ -13,14 +18,14 @@
 		als URL wird ein streamfähiger Link benötigt (MP3 etc.).
 		Über Logo kann eine URL zu einem den Sender illustrieredenen 
 		Bild angegeben werden. Wird kein Bild angegeben, so wird
-		<a href="%%DOMAIN%%media/default.png" target="_blank">
+		<a href="%%SERVERURL%%media/default.png" target="_blank">
 		<code>%%DOMAIN%%media/default.png</code></a>
 		im Radio angezeigt. Beschreibung kann leer bleiben und ist 
 		eine weitere Beschreibung des Sender.
 	</div>
 
 <h3>Podcasts</h3>
-	<form action="?podcasts" method="post">
+	<form action="%%SERVERURL%%gui/?podcasts" method="post">
 		<table>
 			%%PODCAST_FORM%%
 		</table>
@@ -40,6 +45,15 @@
 		Audiodatei an das Radio geschickt.
 	</div>
 
+	<script>
+		$(function (){
+			$("button.del").click( function (){
+				var id = $(this).attr("delid");
+				$("input[delid="+ id +"]").val("");
+			});
+		});
+	</script>
+
 	<h2>Vorschau</h2>
 		<div id="apiviewer">
 		</div>
@@ -52,4 +66,4 @@
 			Browsern nicht, dafür aber auf dem Radio. Weiterhin kann das Radio kein SSL 
 			ein Browser jedoch schon.
 		</div>
-		<script> var serverurl = "%%SERVER_URL%%"; </script>';
+		<script> var serverurl = "%%SERVERURL%%", radiomac = "%%RADIO_MAC%%";</script>

@@ -1,6 +1,6 @@
 <?php
 define('HAMA-Radio', 'Radio');
-error_reporting(0);
+error_reporting( !empty($_ENV['DEV']) && $_ENV['DEV'] == 'dev' ? E_ALL : 0 );
 
 /**
  * Loading
@@ -22,6 +22,9 @@ if( $uri == '/setupapp/hama/asp/BrowseXML/loginXML.asp' && !isset( $_GET['mac'] 
  * Radio ID/ Mac Login
  */
 try{
+	if( empty($_GET['mac']) ){
+		throw new Exception();
+	}
 	$radioid = new Id($_GET['mac']);
 }
 catch(Exception $e){

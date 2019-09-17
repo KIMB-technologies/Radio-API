@@ -1,8 +1,9 @@
 {
-	"%%SERVER_URL%%" : "",
 	"%%PODCAST_FORM%%" : "",
 	"%%DOMAIN%%" : "",
 	"%%RADIO_FORM%%" : "",
 	"%%NEXTCLOUD%%" : "",
-	"%%ADD_HTML%%" : ""
+	"%%ADD_HTML%%" : "",
+	"%%RADIO_MAC%%" : "",
+	"%%LOGIN_CODE%%" : ""
 }

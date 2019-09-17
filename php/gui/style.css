@@ -1,0 +1,59 @@
+body{
+	font-family:Ubuntu,sans-serif;
+	font-size:100%;
+	background-color:#777;
+}
+h1{
+	color:black;
+	border-bottom: 1px solid #5d7;
+	text-align:center;
+	font-size:2em;
+	font-type: bold;
+}
+h2{
+	color:black;
+	border-bottom: 1px solid #5d7;
+	text-align:left;
+	font-size:1.5em;
+	font-type: bold;
+}
+input[type=text]{
+	width:95%;
+	max-width:500px;
+}
+
+div#main{
+	border: 1px solid black;
+	margin:auto;
+	max-width: 800px;
+	background-color: white;
+	padding: 5px;
+	border-radius: 4px;
+}
+div#footer{
+	color: white;
+}
+div#footer a, div#footer a:visited, div#footer a:hover {
+	text-decoration: none;
+	color: white;
+}
+
+div#apiviewer a{
+	text-decoration: none;
+}
+div.achtung {
+	border: 2px solid red;
+	padding: 5px;
+	border-radius: 4px;
+	background-color: orange;
+	margin:auto;
+	max-width: 500px;
+}
+div.note {
+	border: 2px solid darkblue;
+	padding: 5px;
+	border-radius: 4px;
+	background-color: lightblue;
+	margin:auto;
+	max-width: 500px;
+}

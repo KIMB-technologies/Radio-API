@@ -89,7 +89,7 @@ class PodcastLoader {
 		return $poddata;
 	}
 
-	public static function getPodcastByUrl( string $url ){
+	public static function getPodcastByUrl( string $url ) : array {
 		$cachefile = __DIR__ . '/../data/cache/' . sha1( $url ) . '.json';
 		if( isset( self::$memstore[sha1($url)] ) ){
 			return self::$memstore[sha1($url)];

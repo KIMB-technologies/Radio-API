@@ -59,7 +59,7 @@ server {
 
 	location / {
 		set $url "${scheme}${request_uri}";
-		if ( $url ~* "^http/gui.*$" ){ # reqwite gui to ssl
+		if ( $url ~* "^http/gui.*$" ){ # rewite gui to ssl
 			return 301 https://radio.example.com$request_uri;
 		}
 

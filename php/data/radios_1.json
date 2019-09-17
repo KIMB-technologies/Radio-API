@@ -2,7 +2,7 @@
     {
         "name": "NDR Info",
         "url": "http:\/\/www.ndr.de\/resources\/metadaten\/audio\/m3u\/ndrinfo_sh.m3u",
-        "logo": "http:\/\/radio.example.com\/media\/default.png",
+        "logo": "empty",
         "desc": "News"
     }
 ]
