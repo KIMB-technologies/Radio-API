@@ -1,5 +1,6 @@
 <?php
 define('HAMA-Radio', 'Radio');
+error_reporting( !empty($_ENV['DEV']) && $_ENV['DEV'] == 'dev' ? E_ALL : 0 );
 
 // Load System
 require_once(__DIR__ . '/../classes/autoload.php');
