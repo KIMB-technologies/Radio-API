@@ -44,6 +44,7 @@ The entire API is bundled in a Docker Image.
     - Start the radio and open `Internet Radio`
     - There should be a list with three points `Radio, Podcasts, (Streams)`
     - The GUI to define the list of stations and podcasts can be found at `CONF_DOMAIN/gui`. 
+    - You will need a Code to log into the GUI. The code is shown on the radio.
 >
 > The API can be placed outside of the local network as well as inside.
 >

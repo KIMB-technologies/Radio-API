@@ -66,7 +66,7 @@ class Id {
 			$this->id = $val;
 		}
 		else{
-			throw new Exception('Invalid MAC Format');
+			throw new Exception('Invalid Format');
 		}
 
 		//load this data by id

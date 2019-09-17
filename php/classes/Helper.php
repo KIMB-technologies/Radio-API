@@ -38,7 +38,7 @@ class Helper {
 		$chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY';
 		$r = '';
 		$charAnz = strlen( $chars );
-		for($i = 1; $i < $len; $i++){
+		for($i = 0; $i < $len; $i++){
 			$r .= $chars{random_int(0, $charAnz-1)};
 		}
 		return $r;

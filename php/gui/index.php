@@ -14,7 +14,7 @@ if( isset($_GET['login']) || isset( $_GET['err'] )){
 		$login->loginByCode($_POST['code']);
 	}
 	else{
-		$login->logout($_POST['code']);
+		$login->logout();
 	}
 }
 if( $login->isLoggedIn() ){
