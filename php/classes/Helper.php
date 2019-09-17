@@ -30,7 +30,7 @@ class Helper {
 		return is_string($n) && preg_match( '/^[A-Za-z0-9]+$/', $n ) === 1;
 	}
 
-	private static function checkValue($val, string $preg) : bool {
+	public static function checkValue($val, string $preg) : bool {
 		return is_string($val) && preg_match( $preg, $val ) === 1;
 	}
 

@@ -10,11 +10,9 @@ class Data {
 		$this->id = $id;
 
 		$this->radio = is_file( __DIR__ . '/../data/radios_'. $this->id .'.json' ) ?
-			$this->radio = json_decode(
-				file_get_contents( __DIR__ . '/../data/radios_'. $this->id .'.json' ), true) : array();
+			json_decode( file_get_contents( __DIR__ . '/../data/radios_'. $this->id .'.json' ), true) : array();
 		$this->podcasts = is_file( __DIR__ . '/../data/podcasts_'. $this->id .'.json'  ) ?
-			$this->radio = json_decode(
-				file_get_contents( __DIR__ . '/../data/podcasts_'. $this->id .'.json'  ), true) : array();
+			json_decode( file_get_contents( __DIR__ . '/../data/podcasts_'. $this->id .'.json'  ), true) : array();
 
 		$this->stream = $this->loadStreams();
 
