@@ -5,9 +5,9 @@ class PodcastLoader {
 
 	private static $memstore = array();
 
-	private static function loadFromNextcloud( string $url ) : array{
-		$server = Config::NEXTCLOUD;
-		$share = substr( $url, strlen(Config::NEXTCLOUD)+2 );
+	private static function loadFromNextcloud( string $url ) : array {
+		$server = substr( $url, 0, strrpos( $url , '/s/' )+1 );
+		$share = substr( $url, strlen($server)+2 );
 		$share = preg_replace( '/[^0-9A-Za-z]/', '', $share );
 
 		$cont = stream_context_create( array(
@@ -89,7 +89,7 @@ class PodcastLoader {
 		return $poddata;
 	}
 
-	public static function getPodcastByUrl( string $url ) : array {
+	public static function getPodcastByUrl( string $url, bool $nextcloud ) : array {
 		$cachefile = __DIR__ . '/../data/cache/' . sha1( $url ) . '.json';
 		if( isset( self::$memstore[sha1($url)] ) ){
 			return self::$memstore[sha1($url)];
@@ -98,7 +98,7 @@ class PodcastLoader {
 			return json_decode( file_get_contents( $cachefile ), true);	
 		}
 
-		$poddata = substr( $url, 0, strlen(Config::NEXTCLOUD) ) == Config::NEXTCLOUD ? self::loadFromNextcloud( $url ) : self::loadFromFeed( $url );
+		$poddata = $nextcloud ? self::loadFromNextcloud( $url ) : self::loadFromFeed( $url );
 
 		self::$memstore[sha1($url)] = $poddata;
 		file_put_contents( $cachefile, json_encode( $poddata ) );
@@ -110,7 +110,7 @@ class PodcastLoader {
 		if( $pod['cid'] !== 3 ){
 			return array();
 		}
-		$poddata = self::getPodcastByUrl( $pod['url'] );
+		$poddata = self::getPodcastByUrl( $pod['url'], !empty($pod['type']) && $pod['type'] == 'nc' );
 
 		if( isset( $poddata['episodes'][$eid] ) ){
 			//ok
@@ -118,7 +118,9 @@ class PodcastLoader {
 				'episode' => $poddata['episodes'][$eid],
 				'title' => $poddata['title'],
 				'logo' =>  $poddata['logo'],
-				'finalurl' => !empty($pod['finalurl'])
+				'finalurl' => !empty($pod['finalurl']),
+				'proxy' => !empty($pod['proxy']),
+				'type' => !empty($pod['type']) && $pod['type'] == 'nc' ? 'nc' : 'rss'
 			);
 		} 
 		else{
@@ -131,7 +133,7 @@ class PodcastLoader {
 		if( $pod['cid'] !== 3 ){
 			return array();
 		}
-		return self::getPodcastByUrl( $pod['url'] );
+		return self::getPodcastByUrl( $pod['url'], !empty($pod['type']) && $pod['type'] == 'nc' );
 	}
 }		
 ?>

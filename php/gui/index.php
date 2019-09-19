@@ -25,7 +25,6 @@ if( $login->isLoggedIn() ){
 	$mainTemplate->includeTemplate( $listTemplate );
 
 	$listTemplate->setContent('DOMAIN', Config::DOMAIN);
-	$listTemplate->setContent('NEXTCLOUD', Config::NEXTCLOUD);
 
 	$inner = new Inner($login->getId());
 	$inner->checkPost();

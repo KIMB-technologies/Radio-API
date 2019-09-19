@@ -14,7 +14,7 @@ services:
       - CONF_DOMAIN=http://radio.example.com/ # the domain where the system is hosted
       - CONF_ALLOWED_DOMAIN=all # allowed ip for access, DynDNS Domain, or 'all' to allow all
       - CONF_CACHE_EXPIRE=1200 # time in seconds for cache of ips, podcasts, ...
-      - CONF_NEXTCLOUD=http://radio.example.com/cloudproxy/ # the non ssl domain to nextcloud (used for nextcloud streams)
       - CONF_OWN_STREAM=true # fetch own streams at domain below? (true/ false)
-      - CONF_own_stream_json=http://stream.example.com/list.json # url to fetch own streams, json array { "key" : { name : "Test 1" }, ... }
-      - CONF_own_stream_url=http://stream.example.com/?key= # url prefix to open own stream, key gets appended
+      - CONF_OWN_STREAM_JSON=http://stream.example.com/list.json # url to fetch own streams, json array { "key" : { name : "Test 1" }, ... }
+      - CONF_OWN_STREAM_URL=http://stream.example.com/?key= # url prefix to open own stream, key gets appended
+      - CONF_PROXY_OWN_STREAM=false # use the proxy for the own streams

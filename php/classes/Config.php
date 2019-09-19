@@ -4,11 +4,11 @@ defined('HAMA-Radio') or die('Invalid Endpoint');
 /**
  * Docker ENV setup
  */
-define( 'ENV_NEXTCLOUD', $_ENV['CONF_NEXTCLOUD'] );
 define( 'ENV_DOMAIN', $_ENV['CONF_DOMAIN'] );
 define( 'ENV_CACHE_EXPIRE', intval($_ENV['CONF_CACHE_EXPIRE']));
 define( 'ENV_OWN_STREAM', $_ENV['CONF_OWN_STREAM'] == 'true');
 define( 'ENV_ALLOWED_DOMAIN', $_ENV['CONF_ALLOWED_DOMAIN']);
+define( 'ENV_PROXY_OWN_STREAM', $_ENV['CONF_PROXY_OWN_STREAM'] == 'true');
 
 // IP on reverse proxy setup
 if( !empty($_SERVER['HTTP_X_REAL_IP']) ){
@@ -27,11 +27,6 @@ class Config{
 	const DOMAIN = ENV_DOMAIN;
 
 	/**
-	 * Nextcloud Domain
-	 */
-	const NEXTCLOUD = ENV_NEXTCLOUD;
-
-	/**
 	 * Seconds for cache lifetime
 	 */
 	const CACHE_EXPIRE = ENV_CACHE_EXPIRE;
@@ -40,6 +35,11 @@ class Config{
 	 * Own Stream used?
 	 */
 	const OWN_STREAM = ENV_OWN_STREAM;
+
+	/**
+	 * Own Stream Proxy
+	 */
+	const PROXY_OWN_STREAM = ENV_PROXY_OWN_STREAM;
 
 	/**
 	 * Allowed Domain
@@ -84,8 +84,8 @@ class Config{
 				&& filemtime( __DIR__ . '/../data/streamlist.json' ) + self::CACHE_EXPIRE > time() ){
 				$list = json_decode(file_get_contents( __DIR__ . '/../data/streamlist.json'), true );
 			}
-			else if( !empty($_ENV['CONF_own_stream_json']) ){
-				$data = file_get_contents( $_ENV['CONF_own_stream_json'] );
+			else if( !empty($_ENV['CONF_OWN_STREAM_JSON']) ){
+				$data = file_get_contents( $_ENV['CONF_OWN_STREAM_JSON'] );
 				if( !empty($data) ){
 					$list = json_decode( $data, true );
 					if( !empty( $list )){
@@ -126,7 +126,7 @@ class Config{
 	 */
 	public static function myStreamsListGetURL( string $key ) : string {
 		if( self::OWN_STREAM ){
-			return (!empty($_ENV['CONF_own_stream_url']) ? $_ENV['CONF_own_stream_url'] : 'CONF_own_stream_url' ) . $key;
+			return (!empty($_ENV['CONF_OWN_STREAM_URL']) ? $_ENV['CONF_OWN_STREAM_URL'] : 'CONF_OWN_STREAM_URL' ) . $key;
 		}
 		else{
 			return "";

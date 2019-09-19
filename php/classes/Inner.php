@@ -38,7 +38,9 @@ class Inner {
 					$this->podcasts[] = array(
 						'name' => self::filterName( $name ),
 						'url' => self::filterURL( $_POST['url'][$id] ),
-						'finalurl' => isset($_POST['finalurl'][$id]) && $_POST['finalurl'][$id] == 'yes'
+						'finalurl' => isset($_POST['finalurl'][$id]) && $_POST['finalurl'][$id] == 'yes',
+						'proxy' => isset($_POST['proxy'][$id]) && $_POST['proxy'][$id] == 'yes',
+						'type' => isset($_POST['type'][$id]) && $_POST['type'][$id] == 'nc' ? 'nc' : 'rss'
 					);
 				}
 			}
@@ -47,7 +49,7 @@ class Inner {
 	}
 
 	public function radioForm() : string {
-		$head .= '<tr><th>ID</th><td></td><td style="width: 500px; max-width:60%; "></td></tr>';
+		$head = '<tr><th>ID</th><td></td><td style="width: 500px; max-width:60%; "></td></tr>';
 		$rows = array();
 		$count = 0;
 		foreach($this->radios as $key => $radio ){
@@ -82,21 +84,34 @@ class Inner {
 
 			$rows[] = array(  '<b>'. $id .'</b>', '', '' );
 			$rows[] = array(  '', 'Name', '<input type="text" delid="d'.$id.'" value="'.$pod['name'].'" name="name['.$count.']"/>' );
+			$rows[] = array(  '', 'Typ',
+				'<input type="radio" value="rss" value="'.$pod['type'].'" name="type['.$count.']" '.( $pod['type'] == 'rss' ? 'checked="checked"' : '' ).' /> RSS/ Atom' .
+				'<input type="radio" value="nc" value="'.$pod['type'].'" name="type['.$count.']" '.( $pod['type'] == 'nc' ? 'checked="checked"' : '' ).' /> Nextcloud'
+			);
 			$rows[] = array(  '', 'URL', '<input type="text" delid="d'.$id.'" value="'.$pod['url'].'" name="url['.$count.']"/>' );
 			$rows[] = array(  '', 'EndURL',
-				'<input type="radio" delid="d'.$id.'" value="yes" name="finalurl['.$count.']" '. ( $pod['finalurl'] ? 'checked="checked"' : '' ) .' /> &check;' .
-				'<input type="radio" delid="d'.$id.'" value="no" name="finalurl['.$count.']" '. ( !$pod['finalurl'] ? 'checked="checked"' : '' ) .' /> &cross;',
+				'<input type="radio" value="yes" name="finalurl['.$count.']" '. ( $pod['finalurl'] ? 'checked="checked"' : '' ) .' /> &check;' .
+				'<input type="radio" value="no" name="finalurl['.$count.']" '. ( !$pod['finalurl'] ? 'checked="checked"' : '' ) .' /> &cross;'
+			);
+			$rows[] = array(  '', 'Proxy',
+				'<input type="radio" value="yes" name="proxy['.$count.']" '. ( $pod['proxy'] ? 'checked="checked"' : '' ) .' /> &check;' .
+				'<input type="radio" value="no" name="proxy['.$count.']" '. ( !$pod['proxy'] ? 'checked="checked"' : '' ) .' /> &cross;',
 				'<button class="del" delid="d'.$id.'" type="button" title="Löschen.">&cross;</button>'
 			);
 			$count++;
 		}
 		$rows[] = array('<b>Neu</b>', '', '');
 		$rows[] = array('', 'Name', '<input type="text" placeholder="Name" name="name['.$count.']"/>');
+		$rows[] = array(  '', 'Typ',
+				'<input type="radio" value="rss" name="type['.$count.']" checked="checked"  /> RSS/ Atom' .
+				'<input type="radio" value="nc" name="type['.$count.']" /> Nextcloud'
+		);
 		$rows[] = array('', 'URL', '<input type="text" placeholder="URL" name="url['.$count.']"/>');
 		$rows[] = array(  '', 'EndURL',
-				'<input type="radio" delid="d'.$id.'" value="yes" name="finalurl['.$count.']" /> &check;' .
-				'<input type="radio" delid="d'.$id.'" value="no" name="finalurl['.$count.']" checked="checked" /> &cross;'
+				'<input type="radio" value="yes" name="finalurl['.$count.']" /> &check;' .
+				'<input type="radio" value="no" name="finalurl['.$count.']" checked="checked" /> &cross;'
 		);
+		$rows[] = array('', '', '<input type="hidden" value="no" name="proxy['.$count.']" checked="checked" />');
 		return $head . PHP_EOL . implode( PHP_EOL , array_map( function ($c) {
 			return '<tr><td>' . implode( '</td><td>', $c ) . '</td></tr>';
 		} , $rows ) );

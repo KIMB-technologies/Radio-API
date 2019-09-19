@@ -63,7 +63,15 @@ else if( isset( $_GET['sSearchtype'] ) && $_GET['sSearchtype'] == 5 ){ // only o
 	if( preg_match('/^(\d+)X(\d+)$/', $id, $parts ) === 1 ){
 		$ed = PodcastLoader::getEpisodeData( $parts[1], $parts[2], $data );
 		if( $ed != array() ){
-			$url = $ed['finalurl'] ? Helper::getFinalUrl($ed['episode']['url']) : $ed['episode']['url'];
+			if($ed['proxy']){
+				$url = Config::DOMAIN . 'stream.php?id=' . $parts[1] . '&eid=' . $parts[2];
+			}
+			else if($ed['finalurl']){
+				$url = Helper::getFinalUrl($ed['episode']['url']);
+			}
+			else{
+				$url = $ed['episode']['url'];
+			}
 			$out->addEpisode(
 				$parts[1],
 				$parts[2],
@@ -85,13 +93,14 @@ else if( $uri == '/cat' && !empty( $_GET['cid'] )  ){ // list of stations by cat
 		if( $cid == 3 && isset( $_GET['id'] ) && preg_replace('/[^0-9]/','', $_GET['id']  ) === $_GET['id'] ){
 			$id = $_GET['id'];
 			$pd = PodcastLoader::getPodcastDataById( $id, $data );
+			$proxy = !empty($data->getById( $id )['proxy']);
 			foreach( $pd['episodes'] as $eid => $e ){
 				$out->addEpisode(
 					$id,
 					$eid,
 					$pd['title'],
 					$e['title'],
-					$e['url'],
+					$proxy ? Config::DOMAIN . 'stream.php?id=' . $id . '&eid=' . $eid : $e['url'],
 					$e['desc'],
 					$pd['logo']
 				);

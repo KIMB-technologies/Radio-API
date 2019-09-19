@@ -34,12 +34,10 @@ The entire API is bundled in a Docker Image.
         - `CONF_DOMAIN` The domain where the system is hosted, add `/` at the end!
         - `CONF_ALLOWED_DOMAIN` Like `ALLOWED_DOMAIN` in the DNS Image, only requests from the corresponding IP address will be answered. Use DynDNS.
         - `CONF_CACHE_EXPIRE` Time in seconds for cache of ips, podcasts to expire
-        - `CONF_NEXTCLOUD` The system can load audiofiles from nextcloud shares. This is the url to the nextcloud instance.
-            The urls of the share have to look like `CONF_NEXTCLOUD/s/<token>/`. All files in the shared folder will be show in the radio.
-            It is not possible to share only files or folders of folders or to set a password.
         - `CONF_OWN_STREAM` Fetch a list of own streams `true/ false`.
-        - `CONF_own_stream_json` URL where the list of own stream can be fetched. JSON like `{ "key" : { name : "Test 1" }, ... }`
-        - `CONF_own_stream_url` URL where each audiofile can be found, the `key` will be appended
+        - `CONF_OWN_STREAM_JSON` URL where the list of own stream can be fetched. JSON like `{ "key" : { name : "Test 1" }, ... }`
+        - `CONF_OWN_STREAM_URL` URL where each audiofile can be found, the `key` will be appended
+        - `CONF_PROXY_OWN_STREAM` Use the proxy for own streams `true/ false`.
 4. Done
     - Start the radio and open `Internet Radio`
     - There should be a list with three points `Radio, Podcasts, (Streams)`
@@ -56,7 +54,7 @@ An example file to use the image with an nginx load balancer.
 ```nginx
 
 server {
-	server_name radio.example.com hama.wifiradiofrontier.com;
+	server_name radio.example.com .wifiradiofrontier.com;
 
 	location / {
 		set $url "${scheme}${request_uri}";
@@ -71,10 +69,6 @@ server {
 		proxy_send_timeout 3m;
 		proxy_set_header Host $host;
 		proxy_set_header X-Forwarded-Proto $scheme;
-	}
-
-	location /cloudproxy/ {
-		proxy_pass https://cloud.example.com/;
 	}
 
 	listen 80; # needed by radio
@@ -100,7 +94,10 @@ server {
 - This is a list of podcasts.
 - The list can be changed using the GUI at `radio.example.com/gui/`.
 - The URL can be an Atom RSS link or a link of a nextcloud fileshare.
-    - The link of the share has to start with `CONF_NEXTCLOUD`
+- Nextcloud fileshare
+    - The system can load audiofiles from nextcloud shares.
+    - `tld.de/s/<token>/`. All files in the shared folder will be show in the radio.
+    - It is only possible to share a folder filled with files.
     - The share must not have a password.
     - There is no support for subfolders in shares.
 - The list of episodes is cached for `CONF_CACHE_EXPIRE` minutes.
