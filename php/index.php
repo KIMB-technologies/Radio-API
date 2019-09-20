@@ -47,7 +47,7 @@ if( isset( $_GET['sSearchtype'] ) && $_GET['sSearchtype'] == 3 ){ // only one st
 			$out->addStation(
 				$id,
 				$sta['name'],
-				$sta['url'],
+				!empty($sta['proxy']) ? Config::DOMAIN . 'stream.php?id=' . $id : $sta['url'],
 				false,
 				isset($sta['desc']) ? $sta['desc'] : '',
 				isset($sta['logo']) ? $sta['logo'] : ''
@@ -120,7 +120,7 @@ else if( $uri == '/cat' && !empty( $_GET['cid'] )  ){ // list of stations by cat
 					$out->addStation(
 						$id,
 						$item['name'],
-						$item['url'],
+						!empty($item['proxy']) ? Config::DOMAIN . 'stream.php?id=' . $id : $item['url'],
 						true
 					);
 				}

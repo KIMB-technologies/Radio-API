@@ -28,7 +28,8 @@ class Data {
 				foreach( $mydata as $key => $val){
 					$stream[] = array(
 						'name' => $key . ( empty( $val['name'] ) ? '' : ' - ' . $val['name'] ),
-						'url' => Config::myStreamsListGetURL( $key )
+						'url' => Config::myStreamsListGetURL( $key ),
+						'proxy' => Config::PROXY_OWN_STREAM
 					);
 				}
 			}

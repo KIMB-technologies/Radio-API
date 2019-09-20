@@ -1,0 +1,14 @@
+services:
+  - docker
+
+jobs:
+  include:
+    - stage: build docker image
+      script:
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - docker build -t radio_api .
+      - docker images
+      - docker tag radio_api kimbtechnologies/radio_api:$TRAVIS_COMMIT
+      - docker tag radio_api kimbtechnologies/radio_api:latest
+      - docker push kimbtechnologies/radio_api:$TRAVIS_COMMIT
+      - docker push kimbtechnologies/radio_api:latest

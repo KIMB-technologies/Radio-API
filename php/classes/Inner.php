@@ -23,7 +23,8 @@ class Inner {
 						'name' => self::filterName( $name ),
 						'url' => self::filterURL( $_POST['url'][$id] ),
 						'logo' => self::filterURL( $_POST['logo'][$id] ),
-						'desc' => self::filterName( $_POST['desc'][$id] )
+						'desc' => self::filterName( $_POST['desc'][$id] ),
+						'proxy' => isset($_POST['proxy'][$id]) && $_POST['proxy'][$id] == 'yes',
 					);
 				}
 			}
@@ -58,6 +59,10 @@ class Inner {
 			$rows[] = array(  '<b>'. $id .'</b>', '', '' );
 			$rows[] = array(  '', 'Name', '<input delid="d'.$id.'" type="text" value="'.$radio['name'].'" name="name['.$count.']"/>' );
 			$rows[] = array(  '', 'URL', '<input delid="d'.$id.'" type="text" value="'.$radio['url'].'" name="url['.$count.']"/>' );
+			$rows[] = array(  '', 'Proxy',
+				'<input type="radio" value="yes" name="proxy['.$count.']" '. ( $radio['proxy'] ? 'checked="checked"' : '' ) .' /> &check;' .
+				'<input type="radio" value="no" name="proxy['.$count.']" '. ( !$radio['proxy'] ? 'checked="checked"' : '' ) .' /> &cross;',
+			);
 			$rows[] = array(  '', 'Logo', '<input delid="d'.$id.'" type="text" value="'.$radio['logo'].'" name="logo['.$count.']"/>' );
 			$rows[] = array(  '', 'Beschreibung',
 				'<input delid="d'.$id.'" type="text" value="'.$radio['desc'].'" name="desc['.$count.']"/>' .
@@ -70,6 +75,7 @@ class Inner {
 		$rows[] = array(  '', 'URL', '<input type="text" placeholder="URL (MP3, ...)" name="url['.$count.']"/>' );
 		$rows[] = array(  '', 'Logo', '<input type="text" placeholder="Logo (PNG, ...)" name="logo['.$count.']"/>' );
 		$rows[] = array(  '', 'Beschreibung', '<input type="text" placeholder="Beschreibung" name="desc['.$count.']"/>' );
+		$rows[] = array('', '', '<input type="hidden" value="no" name="proxy['.$count.']" />');
 		return $head . PHP_EOL . implode( PHP_EOL , array_map( function ($c) {
 			return '<tr><td>' . implode( '</td><td>', $c ) . '</td></tr>';
 		} , $rows ) );
@@ -111,7 +117,7 @@ class Inner {
 				'<input type="radio" value="yes" name="finalurl['.$count.']" /> &check;' .
 				'<input type="radio" value="no" name="finalurl['.$count.']" checked="checked" /> &cross;'
 		);
-		$rows[] = array('', '', '<input type="hidden" value="no" name="proxy['.$count.']" checked="checked" />');
+		$rows[] = array('', '', '<input type="hidden" value="no" name="proxy['.$count.']" />');
 		return $head . PHP_EOL . implode( PHP_EOL , array_map( function ($c) {
 			return '<tr><td>' . implode( '</td><td>', $c ) . '</td></tr>';
 		} , $rows ) );

@@ -78,6 +78,9 @@ function addOpenTypeListener(elem){
 }
 
 function playFile( url ) {
+	if( url.substr(0, serverurl.length ) == serverurl ){
+		url += '&mac=' + radiomac;
+	}
 	var html ='<audio controls="controls" autoplay="autoplay">'
 		+ '<source src="'+ url +'" type="audio/wav">'
 		+ '</audio>';

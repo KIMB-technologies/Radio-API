@@ -52,7 +52,7 @@ if( !empty( $_GET['id'] ) ){
 			
 			// get hostname and url parts before and after
 			$matches = array();
-			$matchok = preg_match( '/^(https?:\/\/)(.*\.[a-zA-Z]+)((?::[0-9]+)?(?:\/.*)?)$/', $url, $matches ); // get host
+			$matchok = preg_match( '/^(https?:\/\/)([^\/]+\.?[a-zA-Z]+)((?::[0-9]+)?(?:\/.*)?)$/', $url, $matches ); // get host
 			$host = $matches[2];
 
 			// host ok?
@@ -64,7 +64,7 @@ if( !empty( $_GET['id'] ) ){
 				// allow only external ips
 				if( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE |  FILTER_FLAG_NO_RES_RANGE) !== false ){
 					//let nginx do the rest
-					header("X-Accel-Redirect: /proxy/?host=". $host ."&url=" . urlencode( $url ) );
+					header("X-Accel-Redirect: /proxy/". $host ."/?" . $url );
 					die();
 				}
 			}
