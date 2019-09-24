@@ -6,7 +6,7 @@ error_reporting( !empty($_ENV['DEV']) && $_ENV['DEV'] == 'dev' ? E_ALL : 0 );
  * Loading
  */
 require_once( __DIR__ . '/classes/autoload.php' );
-Config::checkAccess();
+Config::checkAccess( !empty($_GET['mac']) && Helper::checkValue( $_GET['mac'], Id::MAC_PREG ) ? $_GET['mac'] : null );
 
 /**
  * Radio Server Test Requests

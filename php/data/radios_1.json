@@ -1,8 +1,9 @@
 [
-    {
-        "name": "NDR Info",
-        "url": "http:\/\/www.ndr.de\/resources\/metadaten\/audio\/m3u\/ndrinfo_sh.m3u",
-        "logo": "empty",
-        "desc": "News"
-    }
+	{
+	    "name": "NDR Info",
+	    "url": "http:\/\/www.ndr.de\/resources\/metadaten\/audio\/m3u\/ndrinfo_sh.m3u",
+	    "logo": "empty",
+	    "desc": "News",
+	    "proxy": false
+	}
 ]

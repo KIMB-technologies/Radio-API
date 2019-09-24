@@ -28,7 +28,7 @@ class Inner {
 					);
 				}
 			}
-			$this->data->setRadioList($this->radios, false);
+			$this->data->setRadioList($this->radios);
 		}
 		else if(isset( $_GET['podcasts'] ) && isset( $_POST['name'] ) ){
 			$this->html[] = '<span style="color:green;">Podcasts geändert!</span>';
@@ -45,7 +45,7 @@ class Inner {
 					);
 				}
 			}
-			$this->data->setPodcastList($this->podcasts, false);
+			$this->data->setPodcastList($this->podcasts);
 		}
 	}
 

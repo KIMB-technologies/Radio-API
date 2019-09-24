@@ -7,7 +7,6 @@ defined('HAMA-Radio') or die('Invalid Endpoint');
 define( 'ENV_DOMAIN', $_ENV['CONF_DOMAIN'] );
 define( 'ENV_CACHE_EXPIRE', intval($_ENV['CONF_CACHE_EXPIRE']));
 define( 'ENV_OWN_STREAM', $_ENV['CONF_OWN_STREAM'] == 'true');
-define( 'ENV_ALLOWED_DOMAIN', $_ENV['CONF_ALLOWED_DOMAIN']);
 define( 'ENV_PROXY_OWN_STREAM', $_ENV['CONF_PROXY_OWN_STREAM'] == 'true');
 
 // IP on reverse proxy setup
@@ -19,7 +18,7 @@ if( !empty( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $_SERVER['HTTP_X_FORWARDED_P
 	$_SERVER['HTTPS'] = 'on';
 }
 
-class Config{
+class Config {
 
 	/**
 	 * The real domain which should be used.
@@ -42,31 +41,60 @@ class Config{
 	const PROXY_OWN_STREAM = ENV_PROXY_OWN_STREAM;
 
 	/**
-	 * Allowed Domain
+	 * Store redis cache for ALLOWED_DOMAINS, OWN_STREAM
 	 */
-	const ALLOWED_DOMAIN = ENV_ALLOWED_DOMAIN;
+	private static $redisAccessDomains = null, $redisOwnStream = null;
 
 	/**
 	 * Checks if access allowed (for this request)
 	 * 	Has to end the script, if not allowed!
+	 * @param $mac give the users mac (we will test his last domain first, to speed up things)
 	 */
-	public static function checkAccess() : void {
-		if( self::ALLOWED_DOMAIN != 'all' ){
-			if( is_file( __DIR__ . '/../data/ip_ok.txt' ) && filemtime( __DIR__ . '/../data/ip_ok.txt' ) + self::CACHE_EXPIRE > time() ){
-				$ip_ok = file_get_contents( __DIR__ . '/../data/ip_ok.txt' );
-			}
-			else {
-				$ip_ok = gethostbyname( self::ALLOWED_DOMAIN );
-				if( filter_var( $ip_ok, FILTER_VALIDATE_IP ) !== false ){
-					file_put_contents( __DIR__ . '/../data/ip_ok.txt', $ip_ok );
+	public static function checkAccess( ?string $mac = null ) : void {
+		if( is_null( self::$redisAccessDomains ) ){ // load redis, if not loaded
+			self::setRedisServer();
+			self::$redisAccessDomains = new RedisCache( 'allowed_domains' );
+		}
+		if( self::$redisAccessDomains->get('type' ) == 'all' ){ // allow all
+			return;
+		}
+		else if( self::$redisAccessDomains->get('type' ) == 'list' ){ // check list
+			$ip = $_SERVER["REMOTE_ADDR"]; // get client ip
+
+			// iterate over all allowed domains, and check all ips (which are not timed out)
+			$checklater = array();
+			foreach( self::$redisAccessDomains->arrayGet('domains') as $domain ){
+				if( self::$redisAccessDomains->keyExists( 'ip_for_domain.' . $domain ) ){
+					if( self::$redisAccessDomains->get( 'ip_for_domain.' . $domain ) == $ip ){
+						if( !is_null( $mac ) ){ // save this domain for this user
+							self::$redisAccessDomains->set( 'domain_for_user.' . $mac, $domain );
+						}
+						return; // access granted
+					}
 				}
-				else{
-					$ip_ok = '';
+				$checklater[] = $domain;
+			}
+
+			// the last domain for this user should be check first
+			if( !is_null( $mac ) && count( $checklater ) > 1 && self::$redisAccessDomains->keyExists( 'domain_for_user.' . $mac ) ){
+				if( $pos = array_search( self::$redisAccessDomains->get( 'domain_for_user.' . $mac ), $checklater ) !== false ){
+					$tmp = $checklater[$pos]; // swap positions, so last domain ist first
+					$checklater[$pos] = $checklater[0];
+					$checklater[0] = $tmp;
 				}
 			}
-			if( empty($ip_ok) || $_SERVER["REMOTE_ADDR"] != $ip_ok ){
-				die('Not Allowed!');
+
+			foreach( $checklater as $domain ){
+				$thisip = gethostbyname( $domain );
+				self::$redisAccessDomains->set( 'ip_for_domain.' . $domain, $thisip, self::CACHE_EXPIRE );
+				if( $thisip == $ip ){ // ip ok?
+				    return;
+				}
 			}
+			die('Not Allowed!');
+		}
+		else{
+			die('Invalid Access Domains!');
 		}
 	}
 
@@ -80,9 +108,11 @@ class Config{
 	 */
 	public static function getMyStreamsList() : array {
 		if( self::OWN_STREAM ){
-			if( is_file( __DIR__ . '/../data/streamlist.json' )
-				&& filemtime( __DIR__ . '/../data/streamlist.json' ) + self::CACHE_EXPIRE > time() ){
-				$list = json_decode(file_get_contents( __DIR__ . '/../data/streamlist.json'), true );
+			if( is_null( self::$redisOwnStream ) ){ // load redis, if not loaded
+				self::$redisOwnStream = new RedisCache( 'own_stream' );
+			}
+			if( self::$redisOwnStream->keyExists( 'list' ) ){
+				return self::$redisOwnStream->arrayGet( 'list' );
 			}
 			else if( !empty($_ENV['CONF_OWN_STREAM_JSON']) ){
 				$data = file_get_contents( $_ENV['CONF_OWN_STREAM_JSON'] );
@@ -96,7 +126,7 @@ class Config{
 							} 
 						}
 						if( $ok ){
-							file_put_contents(  __DIR__ . '/../data/streamlist.json', json_encode( $list, JSON_PRETTY_PRINT ) );
+							self::$redisOwnStream->arraySet( 'list', $list, self::CACHE_EXPIRE );
 						}
 						else{
 							$list = array("NoKey" => array( "name" => "JSON invalid array form" ));
@@ -130,6 +160,22 @@ class Config{
 		}
 		else{
 			return "";
+		}
+	}
+
+	/**
+	 * Sets the redis server copnnection details using the env vars. 
+	 * Should be always called before creating a RedisCache.
+	 */
+	public static function setRedisServer() : void {
+		if( isset( $_ENV['CONF_REDIS_HOST'], $_ENV['CONF_REDIS_PORT'], $_ENV['CONF_REDIS_PASS'] ) ){
+			RedisCache::setRedisServer($_ENV['CONF_REDIS_HOST'], $_ENV['CONF_REDIS_PORT'], $_ENV['CONF_REDIS_PASS']);
+		}
+		else if( isset( $_ENV['CONF_REDIS_HOST'], $_ENV['CONF_REDIS_PORT'] ) ){
+			RedisCache::setRedisServer($_ENV['CONF_REDIS_HOST'], $_ENV['CONF_REDIS_PORT']);
+		}
+		else if( isset( $_ENV['CONF_REDIS_HOST'] ) ){
+			RedisCache::setRedisServer($_ENV['CONF_REDIS_HOST']);
 		}
 	}
 }

@@ -14,12 +14,21 @@ services:
     volumes:
       - ./php/:/php-code/
       - ./data/:/php-code/data/
+      - ./getr.php:/php-code/getr.php:ro # redis all values listing
     environment:
       - DEV=dev
       - CONF_DOMAIN=http://localhost:8080/
-      - CONF_ALLOWED_DOMAIN=all
+      - CONF_ALLOWED_DOMAIN=home1.example.com,home2.example.com,localhost
       - CONF_CACHE_EXPIRE=1200
+      - CONF_REDIS_HOST=redis
       - CONF_OWN_STREAM=false
-      - CONF_OWN_STREAM_JSON=http://172.19.0.1:8081/list.json
-      - CONF_OWN_STREAM_URL=http://172.19.0.1:8081/?key=
+      - CONF_OWN_STREAM_JSON=http://172.21.0.1:8081/list.json
+      - CONF_OWN_STREAM_URL=http://172.21.0.1:8081/?k=
       - CONF_PROXY_OWN_STREAM=false
+    depends_on:
+      - redis
+  redis:
+    image: redis:alpine
+    container_name: radio_api_redis
+    volumes:
+      - ./redis/:/data

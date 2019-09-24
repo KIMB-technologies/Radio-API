@@ -1,4 +1,5 @@
 /php/data/log.txt
-/php/data/cache/*.json
 /data/
+/redis/
+/php/getr.php
 .DS_Store

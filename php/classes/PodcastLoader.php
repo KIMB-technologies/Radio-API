@@ -3,8 +3,23 @@ defined('HAMA-Radio') or die('Invalid Endpoint');
 
 class PodcastLoader {
 
-	private static $memstore = array();
+	/**
+	 * Redis Cache of Podcasts
+	 */
+	private static $redis = null;
 
+	/**
+	 * Redis Setup
+	 */
+	private static function loadRedis(){
+		if( is_null(self::$redis) ){
+			self::$redis = new RedisCache('podcast_loader');
+		}
+	}
+
+	/**
+	 * Nextcloud share loader
+	 */
 	private static function loadFromNextcloud( string $url ) : array {
 		$server = substr( $url, 0, strrpos( $url , '/s/' )+1 );
 		$share = substr( $url, strlen($server)+2 );
@@ -43,6 +58,9 @@ class PodcastLoader {
 		return $poddata;
 	}
 
+	/**
+	 * RSS/ Atom loader
+	 */
 	private static function loadFromFeed( string $url ) : array{
 		$rss = file_get_contents( $url );
 		$data = json_decode(json_encode( simplexml_load_string( $rss, 'SimpleXMLElement', LIBXML_NOCDATA ) ), true );
@@ -89,22 +107,23 @@ class PodcastLoader {
 		return $poddata;
 	}
 
+	/**
+	 * Podcast from url loader, using the cache
+	 */
 	public static function getPodcastByUrl( string $url, bool $nextcloud ) : array {
-		$cachefile = __DIR__ . '/../data/cache/' . sha1( $url ) . '.json';
-		if( isset( self::$memstore[sha1($url)] ) ){
-			return self::$memstore[sha1($url)];
-		}
-		else if( is_file( $cachefile ) && filemtime($cachefile) >= time() - Config::CACHE_EXPIRE ){
-			return json_decode( file_get_contents( $cachefile ), true);	
+		self::loadRedis();
+		if( self::$redis->keyExists( 'url.' . sha1($url) ) ){
+			return self::$redis->arrayGet( 'url.' . sha1($url) );
 		}
 
 		$poddata = $nextcloud ? self::loadFromNextcloud( $url ) : self::loadFromFeed( $url );
-
-		self::$memstore[sha1($url)] = $poddata;
-		file_put_contents( $cachefile, json_encode( $poddata ) );
+		self::$redis->arraySet( 'url.' . sha1($url), $poddata, Config::CACHE_EXPIRE );
 		return $poddata;
 	}
 
+	/**
+	 * Get informations about one episode
+	 */
 	public static function getEpisodeData( int $id, int $eid, Data $data ) : array{
 		$pod = $data->getById( $id );
 		if( $pod['cid'] !== 3 ){
@@ -128,6 +147,9 @@ class PodcastLoader {
 		}
 	}
 
+	/**
+	 * Get the Podcast by its ID
+	 */
 	public static function getPodcastDataById( int $id, Data $data ) : array {
 		$pod = $data->getById( $id );
 		if( $pod['cid'] !== 3 ){

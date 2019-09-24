@@ -32,7 +32,7 @@ The entire API is bundled in a Docker Image.
     - It is recommended to save the folder `/php-code/data/` als volume, because all stations and podcasts are stored there
     - Configure the Image
         - `CONF_DOMAIN` The domain where the system is hosted, add `/` at the end!
-        - `CONF_ALLOWED_DOMAIN` Like `ALLOWED_DOMAIN` in the DNS Image, only requests from the corresponding IP address will be answered. Use DynDNS.
+        - `CONF_ALLOWED_DOMAIN` Like `ALLOWED_DOMAIN` in the DNS Image, only requests from the corresponding IP address will be answered. Use DynDNS. You may give a list of multiple allowed hostnames, divided by `,`.
         - `CONF_CACHE_EXPIRE` Time in seconds for cache of ips, podcasts to expire
         - `CONF_OWN_STREAM` Fetch a list of own streams `true/ false`.
         - `CONF_OWN_STREAM_JSON` URL where the list of own stream can be fetched. JSON like `{ "key" : { name : "Test 1" }, ... }`
