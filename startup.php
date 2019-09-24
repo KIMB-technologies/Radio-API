@@ -16,7 +16,7 @@ $allowedDomains = !empty($_ENV['CONF_ALLOWED_DOMAIN']) ? $_ENV['CONF_ALLOWED_DOM
 if( $allowedDomains == 'all' ){
 	$redis->set( 'type', 'all' );	
 }
-else if( !is_null( allowedDomains ) ){
+else if( !is_null( $allowedDomains ) ){
 	$redis->set( 'type', 'list' );
 	$allowed = array_map( function ($domain){
 		return trim($domain);
