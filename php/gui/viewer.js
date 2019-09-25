@@ -79,7 +79,7 @@ function addOpenTypeListener(elem){
 
 function playFile( url ) {
 	var html ='<audio controls="controls" autoplay="autoplay">'
-		+ '<source src="'+ url +'" type="audio/wav">'
+		+ '<source src="'+ url +'" type="audio/mp3">'
 		+ '</audio>';
 	$("div#audiodiv").html(html);
 }

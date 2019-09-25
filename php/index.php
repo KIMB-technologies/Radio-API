@@ -28,6 +28,11 @@ try{
 	$radioid = new Id($_GET['mac']);
 }
 catch(Exception $e){
+	if(!isset($_GET['yesStay'])){ // redirect user to gui
+		header('Location:'. Config::DOMAIN .'gui/?redirFromIndex');
+		http_response_code(303);
+		die();
+	}
 	Output::sendAnswer('<Error>No MAC!</Error>');
 	die(); //will never be reached
 }

@@ -1,0 +1,21 @@
+%%ADD_HTML%%
+
+<form action="%%SERVERURL%%gui/?login" method="post">
+	<table>
+		<tr>
+			<td>Code</td>
+			<td><input type="text" value="Z" name="code" pattern="^Z[0-9A-Za-z]{4}$"></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><input type="submit" value="Login"></td>
+		</tr>
+	</table>
+</form>
+
+<div class="note">
+	The code used for the login will be shown in the radio (Internet radio &rarr; Stations list)
+	The Login will become possible, after the radio has shown the code on its display for the first time.
+	The list of radio stations and podcasts is different for each radio. The list of streams 
+	is defined per installation.
+</div>

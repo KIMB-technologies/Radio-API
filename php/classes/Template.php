@@ -23,9 +23,10 @@ class Template{
 	private $multiples_data = array();
 	private $inner = null;
 
-	private static $lang = 'de';
+	private static $lang = 'en';
 	private static $allLangs = array(
-		'de'
+		'de',
+		'en'
 	);
 
 	/**

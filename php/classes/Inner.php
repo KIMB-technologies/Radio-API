@@ -14,7 +14,7 @@ class Inner {
 
 	public function checkPost() : void {
 		if(isset( $_GET['radios'] ) && isset( $_POST['name'] )){
-			$this->html[] = '<span style="color:green;">Radiosender geändert!</span>';
+			$this->html[] = '<span style="color:green;">Changed Radio stations!</span>';
 		
 			$this->radios = array();
 			foreach( $_POST['name'] as $id => $name ){
@@ -31,7 +31,7 @@ class Inner {
 			$this->data->setRadioList($this->radios);
 		}
 		else if(isset( $_GET['podcasts'] ) && isset( $_POST['name'] ) ){
-			$this->html[] = '<span style="color:green;">Podcasts geändert!</span>';
+			$this->html[] = '<span style="color:green;">Changed podcasts!</span>';
 		
 			$this->podcasts = array();
 			foreach( $_POST['name'] as $id => $name ){
@@ -64,9 +64,9 @@ class Inner {
 				'<input type="radio" value="no" name="proxy['.$count.']" '. ( !$radio['proxy'] ? 'checked="checked"' : '' ) .' /> &cross;',
 			);
 			$rows[] = array(  '', 'Logo', '<input delid="d'.$id.'" type="text" value="'.$radio['logo'].'" name="logo['.$count.']"/>' );
-			$rows[] = array(  '', 'Beschreibung',
+			$rows[] = array(  '', 'Description',
 				'<input delid="d'.$id.'" type="text" value="'.$radio['desc'].'" name="desc['.$count.']"/>' .
-				'<button class="del" delid="d'.$id.'" type="button" title="Löschen.">&cross;</button>'
+				'<button class="del" delid="d'.$id.'" type="button" title="Delete">&cross;</button>'
 			);
 			$count++;
 		}
@@ -74,7 +74,7 @@ class Inner {
 		$rows[] = array(  '', 'Name', '<input type="text" placeholder="Name" name="name['.$count.']"/>' );
 		$rows[] = array(  '', 'URL', '<input type="text" placeholder="URL (MP3, ...)" name="url['.$count.']"/>' );
 		$rows[] = array(  '', 'Logo', '<input type="text" placeholder="Logo (PNG, ...)" name="logo['.$count.']"/>' );
-		$rows[] = array(  '', 'Beschreibung', '<input type="text" placeholder="Beschreibung" name="desc['.$count.']"/>' );
+		$rows[] = array(  '', 'Description', '<input type="text" placeholder="Description" name="desc['.$count.']"/>' );
 		$rows[] = array('', '', '<input type="hidden" value="no" name="proxy['.$count.']" />');
 		return $head . PHP_EOL . implode( PHP_EOL , array_map( function ($c) {
 			return '<tr><td>' . implode( '</td><td>', $c ) . '</td></tr>';
@@ -90,7 +90,7 @@ class Inner {
 
 			$rows[] = array(  '<b>'. $id .'</b>', '', '' );
 			$rows[] = array(  '', 'Name', '<input type="text" delid="d'.$id.'" value="'.$pod['name'].'" name="name['.$count.']"/>' );
-			$rows[] = array(  '', 'Typ',
+			$rows[] = array(  '', 'Type',
 				'<input type="radio" value="rss" value="'.$pod['type'].'" name="type['.$count.']" '.( $pod['type'] == 'rss' ? 'checked="checked"' : '' ).' /> RSS/ Atom' .
 				'<input type="radio" value="nc" value="'.$pod['type'].'" name="type['.$count.']" '.( $pod['type'] == 'nc' ? 'checked="checked"' : '' ).' /> Nextcloud'
 			);
@@ -102,13 +102,13 @@ class Inner {
 			$rows[] = array(  '', 'Proxy',
 				'<input type="radio" value="yes" name="proxy['.$count.']" '. ( $pod['proxy'] ? 'checked="checked"' : '' ) .' /> &check;' .
 				'<input type="radio" value="no" name="proxy['.$count.']" '. ( !$pod['proxy'] ? 'checked="checked"' : '' ) .' /> &cross;',
-				'<button class="del" delid="d'.$id.'" type="button" title="Löschen.">&cross;</button>'
+				'<button class="del" delid="d'.$id.'" type="button" title="Delete">&cross;</button>'
 			);
 			$count++;
 		}
-		$rows[] = array('<b>Neu</b>', '', '');
-		$rows[] = array('', 'Name', '<input type="text" placeholder="Name" name="name['.$count.']"/>');
-		$rows[] = array(  '', 'Typ',
+		$rows[] = array( '<b>New</b>', '', '');
+		$rows[] = array( '', 'Name', '<input type="text" placeholder="Name" name="name['.$count.']"/>');
+		$rows[] = array(  '', 'Type',
 				'<input type="radio" value="rss" name="type['.$count.']" checked="checked"  /> RSS/ Atom' .
 				'<input type="radio" value="nc" name="type['.$count.']" /> Nextcloud'
 		);

@@ -18,7 +18,7 @@ services:
     environment:
       - DEV=dev
       - CONF_DOMAIN=http://localhost:8080/
-      - CONF_ALLOWED_DOMAIN=home1.example.com,home2.example.com,localhost
+      - CONF_ALLOWED_DOMAIN=all
       - CONF_CACHE_EXPIRE=1200
       - CONF_REDIS_HOST=redis
       - CONF_OWN_STREAM=false
