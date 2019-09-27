@@ -83,8 +83,9 @@ class Data {
 		$this->addCategoryToTable( 3, $this->podcasts );
 
 		// save in redis
-		$this->redis->arraySet( 'categories', $this->table['categories'] );
-		$this->redis->arraySet( 'items', $this->table['items'] );
+		//	if using own stream, we need to give a ttl, else the system won't reload the list of own streams
+		$this->redis->arraySet( 'categories', $this->table['categories'], Config::OWN_STREAM ? Config::CACHE_EXPIRE : 0 );
+		$this->redis->arraySet( 'items', $this->table['items'], Config::OWN_STREAM ? Config::CACHE_EXPIRE : 0 );
 	}
 
 	/**
