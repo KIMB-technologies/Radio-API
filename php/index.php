@@ -52,7 +52,7 @@ if( isset( $_GET['sSearchtype'] ) && $_GET['sSearchtype'] == 3 ){ // only one st
 			$out->addStation(
 				$id,
 				$sta['name'],
-				!empty($sta['proxy']) ? Config::DOMAIN . 'stream.php?id=' . $id . '&mac=' . $radioid->getMac() : $sta['url'],
+				$data->getStationURL($id, $radioid->getMac()),
 				false,
 				isset($sta['desc']) ? $sta['desc'] : '',
 				isset($sta['logo']) ? $sta['logo'] : ''
@@ -125,7 +125,7 @@ else if( $uri == '/cat' && !empty( $_GET['cid'] )  ){ // list of stations by cat
 					$out->addStation(
 						$id,
 						$item['name'],
-						!empty($item['proxy']) ? Config::DOMAIN . 'stream.php?id=' . $id . '&mac=' . $radioid->getMac() : $item['url'],
+						$data->getStationURL($id, $radioid->getMac()),
 						true
 					);
 				}

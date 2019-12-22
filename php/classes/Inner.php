@@ -25,6 +25,7 @@ class Inner {
 						'logo' => self::filterURL( $_POST['logo'][$id] ),
 						'desc' => self::filterName( $_POST['desc'][$id] ),
 						'proxy' => isset($_POST['proxy'][$id]) && $_POST['proxy'][$id] == 'yes',
+						'type' => !empty($_POST['type'][$id]) && $_POST['type'][$id] == 'nc' ? 'nc' : 'radio',
 					);
 				}
 			}
@@ -63,6 +64,10 @@ class Inner {
 				'<input type="radio" value="yes" name="proxy['.$count.']" '. ( $radio['proxy'] ? 'checked="checked"' : '' ) .' /> &check;' .
 				'<input type="radio" value="no" name="proxy['.$count.']" '. ( !$radio['proxy'] ? 'checked="checked"' : '' ) .' /> &cross;',
 			);
+			$rows[] = array(  '', 'Type',
+				'<input type="radio" value="radio" name="type['.$count.']" '. ( $radio['type'] != 'nc' ? 'checked="checked"' : '' ) .' /> Radio' .
+				'<input type="radio" value="nc" name="type['.$count.']" '. ( $radio['type'] == 'nc' ? 'checked="checked"' : '' ) .' /> Nextcloud',
+			);
 			$rows[] = array(  '', 'Logo', '<input delid="d'.$id.'" type="text" value="'.$radio['logo'].'" name="logo['.$count.']"/>' );
 			$rows[] = array(  '', 'Description',
 				'<input delid="d'.$id.'" type="text" value="'.$radio['desc'].'" name="desc['.$count.']"/>' .
@@ -75,6 +80,10 @@ class Inner {
 		$rows[] = array(  '', 'URL', '<input type="text" placeholder="URL (MP3, ...)" name="url['.$count.']"/>' );
 		$rows[] = array(  '', 'Logo', '<input type="text" placeholder="Logo (PNG, ...)" name="logo['.$count.']"/>' );
 		$rows[] = array(  '', 'Description', '<input type="text" placeholder="Description" name="desc['.$count.']"/>' );
+		$rows[] = array(  '', 'Type',
+				'<input type="radio" value="radio" name="type['.$count.']"  checked="checked" /> Radio' .
+				'<input type="radio" value="nc" name="type['.$count.']" /> Nextcloud'
+		);
 		$rows[] = array('', '', '<input type="hidden" value="no" name="proxy['.$count.']" />');
 		return $head . PHP_EOL . implode( PHP_EOL , array_map( function ($c) {
 			return '<tr><td>' . implode( '</td><td>', $c ) . '</td></tr>';

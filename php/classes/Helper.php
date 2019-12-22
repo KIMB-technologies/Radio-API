@@ -39,7 +39,7 @@ class Helper {
 		$r = '';
 		$charAnz = strlen( $chars );
 		for($i = 0; $i < $len; $i++){
-			$r .= $chars{random_int(0, $charAnz-1)};
+			$r .= $chars[random_int(0, $charAnz-1)];
 		}
 		return $r;
 	}

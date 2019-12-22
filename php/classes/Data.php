@@ -130,6 +130,27 @@ class Data {
 	}
 
 	/**
+	 * Generate Link for station
+	 * @param $id radio station id
+	 * @param $mac users radio mac
+	 */
+	public function getStationURL( int $id, string $mac ) : string {
+		$station = $this->getById($id);
+		if(empty($station)){
+			return "";
+		}
+		if(!empty($station['type']) && $station['type'] == 'nc' ){
+			return Config::DOMAIN . 'm3u.php?id=' . $id . '&mac=' . $mac;
+		}
+		else if(!empty($station['proxy'])){
+			return Config::DOMAIN . 'stream.php?id=' . $id . '&mac=' . $mac;
+		}
+		else{
+			return $station['url'];
+		}
+	}
+
+	/**
 	 * Backend Raw Access
 	 */
 	public function getRadioList() : array {

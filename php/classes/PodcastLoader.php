@@ -45,11 +45,12 @@ class PodcastLoader {
 			if( strpos( $d, 'audio' ) !== false ){
 				$fina = substr( $d, 0, strpos( $d, '</d:href>') );
 				$fina = substr( $fina, strrpos( $fina, '/' ) + 1 );
+				$fina = urldecode( $fina );
 
 				$poddata['episodes'][$eid] = array(
 					'title' => $fina,
 					'desc'  => '',
-					'url' => $server . 's/'. $share .'/download?path=%2F&files=' . urlencode( $fina )
+					'url' => $server . 's/'. $share .'/download?path=%2F&files=' . rawurlencode( $fina ) 
 				);
 				$eid++;
 			}
