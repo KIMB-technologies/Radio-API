@@ -8,6 +8,7 @@ define( 'ENV_DOMAIN', $_ENV['CONF_DOMAIN'] . (substr( $_ENV['CONF_DOMAIN'], -1) 
 define( 'ENV_CACHE_EXPIRE', intval($_ENV['CONF_CACHE_EXPIRE']));
 define( 'ENV_OWN_STREAM', $_ENV['CONF_OWN_STREAM'] == 'true');
 define( 'ENV_PROXY_OWN_STREAM', $_ENV['CONF_PROXY_OWN_STREAM'] == 'true');
+define( 'ENV_SHUFFLE_MUSIC', $_ENV['CONF_SHUFFLE_MUSIC'] == 'true');
 
 // IP on reverse proxy setup
 if( !empty($_SERVER['HTTP_X_REAL_IP']) ){
@@ -39,6 +40,11 @@ class Config {
 	 * Own Stream Proxy
 	 */
 	const PROXY_OWN_STREAM = ENV_PROXY_OWN_STREAM;
+
+	/**
+	 * Random shuffle music station streams from nc
+	 */
+	CONST SHUFFLE_MUSIC = ENV_SHUFFLE_MUSIC;
 
 	/**
 	 * Store redis cache for ALLOWED_DOMAINS, OWN_STREAM

@@ -33,12 +33,35 @@ if( !empty( $_GET['id'] ) ){
 	if( is_numeric( $id ) && preg_replace('/[^0-9]/','', $id ) === $id ){
 		// get stattion
 		$stat = $data->getById($id);
-		if( !empty($stat)){ // is a station
+		if( !empty($stat) ){ // is a station
 			header('Content-Type: audio/x-mpegurl; charset=utf-8');
 
-			$musik = PodcastLoader::getPodcastByUrl( $stat['url'], true )['episodes'];
-			foreach( $musik as $m ){
-				echo $m['url'] . PHP_EOL;
+			if( $stat['type'] == 'nc' ){ // nextcloud stattion?
+				$redis = new RedisCache('m3u');
+				if( !$redis->keyExists( $id ) ){
+					$musik = PodcastLoader::getPodcastByUrl( $stat['url'], true )['episodes'];
+					$urllist = array();
+					foreach( $musik as $m ){
+						$urllist[] = $m['url'];
+					}
+					if( Config::SHUFFLE_MUSIC ){
+						shuffle( $urllist );
+					}
+					$redis->arraySet( $id, $urllist, 3600 * 2 );
+				}
+				$urllist = $redis->arrayGet( $id );
+
+				if( $stat['proxy'] ){ // proxy links
+					foreach( $urllist as $k => $m ){
+						echo Config::DOMAIN . 'stream.php?id=' . $id . '&track=' . $k . '&mac=' . $radioid->getMac() . PHP_EOL;
+					}
+				}
+				else{ // echo links (no proxy)
+					echo implode( PHP_EOL, $urllist ) . PHP_EOL;
+				}
+			}
+			else{ // normal station? (just echo streaming-link)
+				echo $stat['url'] . PHP_EOL;
 			}
 			die();
 		}

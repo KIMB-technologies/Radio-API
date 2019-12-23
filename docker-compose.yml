@@ -21,6 +21,7 @@ services:
       - CONF_OWN_STREAM_JSON=http://stream.example.com/list.json # link where to fetch own streams, json like: { "key" : { name : "Test 1" }, "key2" : ... }
       - CONF_OWN_STREAM_URL=http://stream.example.com/?key= # url prefix to open own streamS, key are appended
       - CONF_PROXY_OWN_STREAM=false # use the proxy for the own streams (all own streams are proxied by the docker image)
+      - CONF_SHUFFLE_MUSIC=true # random shuffle music in nextcloud radio stations
     depends_on:
       - redis
   redis:

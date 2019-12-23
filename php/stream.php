@@ -31,14 +31,19 @@ if( !empty( $_GET['id'] ) ){
 
 	// id ok?
 	if( is_numeric( $id ) && preg_replace('/[^0-9]/','', $id ) === $id ){
-		if( !isset($_GET['eid']) ){ // station
+		if( !isset($_GET['eid']) && !isset( $_GET['track'] ) ){ // station
 			// get url
 			$station = $data->getById( $id ); 
 			$url = !empty($station) ? $station['url'] : '';
 		}
-		else if(is_numeric( $_GET['eid'] ) && preg_replace('/[^0-9]/','', $_GET['eid'] ) === $_GET['eid'] ){ // podcast episode
+		else if(isset( $_GET['eid'] ) && is_numeric( $_GET['eid'] ) && preg_replace('/[^0-9]/','', $_GET['eid'] ) === $_GET['eid'] ){ // podcast episode
 			$ed = PodcastLoader::getEpisodeData( $id, $_GET['eid'], $data );
 			$url = !empty($ed) ? $ed['episode']['url'] : '';
+		}
+		else if(is_numeric( $_GET['track'] ) && preg_replace('/[^0-9]/','', $_GET['track'] ) === $_GET['track'] ){
+			$track = $_GET['track'];
+			$redis = new RedisCache('m3u');
+			$url = $redis->arrayKeyGet($id, $track);
 		}
 		else{
 			$url = '';
