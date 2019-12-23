@@ -158,5 +158,27 @@ class PodcastLoader {
 		}
 		return self::getPodcastByUrl( $pod['url'], !empty($pod['type']) && $pod['type'] == 'nc' );
 	}
+
+	/**
+	 * Get nextcloud url list from nextcloud radio station ID
+	 */
+	public static function getMusicById( int $id, Data $data ) : array {
+		$stat = $data->getById($id);
+		if( !empty($stat) && $stat['type'] == 'nc' ){ // is a nextcloud station
+			self::loadRedis();
+			if( !self::$redis->keyExists( 'm3u.' .  $id ) ){
+				$musik = self::getPodcastByUrl( $stat['url'], true )['episodes'];
+				$urllist = array();
+				foreach( $musik as $m ){
+					$urllist[] = $m['url'];
+				}
+				self::$redis->arraySet( 'm3u.' . $id, $urllist, Config::CACHE_EXPIRE );
+			}
+			return self::$redis->arrayGet( 'm3u.' . $id );
+		}
+		else{
+			return array();
+		}
+	}
 }		
 ?>

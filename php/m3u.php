@@ -37,19 +37,7 @@ if( !empty( $_GET['id'] ) ){
 			header('Content-Type: audio/x-mpegurl; charset=utf-8');
 
 			if( $stat['type'] == 'nc' ){ // nextcloud stattion?
-				$redis = new RedisCache('m3u');
-				if( !$redis->keyExists( $id ) ){
-					$musik = PodcastLoader::getPodcastByUrl( $stat['url'], true )['episodes'];
-					$urllist = array();
-					foreach( $musik as $m ){
-						$urllist[] = $m['url'];
-					}
-					if( Config::SHUFFLE_MUSIC ){
-						shuffle( $urllist );
-					}
-					$redis->arraySet( $id, $urllist, 3600 * 2 );
-				}
-				$urllist = $redis->arrayGet( $id );
+				$urllist = PodcastLoader::getMusicById( $id, $data );
 
 				if( $stat['proxy'] ){ // proxy links
 					foreach( $urllist as $k => $m ){
