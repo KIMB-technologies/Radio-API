@@ -78,6 +78,7 @@ class UnRead {
 
 			return file_put_contents(__DIR__ . '/../data/unread.json', json_encode( $reads, JSON_PRETTY_PRINT)) !== false;
 		}
+		return true;
 	}
 
 	public static function loadFromDisk() : array {
@@ -93,6 +94,7 @@ class UnRead {
 			}
 			return $reads;
 		}
+		return array();
 	}
 }
 ?>
