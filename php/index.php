@@ -38,6 +38,7 @@ catch(Exception $e){
 }
 $out = new Output();
 $data = new Data($radioid->getId());
+$unread = new UnRead($radioid->getId());
 
 /**
  * Page Handling
@@ -68,6 +69,7 @@ else if( isset( $_GET['sSearchtype'] ) && $_GET['sSearchtype'] == 5 ){ // only o
 	if( preg_match('/^(\d+)X(\d+)$/', $id, $parts ) === 1 ){
 		$ed = PodcastLoader::getEpisodeData( $parts[1], $parts[2], $data );
 		if( $ed != array() ){
+			$unread->openItem($parts[1], $ed['episode']['url']);
 			if($ed['proxy']){
 				$url = Config::DOMAIN . 'stream.php?id=' . $parts[1] . '&eid=' . $parts[2] . '&mac=' . $radioid->getMac();
 			}
@@ -99,12 +101,13 @@ else if( $uri == '/cat' && !empty( $_GET['cid'] )  ){ // list of stations by cat
 			$id = $_GET['id'];
 			$pd = PodcastLoader::getPodcastDataById( $id, $data );
 			$proxy = !empty($data->getById( $id )['proxy']);
+			$unread->searchItem($id);
 			foreach( $pd['episodes'] as $eid => $e ){
 				$out->addEpisode(
 					$id,
 					$eid,
 					$pd['title'],
-					$e['title'],
+					$unread->knownItem($id, $e['url']) . $e['title'],
 					$proxy ? Config::DOMAIN . 'stream.php?id=' . $id . '&eid=' . $eid . '&mac=' . $radioid->getMac() : $e['url'],
 					$e['desc'],
 					$pd['logo']

@@ -28,4 +28,15 @@ else{
 }
 
 $redis->output();
+
+/**
+ * load un/read episodes into Redis Cache
+ */
+echo "Load (Un-)Read: " . PHP_EOL;
+foreach(UnRead::loadFromDisk() as $id => $d ){
+	echo "\t" . $id . PHP_EOL;
+	foreach( $d as $r ){
+		echo "\t\t" . $r . PHP_EOL;
+	}
+}
 ?>

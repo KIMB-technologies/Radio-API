@@ -60,7 +60,7 @@ class RedisCache {
 	 * Get an array of all the keys of this group.
 	 * @return The array of keys
 	 */
-	private function getAllKeysOfGroup() : array {
+	public function getAllKeysOfGroup() : array {
 		$all = array();
 		$lenpref = strlen($this->prefix);
 		$iterator = NULL;
