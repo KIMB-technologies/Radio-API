@@ -16,6 +16,8 @@ class Output {
 		$items = array(),
 		$prevurl = '';
 
+	const MAX_ITEMS = 200; // to many items will cause the radio to crash (one could add paging, but until then, we remove too much items)
+
 	/**
 	 * Create Outputter
 	 */
@@ -111,6 +113,9 @@ class Output {
 	 * and sends it!
 	 */
 	public function __destruct(){
+		if( count( $this->items ) > self::MAX_ITEMS ){
+			$this->items = array_slice($this->items, 0, self::MAX_ITEMS);
+		}
 		//output
 		$lines = array(
 			'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
