@@ -18,15 +18,17 @@ class UnRead {
 	 * Tell the system, that a user visits the episode list of this podcast
 	 * @param id the podcast id
 	 */
-	public function searchItem(int $id) : void {
+	public function searchItem(int $id, string $noturl = '') : void {
 		if( $this->redis->keyExists( $id . '-started' ) ){
 			$url = $this->redis->get(  $id . '-started' );
-			$this->redis->remove( $id . '-' . $url );
-			$this->redis->remove( $id . '-started' );
-			if( $this->redis->keyExists( 'started' ) ){
-				$this->redis->remove( 'started' );	
+			if( empty($noturl) || $url !== $noturl ){
+				$this->redis->remove( $id . '-' . $url );
+				$this->redis->remove( $id . '-started' );
+				if( $this->redis->keyExists( 'started' ) ){
+					$this->redis->remove( 'started' );	
+				}
+				$this->dontRemove = true;
 			}
-			$this->dontRemove = true;
 		}
 	}
 
@@ -45,6 +47,7 @@ class UnRead {
 	 * @param eid the episode id
 	 */
 	public function openItem(int $id, string $url){
+		$this->searchItem($id, $url);
 		if( !$this->redis->keyExists( $id . '-' . $url ) ){
 			$this->redis->set( $id . '-' . $url, 'S' ); // Started
 			$this->redis->set( $id . '-started' , $url, 120 );
