@@ -55,6 +55,9 @@ class Router {
 				}
 			}
 		}
+		else if( !empty($_GET['toggleUnRead']) && is_string($_GET['toggleUnRead']) ){
+			$this->out->addDir('TOGGLE-UN-READ-' . $this->unread->toggleById($_GET['toggleUnRead'], $this->data), '');
+		}
 		else{ // list of categories (startpage)
 			foreach( $this->data->getCategories() as $cid => $name ){
 				$this->out->addDir( $name, Config::DOMAIN . 'cat?cid=' . $cid );

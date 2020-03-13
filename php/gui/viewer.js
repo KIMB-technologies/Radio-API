@@ -2,8 +2,15 @@ $(function (){
 	loadPage( serverurl + '?', 'div#apiviewer' );
 });
 
+var reloadPageValues = {};
+function reloadPage(){
+	loadPage(reloadPageValues.url, reloadPageValues.elem, reloadPageValues.play);
+}
+
 function loadPage( url, elem, play ){
 	play = play || false;
+	reloadPageValues = {url: url, elem:elem, play:play};
+
 	var html = "<ul>";
 	$.get( url + '&mac=' + radiomac , (data) => { 
 		var xml = $( $.parseXML( data.replace(/&/g, '&amp;') ) );
@@ -22,6 +29,7 @@ function loadPage( url, elem, play ){
 function printItem( item, play ){
 	var type = $(item).find('ItemType').text();
 	var playh = '';
+	var markAsKnow = '';
 
 	if( type == "Station" ){
 		if(play){
@@ -53,10 +61,14 @@ function printItem( item, play ){
 		else{
 			var name = $(item).find('ShowEpisodeName').text();
 			var url = $(item).find('ShowEpisodeID').text();
+
+			markAsKnow = ' &ndash; ' + (name.substr(0,1) == '*' ?
+				'<span class="mark-known" title="Als angehört markieren">&check;</span>' :
+				'<span class="mark-known" title="Als ungehört markieren">&cross;</span>');
 		}
 	}
 
-	return playh == '' ? '<a href="'+ url +'" class="openType" opentype="'+ type +'">'+ name +'</a>' : playh;
+	return playh == '' ? '<a href="'+ url +'" class="openType" opentype="'+ type +'">'+ name +'</a>' + markAsKnow : playh;
 }
 
 function addOpenTypeListener(elem){
@@ -74,6 +86,18 @@ function addOpenTypeListener(elem){
 		else if( type == "ShowEpisode" ){
 			loadPage( serverurl + '?sSearchtype=5&Search=' + url, elem, true );
 		}
+	});
+	$("span.mark-known").click( function (){
+		var url = $(this).parent().children('a').attr('href');
+		$(this).html('&orarr;');
+		$.get(serverurl + "?mac=" + radiomac + "&toggleUnRead=" + url, (d) => {
+			if( d.indexOf('<Title>TOGGLE-UN-READ-ok</Title>') !== -1 ){
+				reloadPage();
+			}
+			else {
+				$(this).html('ERROR');
+			}
+		});
 	});
 }
 

@@ -118,5 +118,31 @@ class UnRead {
 		}
 		return array();
 	}
+
+	public function toggleById(string $id, Data $data) : string {
+		$this->dontRemove = true;
+
+		if( preg_match('/^(\d+)X(\d+)$/', $id, $parts ) === 1 ){
+			$ed = PodcastLoader::getEpisodeData( $parts[1], $parts[2], $data );
+			if( $ed != array() ){
+				$rkey = $parts[1] . '-' . $ed['episode']['url'];
+				if( $this->redis->keyExists( $rkey ) ){
+					$this->redis->remove( $rkey );
+				}
+				else{
+					$this->redis->set( $rkey , 'S' );
+				}
+
+				if( $this->redis->keyExists( $parts[1] . '-started' ) ){
+					$this->redis->remove( $parts[1] . '-started' );
+				}
+				if( $this->redis->keyExists( 'started' ) ){
+					$this->redis->remove( 'started' );	
+				}
+				return "ok";
+			}
+		}
+		return "error";
+	}
 }
 ?>
