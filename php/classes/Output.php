@@ -11,6 +11,9 @@
  */
 defined('HAMA-Radio') or die('Invalid Endpoint');
 
+/**
+ * Radio-API XML Style Output Class
+ */
 mb_substitute_character("none");
 class Output {
 

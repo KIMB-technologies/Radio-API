@@ -11,6 +11,9 @@
  */
 defined('HAMA-Radio') or die('Invalid Endpoint');
 
+/**
+ * Loads Podcasts from RSS or Nextcloud links, caches and parses them
+ */
 class PodcastLoader {
 
 	/**

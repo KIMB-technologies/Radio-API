@@ -19,19 +19,9 @@ require_once( __DIR__ . '/classes/autoload.php' );
 Config::checkAccess( !empty($_GET['mac']) && Helper::checkValue( $_GET['mac'], Id::MAC_PREG ) ? $_GET['mac'] : null );
 
 /**
- * Radio ID/ Mac Login
+ * Auth
  */
-try{
-	if( empty($_GET['mac']) ){
-		throw new Exception();
-	}
-	$radioid = new Id($_GET['mac']);
-}
-catch(Exception $e){
-	Output::sendAnswer('<Error>No MAC!</Error>');
-	die(); //will never be reached
-}
-$data = new Data($radioid->getId());
+$radioid = Auth::authFromMac();
 
 /**
  * Answer M3U Request
@@ -39,31 +29,10 @@ $data = new Data($radioid->getId());
 if( !empty( $_GET['id'] ) ){
 	$id = $_GET['id'];
 
-	// id ok?
-	if( is_numeric( $id ) && preg_replace('/[^0-9]/','', $id ) === $id ){
-		// get stattion
-		$stat = $data->getById($id);
-		if( !empty($stat) ){ // is a station
-			header('Content-Type: audio/x-mpegurl; charset=utf-8');
-
-			if( $stat['type'] == 'nc' ){ // nextcloud stattion?
-				$urllist = PodcastLoader::getMusicById( $id, $data );
-
-				if( $stat['proxy'] ){ // proxy links
-					foreach( $urllist as $k => $m ){
-						echo Config::DOMAIN . 'stream.php?id=' . $id . '&track=' . $k . '&mac=' . $radioid->getMac() . PHP_EOL;
-					}
-				}
-				else{ // echo links (no proxy)
-					echo implode( PHP_EOL, $urllist ) . PHP_EOL;
-				}
-			}
-			else{ // normal station? (just echo streaming-link)
-				echo $stat['url'] . PHP_EOL;
-			}
-			die();
-		}
-	}
+	$m3u = new M3U($radioid);
+	$m3u->musicStream($id);
 }
-Output::sendAnswer('<Error>Invalid Parameter</Error>');
+else{
+	Output::sendAnswer('<Error>Invalid Parameter</Error>');
+}
 ?>

@@ -11,6 +11,9 @@
  */
 defined('HAMA-Radio') or die('Invalid Endpoint');
 
+/**
+ * GUI Login Management
+ */
 class Login {
 
 	public function __construct(){

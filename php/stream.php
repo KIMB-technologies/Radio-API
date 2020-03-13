@@ -19,18 +19,10 @@ require_once( __DIR__ . '/classes/autoload.php' );
 Config::checkAccess( !empty($_GET['mac']) && Helper::checkValue( $_GET['mac'], Id::MAC_PREG ) ? $_GET['mac'] : null );
 
 /**
- * Radio ID/ Mac Login
+ * Auth
  */
-try{
-	if( empty($_GET['mac']) ){
-		throw new Exception();
-	}
-	$radioid = new Id($_GET['mac']);
-}
-catch(Exception $e){
-	Output::sendAnswer('<Error>No MAC!</Error>');
-	die(); //will never be reached
-}
+$radioid = Auth::authFromMac();
+
 $data = new Data($radioid->getId());
 
 /**

@@ -11,6 +11,9 @@
  */
 defined('HAMA-Radio') or die('Invalid Endpoint');
 
+/**
+ * Main Data Storage, Data means Podcasts, Episodes and Stations
+ */
 class Data {
 
 	private $id, $redis, $preloaded = false;

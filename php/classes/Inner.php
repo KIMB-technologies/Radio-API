@@ -11,6 +11,9 @@
  */
 defined('HAMA-Radio') or die('Invalid Endpoint');
 
+/**
+ * Inner GUI Code/ Handling of Post and Output of tables
+ */
 class Inner {
 
 	private $html = array();

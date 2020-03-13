@@ -11,6 +11,9 @@
  */
 defined('HAMA-Radio') or die('Invalid Endpoint');
 
+/**
+ * Helpful functions
+ */
 class Helper {
 	
 	/**

@@ -11,6 +11,9 @@
  */
 defined('HAMA-Radio') or die('Invalid Endpoint');
 
+/**
+ * Manages Un/Read Podcast Episodes
+ */
 class UnRead {
 
 	private RedisCache $redis;
@@ -74,6 +77,9 @@ class UnRead {
 		}
 	}
 
+	/**
+	 * Dump all known podcast episodes to disk (called by cron)
+	 */
 	public static function dumpToDisk() : bool {
 		if( is_file( __DIR__ . '/../data/table.json' ) ){
 			$table = json_decode(file_get_contents( __DIR__ . '/../data/table.json' ), true);
@@ -94,6 +100,9 @@ class UnRead {
 		return true;
 	}
 
+	/**
+	 * Load dumped known episodes into Redis (done on container startup)
+	 */
 	public static function loadFromDisk() : array {
 		if( is_file(__DIR__ . '/../data/unread.json') ){
 			$reads = json_decode(file_get_contents(__DIR__ . '/../data/unread.json'), true);

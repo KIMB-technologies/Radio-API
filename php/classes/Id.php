@@ -11,6 +11,12 @@
  */
 defined('HAMA-Radio') or die('Invalid Endpoint');
 
+/**
+ * We use 3 ids per user.
+ * 	- mac (radio auth parameter)
+ * 	- id (internal numeric id for each user)
+ * 	- code (gui login code)
+ */
 class Id {
 
 	// construct types
