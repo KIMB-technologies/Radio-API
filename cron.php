@@ -1,5 +1,15 @@
 #!/usr/local/bin/php
 <?php
+/** 
+ * Radio-API
+ * https://github.com/KIMB-technologies/Radio-API
+ * 
+ * (c) 2019 - 2020 KIMB-technologies 
+ * https://github.com/KIMB-technologies/
+ * 
+ * released under the terms of GNU Public License Version 3
+ * https://www.gnu.org/licenses/gpl-3.0.txt
+ */
 define('HAMA-Radio', 'Radio');
 error_reporting(E_ALL);
 
