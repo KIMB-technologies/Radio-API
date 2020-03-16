@@ -20,3 +20,6 @@ fi;
 
 #	init redis with env vars
 php /startup.php 
+
+#	file permissions
+chown -R www-data:www-data /php-code/data/
