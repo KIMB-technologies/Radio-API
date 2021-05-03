@@ -1,0 +1,35 @@
+<?php
+
+namespace {
+    class Redis {
+
+        // constants
+        public const REDIS_HASH = 1;
+
+        // methods
+        public function pconnect($host, $port) {}
+        public function auth($auth) {}
+        public function ping() 
+        public function scan($iterator) {}
+        public function unlink($dels) {}
+        
+        public function set(string $key, $value) {}
+        public function expire(string $key, $ttl)
+        public function get(string $key) {}
+        
+        public function exists(string $key) {}
+        public function del(string $key) {}
+        public function hMSet(string $key, $d) {}
+        public function expire(string $key, $ttl) {}	
+        public function hGetAll(string $key)
+        public function hExists(string $key, $arrayK) {}
+        public function hGet(string $key, $arrayK) {}
+        public function hLen(string $key) {}
+        public function hSet(string $key, $arrayK, $value) {}
+        public function expire(string $key, int $ttl) {}	
+        public function type(string $key) 
+
+    }
+}
+
+?>

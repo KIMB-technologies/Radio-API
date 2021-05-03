@@ -83,8 +83,8 @@ class Router {
 					$sta['name'],
 					$this->data->getStationURL($id, $this->radioid->getMac()),
 					false,
-					isset($sta['desc']) ? $sta['desc'] : '',
-					isset($sta['logo']) ? $sta['logo'] : ''
+					$sta['desc'] ?? '',
+					$sta['logo'] ?? ''
 				);
 				$this->out->prevUrl(Config::DOMAIN . 'cat?cid=' . $sta['cid'] );
 			}

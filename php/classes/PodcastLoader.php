@@ -80,7 +80,7 @@ class PodcastLoader {
 		$data = json_decode(json_encode( simplexml_load_string( $rss, 'SimpleXMLElement', LIBXML_NOCDATA ) ), true );
 				
 		$poddata = array(
-			'title' => isset($data['channel']['title']) ? $data['channel']['title'] : '',
+			'title' => $data['channel']['title'] ?? '',
 			'logo' => isset( $data['channel']['image'] ) ? $data['channel']['image']['url'] : '',
 			'episodes' => array()
 		);

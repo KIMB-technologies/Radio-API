@@ -93,7 +93,8 @@ class Config {
 
 			// the last domain for this user should be check first
 			if( !is_null( $mac ) && count( $checklater ) > 1 && self::$redisAccessDomains->keyExists( 'domain_for_user.' . $mac ) ){
-				if( $pos = array_search( self::$redisAccessDomains->get( 'domain_for_user.' . $mac ), $checklater ) !== false ){
+				$pos = array_search( self::$redisAccessDomains->get( 'domain_for_user.' . $mac ), $checklater );
+				if( $pos !== false ){
 					$tmp = $checklater[$pos]; // swap positions, so last domain ist first
 					$checklater[$pos] = $checklater[0];
 					$checklater[0] = $tmp;
