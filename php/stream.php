@@ -65,8 +65,8 @@ if( !empty( $_GET['id'] ) ){
 			$url = '';
 		}
 		// station known?
-		if( !empty($url) ){ 
-			$url = filter_var( $url, FILTER_SANITIZE_URL, FILTER_FLAG_HOST_REQUIRED | FILTER_FLAG_SCHEME_REQUIRED); //clean url
+		if( !empty($url) && filter_var( $url, FILTER_VALIDATE_URL) !== false ){ 
+			$url = filter_var($url, FILTER_SANITIZE_URL); //clean url
 
 			// the proxy does not support redirects!, so do them before
 			$url = Helper::getFinalUrl($url);
