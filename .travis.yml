@@ -1,5 +1,12 @@
+dist: focal
+
 services:
   - docker
+
+addons:
+  apt:
+    packages:
+      - docker-ce
 
 jobs:
   include:
