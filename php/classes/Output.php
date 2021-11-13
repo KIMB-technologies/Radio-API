@@ -131,6 +131,7 @@ class Output {
 	 * and sends it!
 	 */
 	public function __destruct(){
+		array_multisort($this->itemsSortKeys, SORT_ASC, SORT_NATURAL|SORT_FLAG_CASE, $this->items);
 		if( count( $this->items ) > self::MAX_ITEMS ){
 			$this->items = array_slice($this->items, 0, self::MAX_ITEMS);
 		}
@@ -140,8 +141,6 @@ class Output {
 			'<ListOfItems>',
 			'  <ItemCount>' . ( count( $this->items ) ) .'</ItemCount>'
 		);
-
-		array_multisort($this->itemsSortKeys, SORT_ASC, SORT_NATURAL|SORT_FLAG_CASE, $this->items);
 
 		// add <- back url
 		if(!empty( $this->prevurl )){
