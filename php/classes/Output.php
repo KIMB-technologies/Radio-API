@@ -27,6 +27,7 @@ class Output {
 
 	private
 		$items = array(),
+		$itemsSortKeys = array(),
 		$prevurl = '';
 
 	const MAX_ITEMS = 200; // to many items will cause the radio to crash (one could add paging, but until then, we remove too much items)
@@ -64,6 +65,7 @@ class Output {
 			$b = array();
 		}
 		$this->items[] = array_merge( $a, $b );
+		$this->itemsSortKeys[] = 'ra==' . $name;
 	}
 
 	/**
@@ -78,6 +80,7 @@ class Output {
 			'ShowOnDemandURLBackUp' => self::cleanUrl( $url ),
 			'BookmarkShow' => ''
 		);
+		$this->itemsSortKeys[] = 'pod==' . $name;
 	}
 
 	/**
@@ -100,18 +103,20 @@ class Output {
 			'Country' => 'KIMB',
 			'ShowMime' => 'MP3'
 		);
+		$this->itemsSortKeys[] = 'ep==' . $podcastid . '==' . $episodeid;
 	}
 
 	/**
 	 * Add a folder
 	 */
-	public function addDir(string $name, string $url) : void {
+	public function addDir(string $name, string $url, bool $isLast = false) : void {
 		$this->items[] = array(
 			'ItemType' => 'Dir',
 			'Title' => self::cleanText($name),
 			'UrlDir' => self::cleanUrl($url),
 			'UrlDirBackUp' => self::cleanUrl($url)
 		);
+		$this->itemsSortKeys[] = ($isLast ? 'z' : '') . 'dir==' . $name;
 	}
 
 	/**
@@ -135,6 +140,8 @@ class Output {
 			'<ListOfItems>',
 			'  <ItemCount>' . ( count( $this->items ) ) .'</ItemCount>'
 		);
+
+		array_multisort($this->itemsSortKeys, SORT_ASC, SORT_NATURAL|SORT_FLAG_CASE, $this->items);
 
 		// add <- back url
 		if(!empty( $this->prevurl )){

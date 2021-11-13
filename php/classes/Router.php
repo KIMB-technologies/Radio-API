@@ -63,7 +63,7 @@ class Router {
 				$this->out->addDir( $name, Config::DOMAIN . 'cat?cid=' . $cid );
 			}
 			// add code (for gui)
-			$this->out->addDir( 'GUI-Code: ' . $this->radioid->getCode(), Config::DOMAIN . '?go=initial' );
+			$this->out->addDir( 'GUI-Code: ' . $this->radioid->getCode(), Config::DOMAIN . '?go=initial', true );
 
 			// Log unknown
 			if( $uri != '/setupapp/hama/asp/BrowseXML/loginXML.asp' ){
