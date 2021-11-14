@@ -16,7 +16,6 @@ error_reporting( !empty($_ENV['DEV']) && $_ENV['DEV'] == 'dev' ? E_ALL : 0 );
  * Loading
  */
 require_once( __DIR__ . '/classes/autoload.php' );
-Config::checkAccess( !empty($_GET['mac']) && Helper::checkValue( $_GET['mac'], Id::MAC_PREG ) ? $_GET['mac'] : null );
 
 /**
  * Radio Server Test Requests
@@ -27,6 +26,11 @@ if( $uri == '/setupapp/hama/asp/BrowseXML/loginXML.asp' && !isset( $_GET['mac'] 
 	Output::sendAnswer('<EncryptedToken>3a3f5ac48a1dab4e</EncryptedToken>');
 	die(); //will never be reached
 }
+
+/**
+ * Check if IP valid
+ */
+Config::checkAccess( !empty($_GET['mac']) && Helper::checkValue( $_GET['mac'], Id::MAC_PREG ) ? $_GET['mac'] : null );
 
 /**
  * Auth
