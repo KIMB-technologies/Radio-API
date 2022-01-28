@@ -29,7 +29,7 @@ class Auth {
 		}
 		catch(Exception $e){
 			if($redirectGui && !isset($_GET['yesStay'])){ // redirect user to gui
-				header('Location:'. Config::DOMAIN .'gui/?redirFromIndex');
+				header('Location:'. Config::DOMAIN .'gui/view.php?redirFromIndex');
 				http_response_code(303);
 				die();
 			}

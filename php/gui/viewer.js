@@ -1,5 +1,20 @@
 $(function (){
-	loadPage( serverurl + '?', 'div#apiviewer' );
+	if(radiomac === null){ // => using the viewer as a standalone app
+		if( localStorage.hasOwnProperty("last_radio_mac") ){
+			radiomac = localStorage.getItem("last_radio_mac");
+		}
+		else{
+			$("div#apiviewer").html("<b>Unable to detect the last used radio in GUI!</b><br>Please log into GUI!");
+			$("div#apiviewer").addClass("achtung");
+		}
+	}
+	else{ // => using the list below gui 
+		localStorage.setItem("last_radio_mac", radiomac);
+	}
+
+	if(radiomac !== null){
+		loadPage( serverurl + '?', 'div#apiviewer' );
+	}
 });
 
 var reloadPageValues = {};

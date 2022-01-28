@@ -17,17 +17,7 @@ require_once(__DIR__ . '/../classes/autoload.php');
 // Load Login
 $login = new Login();
 // Parse Language and change
-if( !empty( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ){
-	$langarray = array_map( function ($i){
-		return substr(trim($i),0,2);
-	}, explode( ',', $_SERVER['HTTP_ACCEPT_LANGUAGE']));
-	if( in_array('de', $langarray) && (
-			!in_array('en', $langarray)
-			|| array_search('de', $langarray) < array_search('en', $langarray)
-		)) {
-			Template::setLanguage('de');
-	}
-}
+Template::detectLanguage();
 
 // Load Main Template
 $mainTemplate = new Template('main');
@@ -43,7 +33,7 @@ if( isset($_GET['login']) || isset( $_GET['err'] )){
 }
 if( $login->isLoggedIn() ){
 	$mainTemplate->setContent('TITLE', 'List');
-	$mainTemplate->setContent('MOREHEADER', '<script src="viewer.js"></script>');
+	$mainTemplate->setContent('MOREHEADER', '<script src="viewer.js?v=2"></script>');
 	$listTemplate = new Template('list');
 	$mainTemplate->includeTemplate( $listTemplate );
 
@@ -70,10 +60,6 @@ else{
 	// Error Page
 	if( isset( $_GET['err'] ) && ( $_GET['err'] == '404' || $_GET['err'] == '403' ) ){
 		$loginTemplate->setContent('ADD_HTML', '<div class="achtung">Error '. $_GET['err'] .'</div>');
-	}
-	// Redirect from /index.php to GUI?
-	if( isset( $_GET['redirFromIndex'] ) ){
-		$loginTemplate->setContent('ADD_HTML', '<div class="note">Redirected to GUI, looking for <a href="'. Config::DOMAIN .'?yesStay">API</a> instead?</div>');
 	}
 }
 echo $mainTemplate->output();

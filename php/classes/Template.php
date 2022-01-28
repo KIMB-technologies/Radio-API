@@ -51,6 +51,34 @@ class Template{
 	}
 
 	/**
+	 * Get the language of the site
+	 * @return string the lang used
+	 */
+	public static function getLanguage() : string {
+		return self::$lang;
+	}
+
+	/**
+	 * Detect the language sent by the browser (HTTP ACCEPT_LANGUAGE)
+	 *  will change to first language the template supports, else stay at default
+	 */
+	public static function detectLanguage() : void {
+		if( !empty( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ){
+
+			$langs = array_map( function ($i){
+				return strtolower(substr(trim($i),0,2));
+			}, explode( ',', $_SERVER['HTTP_ACCEPT_LANGUAGE']));
+
+			foreach($langs as $lang){
+				if( in_array($lang, self::$allLangs, true ) ){
+					self::setLanguage($lang);
+					break;
+				}
+			}
+		}
+	}
+
+	/**
 	 * Create an new Template
 	 * @param name The name of the template
 	 * 		./templates/<name>.json)
