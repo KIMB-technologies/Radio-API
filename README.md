@@ -81,6 +81,7 @@ The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechn
 			JSON like `{ "key" : { name : "Test 1" }, ... }`
       	- `CONF_OWN_STREAM_URL` URL where each audiofile can be accessed, the `key` will be appended
       	- `CONF_PROXY_OWN_STREAM` Use the builtin HTTP proxy for own streams `true/ false`.
+      	- `CONF_SETUPAPP_IDENT` Sets the setupapp ident string (seems to vary per manufactuer. Example: When the setupapp URI is `/setupapp/hama/asp/BrowseXML/loginXML.asp` you have to set `hama` here).
 	- There are to ways to store, which episodes of a podcasts were already played (new ones are marked by `*`)
 		- Use the Redis-Data-Volume (Redis will load its dump files on container startup)
 		- Create a CronJob to `/cron.php` (this will dump the already played episodes to a JSON-File and load the file on container startup)
