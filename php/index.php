@@ -22,7 +22,7 @@ require_once( __DIR__ . '/classes/autoload.php' );
  */
 $uri = !empty( $_GET['uri'] ) && is_string($_GET['uri']) ? $_GET['uri'] : 'none';
 // Login (Radio tries a login before accessing the api)
-if( $uri == '/setupapp/hama/asp/BrowseXML/loginXML.asp' && !isset( $_GET['mac'] ) ){
+if( $uri == '/setupapp/' . Config::SETUPAPP_IDENT . '/asp/BrowseXML/loginXML.asp' && !isset( $_GET['mac'] ) ){
 	Output::sendAnswer('<EncryptedToken>3a3f5ac48a1dab4e</EncryptedToken>');
 	die(); //will never be reached
 }
