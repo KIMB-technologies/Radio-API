@@ -26,6 +26,7 @@ services:
       - CONF_OWN_STREAM_URL=http://172.21.0.1:8081/?k=
       - CONF_PROXY_OWN_STREAM=false
       - CONF_SHUFFLE_MUSIC=true
+      - CONF_SETUPAPP_IDENT=hama
     depends_on:
       - redis
   redis:

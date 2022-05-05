@@ -22,6 +22,7 @@ services:
       - CONF_OWN_STREAM_URL=http://stream.example.com/?key= # url prefix to open own streamS, key are appended
       - CONF_PROXY_OWN_STREAM=false # use the proxy for the own streams (all own streams are proxied by the docker image)
       - CONF_SHUFFLE_MUSIC=true # random shuffle music in nextcloud radio stations
+      - CONF_SETUPAPP_IDENT=hama # ident string for setupapp uri
     depends_on:
       - redis
   redis:
