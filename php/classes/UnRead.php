@@ -35,7 +35,7 @@ class UnRead {
 		if( $this->redis->keyExists( $id . '-started' ) ){
 			$url = $this->redis->get(  $id . '-started' );
 			if( empty($noturl) || $url !== $noturl ){
-				$this->redis->remove( $id . '-' . $url );
+				$this->redis->remove( $url );
 				$this->redis->remove( $id . '-started' );
 				if( $this->redis->keyExists( 'started' ) ){
 					$this->redis->remove( 'started' );	
@@ -51,7 +51,7 @@ class UnRead {
 	 * @param url of episode
 	 */
 	public function knownItem(int $id, string $url) : string {
-		return $this->redis->keyExists( $id . '-' . $url ) ? '' : '*';
+		return $this->redis->keyExists( $url ) ? '' : '*';
 	}
 
 	/**
@@ -61,8 +61,8 @@ class UnRead {
 	 */
 	public function openItem(int $id, string $url){
 		$this->searchItem($id, $url);
-		if( !$this->redis->keyExists( $id . '-' . $url ) ){
-			$this->redis->set( $id . '-' . $url, 'S' ); // Started
+		if( !$this->redis->keyExists( $url ) ){
+			$this->redis->set( $url, 'S' ); // Started
 			$this->redis->set( $id . '-started' , $url, 120 );
 			$this->redis->set( 'started' , $id , 115 );
 
@@ -72,7 +72,7 @@ class UnRead {
 
 	public function __destruct(){
 		if( !$this->dontRemove && $this->redis->keyExists( 'started' ) ){
-			$id = intval($this->redis->get(  'started' ));
+			$id = intval($this->redis->get( 'started' ));
 			$this->searchItem($id);
 		}
 	}
@@ -89,7 +89,7 @@ class UnRead {
 				$redis = new RedisCache('unread_podcasts.' . $id );
 				$reads[$id] = array();
 				foreach($redis->getAllKeysOfGroup() as $key ){
-					if( preg_match('/^.*:(\d+\-[^s].*)$/', $key, $matches) === 1){
+					if( preg_match('/^.*:([^0-9s].*)$/', $key, $matches) === 1){
 						$reads[$id][] = $matches[1];
 					}
 				}
@@ -110,6 +110,10 @@ class UnRead {
 				if( !empty($read) ){
 					$redis = new RedisCache('unread_podcasts.' . $id );
 					foreach( $read as $r ){
+						// update "old" key! "3001-http://..." => "http://..."
+						if( preg_match('/^\d+\-(.*)$/', $r, $matches) === 1 ){
+							$r = $matches[1];
+						}
 						$redis->set( $r, 'S' ); // Started
 					}
 				}
@@ -125,7 +129,7 @@ class UnRead {
 		if( preg_match('/^(\d+)X(\d+)$/', $id, $parts ) === 1 ){
 			$ed = PodcastLoader::getEpisodeData( $parts[1], $parts[2], $data );
 			if( $ed != array() ){
-				$rkey = $parts[1] . '-' . $ed['episode']['url'];
+				$rkey = $ed['episode']['url'];
 				if( $this->redis->keyExists( $rkey ) ){
 					$this->redis->remove( $rkey );
 				}
