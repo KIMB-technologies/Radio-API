@@ -1,4 +1,4 @@
-FROM kimbtechnologies/php_nginx:8-latest 
+FROM kimbtechnologies/php_nginx:latest 
 
 # php redis support
 RUN apk add --update --no-cache $PHPIZE_DEPS \
