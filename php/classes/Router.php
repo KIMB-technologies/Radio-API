@@ -132,10 +132,11 @@ class Router {
 				$id,
 				$eid,
 				$pd['title'],
-				$this->unread->knownItem($id, $e['url']) . $e['title'],
+				$this->unread->knownItemMark($id, $e['url']) . $e['title'],
 				$proxy ? Config::DOMAIN . 'stream.php?id=' . $id . '&eid=' . $eid . '&mac=' . $this->radioid->getMac() : $e['url'],
 				$e['desc'],
-				$pd['logo']
+				$pd['logo'],
+				!$this->unread->knownItem($id, $e['url'])
 			);
 		}
 		$this->out->prevUrl(Config::DOMAIN . 'cat?cid=3');

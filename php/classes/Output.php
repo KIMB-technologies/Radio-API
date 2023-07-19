@@ -87,7 +87,7 @@ class Output {
 	 * Add a podcast episode
 	 */
 	public function addEpisode( int $podcastid, int $episodeid, string $podcastname, string $episodename,
-						string $url, string $desc = '', string $logo = '' ) : void {
+						string $url, string $desc = '', string $logo = '', bool $top = false ) : void {
 		$logo = empty($logo) || substr($logo, 0, 4) != 'http' ? Config::DOMAIN . 'media/default.png' : $logo;
 		$this->items[] = array(
 			'ItemType' => 'ShowEpisode',
@@ -103,7 +103,7 @@ class Output {
 			'Country' => 'KIMB',
 			'ShowMime' => 'MP3'
 		);
-		$this->itemsSortKeys[] = 'ep==' . $podcastid . '==' . $episodeid;
+		$this->itemsSortKeys[] = ($top ? 'epA' : 'epZ' ) . '==' . $podcastid . '==' . $episodeid;
 	}
 
 	/**

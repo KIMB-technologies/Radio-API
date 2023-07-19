@@ -45,13 +45,17 @@ class UnRead {
 		}
 	}
 
+	public function knownItem(int $id, string $url) : bool {
+		return $this->redis->keyExists( $url );
+	}
+
 	/**
 	 * Get the status of one episode (as gui prefix string)
 	 * @param id the podcast id
 	 * @param url of episode
 	 */
-	public function knownItem(int $id, string $url) : string {
-		return $this->redis->keyExists( $url ) ? '' : '*';
+	public function knownItemMark(int $id, string $url) : string {
+		return $this->knownItem($id, $url) ? '' : '*';
 	}
 
 	/**
