@@ -97,14 +97,12 @@ The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechn
 
 > The API can be placed outside of the local network as well as inside.
 
+### Platforms
+The [Docker Image](https://hub.docker.com/r/kimbtechnologies/radio_api) of *Radio-API* is available for `linux/amd64`, `linux/arm/v6`, `linux/arm/v7`, `linux/arm64/v8`, and `linux/arm64` and thus also for, e.g., Raspberry Pis.
+The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_api) is available for `linux/amd64`, `linux/arm/v7`, `linux/arm64/v8`, and `linux/arm64`.
+
 ### Requests Logfile
-The *Radio-API* creates a log file in the `data`-directory named `log.txt`. 
-
-### Non AMD64 hosts
-Currently the [Docker Image](https://hub.docker.com/r/kimbtechnologies/radio_api) of *Radio-API* is only build for `linux/amd64`.
-There is an open issue to build multi platform images [#13](https://github.com/KIMB-technologies/Radio-API/issues/13), e.g., for Raspberry Pis.
-
-In the mean time, one might build the image on its own, e.g., see issue [#10](https://github.com/KIMB-technologies/Radio-API/issues/10#issuecomment-1792708498) and comments.  
+The *Radio-API* creates a log file in the `data`-directory named `log.txt`.  
 
 ### Nginx Load Balancer
 An example file to use *Radio-API* behind a nginx load balancer as reverse proxy.
