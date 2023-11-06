@@ -14,30 +14,22 @@ Eingeloggt als %%LOGIN_CODE%%,
 	</form>
 
 	<div class="note">
-		Der Name eines Radiosenders wird in der GUI des Radios angezeigt,
-		als URL wird ein streamfähiger Link benötigt (MP3 etc.).
+		Der Name eines Radiosenders wird im Display des Radios angezeigt, als URL wird ein streamfähiger Link benötigt (MP3, M3U, etc.).
 		Der Link muss ohne SSL (also <code>http://</code>) erreichbar sein!
 		<br />
-		Mit dem Proxy können Links, die nur per SSL erreichbar sind, 
-		hinzugefügt werden. Achtung, der Proxy kann keine M3U Dateien 
-		streamen!
+		Mit dem Proxy können Links, die nur per SSL erreichbar sind, hinzugefügt werden.
+		Achtung, der Proxy kann keine M3U Dateien streamen!
 		<br />
-		Bei Nextcloud Streams werden alle Musikdateien in einem freigegebenen
-		Ordner nacheinander vom Radio abgespielt. Anders als bei Podcasts werden alle 
-		Dateien nacheinander Ordner abgespielt und sind nicht einzeln wählbar.
-		(Die Nextcloud Freigabe muss die Form <code>&lt;url&gt;/s/&lt;token&gt;</code>
-		haben.) Sollte Nextcloud nur per SSL erreichbar sein, muss der Proxy genutzt werden!
-		Ist die zufällige Reihenfolge im System aktiviert, so werden die Dateien im Ordner in einer
-		zufälligen Reihenfolge abgespielt.
+		Bei Nextcloud Streams werden alle Musikdateien in einem freigegebenen Ordner vom Radio abgespielt.
+		Anders als bei Podcasts werden alle Dateien im Ordner nacheinander abgespielt und sind nicht einzeln wählbar.
+		(Die Nextcloud Freigabe muss die Form <code>&lt;url&gt;/s/&lt;token&gt;</code> und kein Passwort haben.)
+		Sollte die Nextcloud nur per SSL erreichbar sein, muss der Proxy genutzt werden!
+		Ist die zufällige Reihenfolge im System (Radio-API Installation) aktiviert, so werden die Dateien im Ordner in einer zufälligen Reihenfolge abgespielt.
 		<br/>
-		Über Logo kann eine URL zu einem den Sender illustrieredenen 
-		Bild angegeben werden. Wird kein Bild angegeben, so wird
-		<a href="%%SERVERURL%%media/default.png" target="_blank">
-		<code>%%DOMAIN%%media/default.png</code></a>
-		im Radio angezeigt.
+		Über Logo kann eine URL zu einem den Sender illustrieredenen Bild angegeben werden.
+		Wird kein Bild angegeben, so wird <a href="%%SERVERURL%%media/default.png" target="_blank"><code>%%DOMAIN%%media/default.png</code></a> im Radio angezeigt.
 		<br />
-		Die Beschreibung ist optional und
-		eine weitere Beschreibung des Senders.
+		Die Beschreibung ist optional und eine weitere Beschreibung des Senders.
 	</div>
 
 <h3>Podcasts</h3>
@@ -49,20 +41,16 @@ Eingeloggt als %%LOGIN_CODE%%,
 	</form>	
 
 	<div class="note">
-		Der Name eines Podcasts wird in der GUI des Radios angezeigt,
-		als URL kann entweder ein RSS Atom Feed angegeben werden oder 
-		der Link zu einer Nextcloud Freigabe (Die Nextcloud Freigabe muss 
-		die Form <code>&lt;url&gt;/s/&lt;token&gt;</code> haben.)<br/>
-		Sollte die Nextcloud oder die Audiofiles der 
-		der Episoden nur per SSL erreichbar sein, so muss 
-		der Proxy aktiviert werden! Der Proxy nutzt automatisch EndURL.
+		Der Name eines Podcasts wird in im Display des Radios angezeigt, als URL kann entweder ein RSS-Atom-Feed angegeben werden oder der Link zu einer Nextcloud Freigabe.
+		Anders als bei Radiosendern werden alle Dateien im Ordner als Episoden angezeigt und sind einzeln abspielbar.
+		(Die Nextcloud Freigabe muss die Form <code>&lt;url&gt;/s/&lt;token&gt;</code> und kein Passwort haben.)
+		<br/>
+		Sollte die Nextcloud oder die Audiodateien der Episoden nur per SSL erreichbar sein, so muss der Proxy aktiviert werden!
+		Der Proxy nutzt automatisch EndURL.
 		<br />
-		Einige Anbieter wie Soundcloud leiten in den Links zu den 
-		Episoden auf SSL um, die eigentliche URL zur Audiodatei ist jedoch 
-		auch ohne SSL erreichbar. Mit EndURL wird der direkte Link zur
-		Audiodatei an das Radio geschickt.
-		EndURL ist dem Proxy vorzuziehen, da es den Server weniger belastet und 
-		schneller ist.
+		Einige Anbieter, z.B. podigee oder Soundcloud, leiten in den Links zu den Episoden auf SSL um, die eigentliche URL zur Audiodatei ist jedoch auch ohne SSL erreichbar.
+		Mit EndURL wird der direkte Link zur Audiodatei an das Radio geschickt.
+		EndURL ist dem Proxy vorzuziehen, da es den Server weniger belastet und schneller ist.
 	</div>
 
 	<script>
@@ -81,9 +69,8 @@ Eingeloggt als %%LOGIN_CODE%%,
 		</div>
 
 		<div class="achtung">
-			Achtung, die Vorschau dient in erster Linie dazu die Liste der Radios, Podcast, Episoden 
-			und Streams anzuschauen. Das Abspielen von einigen Audioformaten klappt in 
-			Browsern nicht, dafür aber auf dem Radio. Weiterhin kann das Radio kein SSL 
-			ein Browser jedoch schon.
+			Achtung, die Vorschau dient in erster Linie dazu die Liste der Radios, Podcast, Episoden und Streams anzuschauen.
+			Das Abspielen von einigen Audioformaten klappt in Browsern nicht, dafür aber auf dem Radio.
+			Weiterhin kann das Radio kein SSL ein Browser jedoch schon.
 		</div>
 		<script> var serverurl = "%%SERVERURL%%", radiomac = "%%RADIO_MAC%%";</script>

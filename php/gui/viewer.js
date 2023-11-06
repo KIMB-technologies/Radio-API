@@ -78,8 +78,8 @@ function printItem( item, play ){
 			var url = $(item).find('ShowEpisodeID').text();
 
 			markAsKnow = ' &ndash; ' + (name.substr(0,1) == '*' ?
-				'<span class="mark-known" title="Als angehört markieren">&check;</span>' :
-				'<span class="mark-known" title="Als ungehört markieren">&cross;</span>');
+				'<span class="mark-known" title="Als angehört markieren/ Mark as seen">&check;</span>' :
+				'<span class="mark-known" title="Als ungehört markieren/ Mark as unseen">&cross;</span>');
 		}
 	}
 

@@ -16,25 +16,21 @@ Logged in as %%LOGIN_CODE%%,
 	<div class="note">
 		The name of a radio station will be shown in the radios menu.
 		The url a has to be a link to a streamable audiofile (MP3, M3U, etc.).
-		As the radio does not support SSL, do the links must use <code>http://</code>!
+		As the radio does not support SSL, thus the links must support <code>http://</code>!
 		<br />
-		If there is no link without SSL, one can use the proxy 
-		to provide a stream without SSL for the radio.
+		If there is no link without SSL, one can use the proxy to provide a stream without SSL for the radio.
 		Attention, the proxy is not able to open M3U streams.
 		<br />
-		You can also give a nextcloud fileshare it must look like <code>&lt;url&gt;/s/&lt;token&gt;</code> and 
-		must not have a password. Each file in the shared folder will be played one after one (in a 
-		random order, if enabled for this installation).
-		There is no support for subfolders.
-		If the NextCloud share is only accessible via SSL, the proxy has to be used.
+		You can also give a nextcloud file share.
+		The URL must look like <code>&lt;url&gt;/s/&lt;token&gt;</code> and must not have a password.
+		Each file in the shared folder will be played one after one (in a random order, if enabled for this installation).
+		There is no support for sub folders.
+		If the Nextcloud share is only accessible via SSL, the proxy has to be used.
 		<br/>
-		While playing a station the radio shows an image, 
-		the image can be specified by giving a custom link (also no SSL support).
-		If no image is speciefied <a href="%%SERVERURL%%media/default.png" target="_blank">
-		<code>%%DOMAIN%%media/default.png</code></a>
-		will be displayed.
+		While playing a station the radio shows an image, the image can be specified by giving a custom link (also no SSL support).
+		If no image is specified <a href="%%SERVERURL%%media/default.png" target="_blank"><code>%%DOMAIN%%media/default.png</code></a> will be displayed.
 		<br />
-		Using the description one may give more informations about the station.
+		The description holds more information about a station.
 	</div>
 
 <h3>Podcasts</h3>
@@ -47,25 +43,21 @@ Logged in as %%LOGIN_CODE%%,
 
 	<div class="note">
 		The name of a podcast will be shown in the radios menu.
-		As url a RSS Atom link or a NextCloud fileshare can be provided.
-		(The NextCloud fileshare must look like <code>&lt;url&gt;/s/&lt;token&gt;</code> and 
-		must not have a password. Each file in the shared folder will be shown as playable episode.
-		There is no support for subfolders.)
+		As url a RSS atom feed or a Nextcloud file share can be provided.
+		The Nextcloud file share must look like <code>&lt;url&gt;/s/&lt;token&gt;</code> and must not have a password.
+		Each file in the shared folder will be shown as playable episode.
+		There is no support for sub folders.
 		<br/>
-		If the NextCloud share or the audiofiles of each episode are only 
-		accessible via SSL, the proxy has to be used. It will 
-		provide a stream without SSL for the radio.
+		If the Nextcloud share or the audiofiles of each episode are only accessible via SSL, the proxy has to be used.
+		It will provide a stream without SSL for the radio.
 		The proxy will always use EndURL.
 		<br />
-		Some podcast provider like Soundcloud redirect their
-		episode URLs to SSL, while they also work without SSL.
-		The radio won't be able to play these 
-		SSL URLs. Using EndURL the server will determine the redirected 
-		destination and send this destination URL to the radio. 
+		Some podcast provider, e.g., podigee or Soundcloud, redirect their episode URLs to SSL, while they also work without SSL.
+		The radio won't be able to play these SSL URLs.
+		Using EndURL the server will determine the redirected destination and send this destination URL to the radio. 
 		<b>
-			Don't use the proxy if the media can played without proxy or 
-			if EndURL is enough. The proxy will put more load on the server 
-			and will slow down the connection time to streams.
+			Don't use the proxy if the media can played without proxy or if EndURL is enough.
+			The proxy will put more load on the server and will slow down the connection time to streams.
 		</b>
 	</div>
 
@@ -85,10 +77,9 @@ Logged in as %%LOGIN_CODE%%,
 		</div>
 
 		<div class="achtung">
-			Attention, the preview is just a preview for the list of stations, podcasts and 
-			streams. If some stream or episode does not start playing in the browser,
-			it may do so using the radio nevertheless.
-			Also if something works using a browser, it may not work with the radio. One 
-			possible reason is, that the radio does not support SSL.
+			Attention, the preview is just a preview for the list of stations, podcasts, and streams.
+			If some stream or episode does not start playing in the browser, it may do so using the radio nevertheless.
+			Also if something works using a browser, it may not work with the radio.
+			One possible reason is, that the radio does not support SSL.
 		</div>
 		<script> var serverurl = "%%SERVERURL%%", radiomac = "%%RADIO_MAC%%";</script>
