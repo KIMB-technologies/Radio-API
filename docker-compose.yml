@@ -13,16 +13,15 @@ services:
     environment:
       - CONF_DOMAIN=http://radio.example.com/ # the domain where the system is hosted
       - CONF_ALLOWED_DOMAIN=all # allowed ips for access, list of DynDNS domainnames (divided by ','), or 'all' to allow all ips
+      - CONF_SHUFFLE_MUSIC=true # random shuffle music in nextcloud radio stations
       - CONF_CACHE_EXPIRE=1200 # cache expire time of ips, podcasts, ...
       - CONF_REDIS_HOST=redis # the redis hostname
       # - CONF_REDIS_PORT=6379 # default 6379
       # - CONF_REDIS_PASS= # default no auth
-      - CONF_OWN_STREAM=true # fetch own streams at link below? (true/ false)
+      - CONF_OWN_STREAM=false # fetch own streams at link below? (true/ false)
       - CONF_OWN_STREAM_JSON=http://stream.example.com/list.json # link where to fetch own streams, json like: { "key" : { name : "Test 1" }, "key2" : ... }
-      - CONF_OWN_STREAM_URL=http://stream.example.com/?key= # url prefix to open own streamS, key are appended
+      - CONF_OWN_STREAM_URL=http://stream.example.com/?key= # url prefix to open own streams, key are appended
       - CONF_PROXY_OWN_STREAM=false # use the proxy for the own streams (all own streams are proxied by the docker image)
-      - CONF_SHUFFLE_MUSIC=true # random shuffle music in nextcloud radio stations
-      - CONF_SETUPAPP_IDENT=hama # ident string for setupapp uri
     depends_on:
       - redis
   redis:

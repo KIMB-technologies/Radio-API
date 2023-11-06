@@ -97,6 +97,9 @@ The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechn
 
 > The API can be placed outside of the local network as well as inside.
 
+### Requests Logfile
+The *Radio-API* creates a log file in the `data`-directory named `log.txt`. 
+
 ### Non AMD64 hosts
 Currently the [Docker Image](https://hub.docker.com/r/kimbtechnologies/radio_api) of *Radio-API* is only build for `linux/amd64`.
 There is an open issue to build multi platform images [#13](https://github.com/KIMB-technologies/Radio-API/issues/13), e.g., for Raspberry Pis.

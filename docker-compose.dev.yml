@@ -19,13 +19,13 @@ services:
       - DEV=dev
       - CONF_DOMAIN=http://localhost:8080/
       - CONF_ALLOWED_DOMAIN=all
+      - CONF_SHUFFLE_MUSIC=true
       - CONF_CACHE_EXPIRE=1200
       - CONF_REDIS_HOST=redis
       - CONF_OWN_STREAM=false
       - CONF_OWN_STREAM_JSON=http://172.21.0.1:8081/list.json
       - CONF_OWN_STREAM_URL=http://172.21.0.1:8081/?k=
       - CONF_PROXY_OWN_STREAM=false
-      - CONF_SHUFFLE_MUSIC=true
     depends_on:
       - redis
   redis:
