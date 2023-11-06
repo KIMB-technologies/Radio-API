@@ -10,6 +10,7 @@ env:
   IMAGE_OWNER: kimbtechnologies
   IMAGE_NAME: radio_api
   BASE_IMAGE: kimbtechnologies/php_nginx:latest 
+  PLATFORMS: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8,linux/arm64
 
 jobs:
   build:
@@ -17,10 +18,7 @@ jobs:
     steps:
     
     # Init and check
-    
-    - name: Access to repository contents
-      uses: actions/checkout@v3
-    
+
     - name: Check for new baseimage 
       id: check
       uses: lucacome/docker-image-update-checker@v1
@@ -28,29 +26,33 @@ jobs:
         base-image: "${{env.BASE_IMAGE}}"
         image: "${{env.IMAGE_OWNER}}/${{env.IMAGE_NAME}}:latest"
       if: github.event_name != 'push'
-        
-   # Build image
-        
-    - name: Build the Docker image
-      run: docker build . --file "Dockerfile" --tag "$IMAGE_OWNER/$IMAGE_NAME:latest"
+    
+    - name: Access repository contents
+      uses: actions/checkout@v3
       if: ${{ (github.event_name == 'push') || (steps.check.outputs.needs-updating == 'true') }}
-   
-    # Push latest tag
-   
     - name: Login to DockerHub
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
       if: ${{ (github.event_name == 'push') || (steps.check.outputs.needs-updating == 'true') }}
-      
-    - name: Push to DockerHub 
-      run: docker push "$IMAGE_OWNER/$IMAGE_NAME:latest"
-      if: ${{ (github.event_name == 'push') || (steps.check.outputs.needs-updating == 'true') }}
-      
-    # Version tags to push
     
-    - name: Tag and push versions 
+    # Multi platform support
+
+    - name: Set up QEMU for Docker Buildx
+      uses: docker/setup-qemu-action@v3
+      if: ${{ (github.event_name == 'push') || (steps.check.outputs.needs-updating == 'true') }}
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      if: ${{ (github.event_name == 'push') || (steps.check.outputs.needs-updating == 'true') }}
+  
+    # Multi platform image build and push
+
+    - name: Build and push the latest Docker image
+      run: docker buildx build --platform "$PLATFORMS" . --file "Dockerfile" --tag "$IMAGE_OWNER/$IMAGE_NAME:latest" --push
+      if: ${{ (github.event_name == 'push') || (steps.check.outputs.needs-updating == 'true') }}
+     
+    - name: Push more tags
       if: ${{ (github.event_name == 'push') || (steps.check.outputs.needs-updating == 'true') }} 
       run: |
           cat VERSION | while read TAG; do
@@ -58,7 +60,6 @@ jobs:
               echo "Skipping $TAG";
             else 
               echo "Tagging image as $TAG and pushing";
-              docker tag "$IMAGE_OWNER/$IMAGE_NAME:latest" "$IMAGE_OWNER/$IMAGE_NAME:$TAG"
-              docker push "$IMAGE_OWNER/$IMAGE_NAME:$TAG"
+              docker buildx build --platform "$PLATFORMS" . --file "Dockerfile" --tag "$IMAGE_OWNER/$IMAGE_NAME:$TAG" --push
             fi;
           done;
