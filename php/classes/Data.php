@@ -40,10 +40,23 @@ class Data {
 	 * Load files from disk
 	 */
 	private function preloadAll() : void {
-		$this->radio = is_file( __DIR__ . '/../data/radios_'. $this->id .'.json' ) ?
-			json_decode( file_get_contents( __DIR__ . '/../data/radios_'. $this->id .'.json' ), true) : array();
-		$this->podcasts = is_file( __DIR__ . '/../data/podcasts_'. $this->id .'.json'  ) ?
-			json_decode( file_get_contents( __DIR__ . '/../data/podcasts_'. $this->id .'.json'  ), true) : array();
+		$radio = null;
+		if(is_file( __DIR__ . '/../data/radios_'. $this->id .'.json' )){
+			$radio = json_decode( file_get_contents( __DIR__ . '/../data/radios_'. $this->id .'.json' ), true);
+			if(is_null($radio)){ // on json error, move file and create new
+				rename(__DIR__ . '/../data/radios_'. $this->id .'.json', __DIR__ . '/../data/radios_'. $this->id .'.error.json');
+			}
+		}
+		$this->radio = is_null($radio) ?  array() : $radio;
+
+		$podcasts = null;
+		if(is_file( __DIR__ . '/../data/podcasts_'. $this->id .'.json' )){
+			$podcasts = json_decode( file_get_contents( __DIR__ . '/../data/podcasts_'. $this->id .'.json'  ), true);
+			if(is_null($podcasts)){ 
+				rename(__DIR__ . '/../data/podcasts_'. $this->id .'.json', __DIR__ . '/../data/podcasts_'. $this->id .'.error.json');
+			}
+		}
+		$this->podcasts = is_null($podcasts) ?  array() : $podcasts;
 
 		$this->stream = $this->loadStreams();
 
@@ -180,12 +193,12 @@ class Data {
 	}
 	public function setRadioList(array $radios) : void {
 		$this->radio = $radios;
-		file_put_contents( __DIR__ . '/../data/radios_'. $this->id .'.json', json_encode($this->radio, JSON_PRETTY_PRINT));
+		file_put_contents( __DIR__ . '/../data/radios_'. $this->id .'.json', json_encode($this->radio, JSON_PRETTY_PRINT), LOCK_EX);
 		$this->constructTable(); // update redis
 	}
 	public function setPodcastList(array $pods) : void {
 		$this->podcasts = $pods;
-		file_put_contents( __DIR__ . '/../data/podcasts_'. $this->id .'.json', json_encode($this->podcasts, JSON_PRETTY_PRINT));
+		file_put_contents( __DIR__ . '/../data/podcasts_'. $this->id .'.json', json_encode($this->podcasts, JSON_PRETTY_PRINT), LOCK_EX);
 		$this->constructTable(); // update redis
 	}
 }

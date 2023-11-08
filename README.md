@@ -28,11 +28,11 @@ This redirect is possible by manipulating the DNS queries.
 		- The list of episodes for each podcast is cached for `CONF_CACHE_EXPIRE` seconds.
 		- The URL of a podcast can be an Atom RSS link or a link to a Nextcloud share.
 		- Nextcloud share:
-    			- The system can fetch and stream audiofiles from Nextcloud shares.
-    			- The link of the share needs a to look like `<mycloud.expample.com>/s/<token>/`. 
+			- The system can fetch and stream audiofiles from Nextcloud shares.
+			- The link of the share needs a to look like `<mycloud.expample.com>/s/<token>/`. 
 			- All files in the shared folder will be shown in the radio as episode.
-    			- The share must not have a password.
-    			- There is no support for sub folders in shares, only the files in the share are shown.
+			- The share must not have a password.
+			- There is no support for sub folders in shares, only the files in the share are shown.
 		- Episodes get a `*` in front of their name if they have not yet been listened to.
 	- **Stream**
 		- This is a list of custom streams.
@@ -89,11 +89,11 @@ The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechn
 		- Use the data volume of Redis. (Redis will (re-)load its dump files on container startup.)
 		- Create a cron job to `/cron.php` (this will dump the already played episodes to a JSON file and *Radio-API* will load the file on container startup.)
 4. Done
-    - Start the radio and open `Internet Radio`
-    - There should be a list with three items `Radio, Podcasts, (Streams)` and a GUI-Code.
-    - Use the gui to define the list of stations and podcasts. It can be accessed with a browser at `CONF_DOMAIN/gui`. 
-    - You will need the Code shown by the radio to log into the gui. 
-    - Each connected radio has is own list of radio stations and podcasts, the *own streams* are global.
+	- Start the radio and open `Internet Radio`
+	- There should be a list with three items `Radio, Podcasts, (Streams)` and a GUI-Code.
+	- Use the gui to define the list of stations and podcasts. It can be accessed with a browser at `CONF_DOMAIN/gui`. 
+	- You will need the Code shown by the radio to log into the gui. 
+	- Each connected radio has is own list of radio stations and podcasts, the *own streams* are global.
 
 > The API can be placed outside of the local network as well as inside.
 
@@ -133,5 +133,4 @@ server {
 	listen 443 ssl;
 	# more ssl setup ....
 }
-
 ```
