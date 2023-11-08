@@ -12,7 +12,8 @@ The main idea is to redirect the HTTP request of the radio to another server, wh
 This redirect is possible by manipulating the DNS queries.
 
 > This *Radio-API* does not come with a predefined list of stations. 
-> Instead is allows each user to define their own list of radio stations, podcasts and audio streams from Nextcloud shares.
+> Instead is allows each user to define their own list of radio stations, podcasts and audio streams from Nextcloud shares.  
+> If you are searching for streaming urls of radio station, you may use the search at https://www.radio-browser.info/search and copy the url to Radio-API. 
 
 ## Usage
 - First [set up](#setup) the Docker Container of this *Radio-API* and change the DNS resolver of the radio (e.g. as described in set up, too).
