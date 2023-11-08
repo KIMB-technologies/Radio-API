@@ -119,6 +119,7 @@ class Id {
 		$table = json_decode(file_get_contents( __DIR__ . '/../data/table.json' ), true);
 		if(is_null($table)){ // error in file, fix this!
 			$this->loadFileIntoRedis($redis);
+			$table = json_decode(file_get_contents( __DIR__ . '/../data/table.json' ), true);
 		}
 
 		// new id

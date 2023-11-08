@@ -106,6 +106,7 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_api) is
 - A log file of (unknown) request received by the Radio-API is created at `./data/log.txt`.  
 - If the Radio-API is unable to parse a JSON-file in `./data/`, it will initialize a new one, while the old one is renamed to `*.error.json`.
 - PHP error messages are disabled by default, set `DEV=dev` in the environment to enable them.
+- Erase the data folder/ volume of redis and restart Radio-API.
 - Check the outputs from the Docker Container `docker-compose logs`
 	- Make sure, that your radio sends the requests to Radio-API (i.e., the DNS setup works)
 - Test the Radio-API with your browser
