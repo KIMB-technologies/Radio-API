@@ -101,8 +101,16 @@ The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechn
 The [Docker Image](https://hub.docker.com/r/kimbtechnologies/radio_api) of *Radio-API* is available for `linux/amd64`, `linux/arm/v6`, `linux/arm/v7`, `linux/arm64/v8`, and `linux/arm64` and thus also for, e.g., Raspberry Pis.
 The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_api) is available for `linux/amd64`, `linux/arm/v7`, `linux/arm64/v8`, and `linux/arm64`.
 
-### Requests Logfile
-The *Radio-API* creates a log file in the `data`-directory named `log.txt`.  
+### Troubleshooting 
+- A log file of (unknown) request received by the Radio-API is created at `./data/log.txt`.  
+- If the Radio-API is unable to parse a JSON-file in `./data/`, it will initialize a new one, while the old one is renamed to `*.error.json`.
+- PHP error messages are disabled by default, set `DEV=dev` in the environment to enable them.
+- Check the outputs from the Docker Container `docker-compose logs`
+	- Make sure, that your radio sends the requests to Radio-API (i.e., the DNS setup works)
+- Test the Radio-API with your browser
+	1. `http://radio.example.com/setupapp/iden/asp/BrowseXML/loginXML.asp?token=0` (returns `<EncryptedToken>3a3f5ac48a1dab4e</EncryptedToken>`)
+	2. `http://radio.example.com/setupapp/iden/asp/BrowseXML/loginXML.asp?gofile=&mac=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&dlang=eng&fver=4&ven=iden00` (returns `<?xml version="1.0" encoding="UTF-8" standalone="yes"?> <ListOfItems> ... </ListOfItems>`) 
+	3. Get the GUI-Code from the preceding response and try to used it to access the gui at `http://radio.example.com/gui/`
 
 ### Nginx Load Balancer
 An example file to use *Radio-API* behind a nginx load balancer as reverse proxy.
