@@ -33,7 +33,7 @@ if( isset($_GET['login']) || isset( $_GET['err'] )){
 }
 if( $login->isLoggedIn() ){
 	$mainTemplate->setContent('TITLE', 'List');
-	$mainTemplate->setContent('MOREHEADER', '<script src="viewer.js?v=2"></script>');
+	$mainTemplate->setContent('MOREHEADER', '<script src="viewer.js?v=3"></script>');
 	$listTemplate = new Template('list');
 	$mainTemplate->includeTemplate( $listTemplate );
 

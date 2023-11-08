@@ -13,7 +13,7 @@ $(function (){
 	}
 
 	if(radiomac !== null){
-		loadPage( serverurl + '?', 'div#apiviewer' );
+		loadPage( serverurl + '?go=initial', 'div#apiviewer' );
 	}
 });
 

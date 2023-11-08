@@ -66,8 +66,11 @@ class Router {
 			$this->out->addDir( 'GUI-Code: ' . $this->radioid->getCode(), Config::DOMAIN . '?go=initial', true );
 
 			// Log unknown
-			if( preg_match('/^\/setupapp\/[A-Za-z0-9\-\_]+\/asp\/BrowseXML\/loginXML.asp/i', $uri) === 0 ){
-				file_put_contents( __DIR__ . '/../data/log.txt', json_encode( $_GET ) . PHP_EOL, FILE_APPEND );
+			if(
+				preg_match('/^\/setupapp\/[A-Za-z0-9\-\_]+\/asp\/BrowseXML\/loginXML.asp/i', $uri) === 0 &&
+				(!isset( $_GET['go'] ) || $_GET['go'] != "initial")
+			){
+				file_put_contents( __DIR__ . '/../data/log.txt', date('d.m.Y H:i:s') . " : " . json_encode( $_GET ) . PHP_EOL, FILE_APPEND );
 			}
 
 			

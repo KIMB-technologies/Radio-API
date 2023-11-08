@@ -24,7 +24,7 @@ $mainTemplate = new Template('main');
 $viewTemplate = new Template('view');
 
 $mainTemplate->setContent('TITLE', Template::getLanguage() == 'de' ? 'Vorschau' : 'Preview');
-$mainTemplate->setContent('MOREHEADER', '<script src="viewer.js?v=2"></script>');
+$mainTemplate->setContent('MOREHEADER', '<script src="viewer.js?v=3"></script>');
 
 // Redirect from /index.php to viewer?
 if( isset( $_GET['redirFromIndex'] ) ){
