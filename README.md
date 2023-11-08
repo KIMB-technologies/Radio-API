@@ -86,9 +86,9 @@ The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechn
 		- `CONF_OWN_STREAM_URL` URL where each audio file can be accessed, the `key` will be appended, i.e, `CONF_OWN_STREAM_URL+"key1"` for `Test 1`.
 		- `CONF_PROXY_OWN_STREAM` Use the builtin HTTP proxy for own streams `true/ false`.
 	- There are two ways to store which episodes of podcasts have already been listened to (new ones are marked by `*`)
+		- Create a cron job to `/cron.php`, e.g., `docker exec --user www-data radio_api php /cron.php`. (This will dump the already played episodes to a JSON file in `./data/` and *Radio-API* will load the file into redis on container startup).
 		- Use the data volume of Redis. (Redis will (re-)load its dump files on container startup.)
-		- Create a cron job to `/cron.php` (this will dump the already played episodes to a JSON file and *Radio-API* will load the file on container startup.)
-4. Done
+3. Done
 	- Start the radio and open `Internet Radio`
 	- There should be a list with three items `Radio, Podcasts, (Streams)` and a GUI-Code.
 	- Use the gui to define the list of stations and podcasts. It can be accessed with a browser at `CONF_DOMAIN/gui`. 
