@@ -2,7 +2,8 @@ name: Docker Image Push (on commit and base image update)
 
 on:
   push:
-    branches: [ "master" ]
+    tags:
+      - '*'
   schedule:
     - cron: "15 4 */3 * *"
 

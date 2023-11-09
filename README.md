@@ -1,12 +1,12 @@
 # Radio-API
 
-> Silicon Frontier, Frontier Silicone, or Frontier Nuvola (Smart) Internet Radio alternative API
+> Silicon Frontier, Frontier Silicon, or Frontier Nuvola (Smart) Internet Radio alternative API
 
 see https://github.com/kimbtech/WiFi-RadioAPI for information about the API used by the radios  
 see https://hub.docker.com/r/kimbtechnologies/radio_api for the Docker Image
 
 ## About
-This is an alternative API for Frontier Nuvola (Frontier Silicone) internet radios, it can be placed on a server and will host the list of internet radio stations, podcasts etc. which then can be found in the radio's menu.
+This is an alternative API for Frontier Nuvola (Frontier Silicon) internet radios, it can be placed on a server and will host the list of internet radio stations, podcasts etc. which then can be found in the radio's menu.
 
 The main idea is to redirect the HTTP request of the radio to another server, where own stations and podcasts can be added.
 This redirect is possible by manipulating the DNS queries.
@@ -14,6 +14,8 @@ This redirect is possible by manipulating the DNS queries.
 > This *Radio-API* does not come with a predefined list of stations. 
 > Instead is allows each user to define their own list of radio stations, podcasts and audio streams from Nextcloud shares.  
 > If you are searching for streaming urls of radio station, you may use the search at https://www.radio-browser.info/search and copy the url to Radio-API. 
+
+&rarr; [Have a look at **screenshots**](./screenshots/Readme.md)
 
 ## Usage
 - First [set up](#setup) the Docker Container of this *Radio-API* and change the DNS resolver of the radio (e.g. as described in set up, too).
@@ -30,7 +32,7 @@ This redirect is possible by manipulating the DNS queries.
 		- The URL of a podcast can be an Atom RSS link or a link to a Nextcloud share.
 		- Nextcloud share:
 			- The system can fetch and stream audiofiles from Nextcloud shares.
-			- The link of the share needs a to look like `<mycloud.expample.com>/s/<token>/`. 
+			- The link of the share needs a to look like `mycloud.example.com/s/<token>/`. 
 			- All files in the shared folder will be shown in the radio as episode.
 			- The share must not have a password.
 			- There is no support for sub folders in shares, only the files in the share are shown.
@@ -44,17 +46,17 @@ This redirect is possible by manipulating the DNS queries.
 	- **GUI-Code**
 		- This code is like a password to access the GUI for this radio and edit the radio stations and streams.
 - Gui:
-	- The gui can be opened via a webbrowser at `radio.expample.com/gui/`.
-	- The gui provides the editable lists of radio stations and podcasts.
-	- A preview of the items shown by the radio is provided by the gui, too.
+	- The GUI can be opened via a webbrowser at `radio.example.com/gui/`.
+	- The GUI provides the editable lists of radio stations and podcasts.
+	- A preview of the items shown by the radio is provided by the GUI, too.
 		- The preview is also shown when opening `radio.example.com` in an browser and this browser has already logged into the GUI.
 		- The `*` to mark new episodes can be toggled by the &check;/ &cross; in the preview.
 	- Additional information texts describe the options chooseable for radio stations and podcasts.
 
 ### Notes
-- This is a private project and has no connections to Frontier Nuvola/ Frontier Silicone.
+- This is a private project and has no connections to Frontier Nuvola/ Frontier Silicon.
 - There is a limit of 1000 items per list: 1000 radio stations, 1000 streams, 1000 podcasts.
-- Nobody should host a pubic DNS resolver resolving wrong IPs. Some type of access control is recommended.
+- Nobody should host a public DNS resolver resolving wrong IPs. Some type of access control is recommended.
 
 ## Setup
 The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechnologies/radio_api).
@@ -92,15 +94,15 @@ The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechn
 3. Done
 	- Start the radio and open `Internet Radio`
 	- There should be a list with three items `Radio, Podcasts, (Streams)` and a GUI-Code.
-	- Use the gui to define the list of stations and podcasts. It can be accessed with a browser at `CONF_DOMAIN/gui`. 
-	- You will need the Code shown by the radio to log into the gui. 
+	- Use the GUI to define the list of stations and podcasts. It can be accessed with a browser at `CONF_DOMAIN/gui`. 
+	- You will need the code shown by the radio to log into the GUI. 
 	- Each connected radio has is own list of radio stations and podcasts, the *own streams* are global.
 
 > The API can be placed outside of the local network as well as inside.
 
 ### Platforms
 The [Docker Image](https://hub.docker.com/r/kimbtechnologies/radio_api) of *Radio-API* is available for `linux/amd64`, `linux/arm/v6`, `linux/arm/v7`, `linux/arm64/v8`, and `linux/arm64` and thus also for, e.g., Raspberry Pis.
-The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_api) is available for `linux/amd64`, `linux/arm/v7`, `linux/arm64/v8`, and `linux/arm64`.
+The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is available for `linux/amd64`, `linux/arm/v7`, `linux/arm64/v8`, and `linux/arm64`.
 
 ### Troubleshooting 
 - A log file of (unknown) request received by the Radio-API is created at `./data/log.txt`.  
@@ -112,7 +114,7 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_api) is
 - Test the Radio-API with your browser
 	1. `http://radio.example.com/setupapp/iden/asp/BrowseXML/loginXML.asp?token=0` (returns `<EncryptedToken>3a3f5ac48a1dab4e</EncryptedToken>`)
 	2. `http://radio.example.com/setupapp/iden/asp/BrowseXML/loginXML.asp?gofile=&mac=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&dlang=eng&fver=4&ven=iden00` (returns `<?xml version="1.0" encoding="UTF-8" standalone="yes"?> <ListOfItems> ... </ListOfItems>`) 
-	3. Get the GUI-Code from the preceding response and try to used it to access the gui at `http://radio.example.com/gui/`
+	3. Get the GUI-Code from the preceding response and try to used it to access the GUI at `http://radio.example.com/gui/`
 
 ### Nginx Load Balancer
 An example file to use *Radio-API* behind a nginx load balancer as reverse proxy.
@@ -123,7 +125,7 @@ server {
 
 	location / {
 		set $url "${scheme}${request_uri}";
-		if ( $url ~* "^http/gui.*$" ){ # rewite gui to ssl
+		if ( $url ~* "^http/gui.*$" ){ # rewite GUI to ssl
 			return 301 https://radio.example.com$request_uri;
 		}
 
@@ -139,7 +141,7 @@ server {
 	listen 80; # needed by radio
 	listen [::]:80;	
 
-	listen [::]:443 ssl; # add for gui
+	listen [::]:443 ssl; # add for GUI
 	listen 443 ssl;
 	# more ssl setup ....
 }
