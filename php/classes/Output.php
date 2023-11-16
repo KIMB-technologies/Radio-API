@@ -41,8 +41,8 @@ class Output {
 	/**
 	 * Add a station
 	 */
-	public function addStation( int $id, string $name, string $url,
-						$light = false, string $desc = '', string $logo = '') : void {
+	public function addStation( int|string $id, string $name, string $url,
+						$light = false, string $desc = '', string $logo = '', int|string $sortKey = "") : void {
 		$a = array(
 			'ItemType' => 'Station',
 			'StationId' => $id,
@@ -65,13 +65,13 @@ class Output {
 			$b = array();
 		}
 		$this->items[] = array_merge( $a, $b );
-		$this->itemsSortKeys[] = 'ra==' . $name;
+		$this->itemsSortKeys[] = 'ra==' . ($sortKey === "" ? $name : $sortKey);
 	}
 
 	/**
 	 * Add a podcast
 	 */
-	public function addPodcast( int $podcastid, string $name, string $url ) : void {
+	public function addPodcast( int $podcastid, string $name, string $url, int|string $sortKey = "" ) : void {
 		$this->items[] = array(
 			'ItemType' => 'ShowOnDemand',
 			'ShowOnDemandID' => $podcastid,
@@ -80,7 +80,7 @@ class Output {
 			'ShowOnDemandURLBackUp' => self::cleanUrl( $url ),
 			'BookmarkShow' => ''
 		);
-		$this->itemsSortKeys[] = 'pod==' . $name;
+		$this->itemsSortKeys[] = 'pod==' . ($sortKey === "" ? $name : $sortKey);
 	}
 
 	/**
@@ -109,14 +109,14 @@ class Output {
 	/**
 	 * Add a folder
 	 */
-	public function addDir(string $name, string $url, bool $isLast = false) : void {
+	public function addDir(string $name, string $url, bool $isLast = false, int|string $sortKey = "") : void {
 		$this->items[] = array(
 			'ItemType' => 'Dir',
 			'Title' => self::cleanText($name),
 			'UrlDir' => self::cleanUrl($url),
 			'UrlDirBackUp' => self::cleanUrl($url)
 		);
-		$this->itemsSortKeys[] = ($isLast ? 'z' : '') . 'dir==' . $name;
+		$this->itemsSortKeys[] = ($isLast ? 'z' : '') . 'dir==' . ($sortKey === "" ? $name : $sortKey);;
 	}
 
 	/**

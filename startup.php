@@ -49,4 +49,12 @@ foreach(UnRead::loadFromDisk() as $id => $d ){
 		echo "\t\t" . $r . PHP_EOL;
 	}
 }
+
+/**
+ * load last stations into Redis Cache
+ */
+echo "Load RadioBrowser: " . PHP_EOL;
+foreach(RadioBrowser::loadFromDisk() as $id => $d ){
+	echo "\t" . $id . " has " . count($d) . " last stations." .PHP_EOL;
+}
 ?>

@@ -20,6 +20,7 @@ class Router {
 	private Output $out;
 	private Data $data;
 	private Unread $unread;
+	private RadioBrowser $radio_browser;
 
 	/**
 	 * Generate Objects
@@ -29,7 +30,7 @@ class Router {
 		$this->out = new Output();
 		$this->data = new Data($this->radioid->getId());
 		$this->unread = new UnRead($this->radioid->getId());
-
+		$this->radio_browser = new RadioBrowser($this->radioid);
 	}
 
 	/**
@@ -37,12 +38,17 @@ class Router {
 	 */
 	public function handleGet(string $uri) : void {
 		if( isset( $_GET['sSearchtype'] ) && $_GET['sSearchtype'] == 3 ){ // only one station (play this)
-			$this->listStation();
+			if( !empty($_GET['Search']) && RadioBrowser::matchStationID($_GET['Search']) ){ // is an uuid from Radio-Browser??
+				$this->radio_browser->handleStationPlay($this->out, $_GET['Search']);
+			}
+			else { // local ID
+				$this->listStation();
+			}
 		}
 		else if( isset( $_GET['sSearchtype'] ) && $_GET['sSearchtype'] == 5 ){ // only one episode (play this)
 			$this->listEpisode();
 		}
-		else if( $uri == '/cat' && !empty( $_GET['cid'] )  ){ // list of stations by catergory
+		else if( $uri == '/cat' && !empty( $_GET['cid'] )  ){ // list of stations by category
 			$this->out->prevUrl(Config::DOMAIN . '?go=initial');
 
 			$cid = $_GET['cid'];
@@ -55,6 +61,10 @@ class Router {
 				}
 			}
 		}
+		else if( $uri == '/radio-browser' && !empty( $_GET['by'] ) && !empty( $_GET["term"] ) ){
+			$offset = isset($_GET["offset"]) && is_numeric($_GET["offset"]) ? intval($_GET["offset"]) : 0;
+			$this->radio_browser->handleBrowse($this->out, $_GET['by'], $_GET["term"], $offset);
+		}
 		else if( !empty($_GET['toggleUnRead']) && is_string($_GET['toggleUnRead']) ){
 			$this->out->addDir('TOGGLE-UN-READ-' . $this->unread->toggleById($_GET['toggleUnRead'], $this->data), '');
 		}
@@ -62,6 +72,9 @@ class Router {
 			foreach( $this->data->getCategories() as $cid => $name ){
 				$this->out->addDir( $name, Config::DOMAIN . 'cat?cid=' . $cid );
 			}
+			// add link to RadioBrowser
+			$this->out->addDir( 'Radio-Browser', Config::DOMAIN . 'radio-browser?by=none&term=none' );
+
 			// add code (for gui)
 			$this->out->addDir( 'GUI-Code: ' . $this->radioid->getCode(), Config::DOMAIN . '?go=initial', true );
 
@@ -72,13 +85,11 @@ class Router {
 			){
 				file_put_contents( __DIR__ . '/../data/log.txt', date('d.m.Y H:i:s') . " : " . json_encode( $_GET ) . PHP_EOL, FILE_APPEND );
 			}
-
-			
 		}
 	}
 
 	private function listStation() : void {
-		$this->out->prevUrl(Config::DOMAIN . '?go=inital');
+		$this->out->prevUrl(Config::DOMAIN . '?go=initial');
 		$id = $_GET['Search'];
 		if( is_numeric( $id ) && preg_replace('/[^0-9]/','', $id ) === $id ){
 			$sta = $this->data->getById( $id );

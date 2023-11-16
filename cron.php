@@ -25,10 +25,18 @@ Config::setRedisServer();
 if( trim(shell_exec("whoami")) != "www-data" ){
 	die("Run as user www-data!" . PHP_EOL);
 }
+
 if( UnRead::dumpToDisk() ){
 	echo "Dumped (Un-)Read at " . date("d.m.Y H:i:s") . PHP_EOL;
 }
 else{
 	echo "Error while dumping (Un-)Read at " . date("d.m.Y H:i:s") . PHP_EOL;
+}
+
+if( RadioBrowser::dumpToDisk() ){
+	echo "Dumped RadioBrowser at " . date("d.m.Y H:i:s") . PHP_EOL;
+}
+else{
+	echo "Error while dumping RadioBrowser at " . date("d.m.Y H:i:s") . PHP_EOL;
 }
 ?>
