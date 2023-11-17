@@ -22,8 +22,7 @@ class RadioBrowser {
 
 	private const RADIO_BROWSER_API = "all.api.radio-browser.info";
 	private const RADIO_BROWSER_LIMIT = 100;
-	private const RADIO_BROWSER_CACHE_TTL = 60*5;
-	private const RADIO_BROWSER_LAST_MAX = 20;
+	private const RADIO_BROWSER_LAST_MAX = 40;
 
 	private Id $radioid;
 	private RedisCache $redis;
@@ -72,7 +71,7 @@ class RadioBrowser {
 				// select one API server
 				$this->api_server = $this->api_servers[0];
 				
-				$this->redis->arraySet('api_servers', $this->api_servers, self::RADIO_BROWSER_CACHE_TTL);
+				$this->redis->arraySet('api_servers', $this->api_servers, Config::CACHE_EXPIRE);
 				$this->redis->set('api_server', $this->api_server);
 			}
 
@@ -81,7 +80,14 @@ class RadioBrowser {
 		}
 	}
 
-	private function run_request(string $path, array $params = array()) {
+	private function run_request(string $path, array $params = array(), bool $cache = true) {
+		if($cache){
+			$cacheKey = 'api_cache.' . sha1($path . json_encode($params));
+			if($this->redis->keyExists($cacheKey)){
+				return json_decode($this->redis->get($cacheKey), true);
+			}
+		}
+
 		// check all servers, if one has errors
 		$errored_servers = array();
 		while( true ){
@@ -109,6 +115,9 @@ class RadioBrowser {
 			if($response !== false){
 				$result = json_decode($response, true);
 				if( !is_null($result) ){
+					if($cache){
+						$this->redis->set($cacheKey, $response, Config::CACHE_EXPIRE);
+					}
 					return $result;
 				}
 			}
@@ -126,24 +135,34 @@ class RadioBrowser {
 		}
 	}
 
+	private function browseUrl(string $by = "none", string $term = "none", int $offset = 0) : string {
+		return Config::DOMAIN . "radio-browser?". 
+			"by=" . rawurlencode($by) .
+			"&term=" . rawurlencode($term) .
+			( $offset > 0 ? "&offset=".$offset : '');
+	}
+
 	public function handleBrowse(Output $out, string $by, string $term, int $offset = 0) : void {
 		$this->before_request($out);
 
 		// store last request from user 
-		$this->redis->set('last_browse.'.$this->radioid->getId(), "by=".$by."&term=".urlencode($term)."&offset=".$offset );		
+		$keyPrev = 'last_browse.'.$this->radioid->getId();
+		$this->redis->set($keyPrev, $this->browseUrl($by, $term, $offset));		
 
 		if($by == "none" && $term == "none"){
 			$out->prevUrl(Config::DOMAIN . "?go=initial");
 
-			$out->addDir("Country", Config::DOMAIN . 'radio-browser?by=country&term=none');
-			$out->addDir("Language", Config::DOMAIN . 'radio-browser?by=language&term=none');
-			$out->addDir("Tags", Config::DOMAIN . 'radio-browser?by=tags&term=none');
-			$out->addDir("Top Click", Config::DOMAIN . 'radio-browser?by=topclick&term=none');
-			$out->addDir("Top Votes", Config::DOMAIN . 'radio-browser?by=votes&term=none');
-			$out->addDir("My Last", Config::DOMAIN . 'radio-browser?by=last&term=none');
+			$out->addDir("Languages", $this->browseUrl("languages"));
+			$out->addDir("Tags", $this->browseUrl("tags"));
+			$out->addDir("Countries", $this->browseUrl("countries"));
+			$out->addDir("Top Click", $this->browseUrl("topclick"));
+			$out->addDir("Top Vote", $this->browseUrl("topvote"));
+			$out->addDir("My Last", $this->browseUrl("last"));
+
+			return;
 		}
 		else if ($term == "none"){
-			$out->prevUrl(Config::DOMAIN . 'radio-browser?by=none&term=none');
+			$out->prevUrl($this->browseUrl());
 
 			// build query parameters
 			$params = array(
@@ -152,39 +171,30 @@ class RadioBrowser {
 				"offset" => $offset
 			);
 			switch ($by) {
-				case "country":
-					$path = "countries";
-					break;
-				case "language":
-					$path = "languages";
-					$params["order"] = "stationcount";
-					$params["reverse"] = "true";
-					break;
+				case "languages":
 				case "tags":
-					$path = "tags";
 					$params["order"] = "stationcount";
 					$params["reverse"] = "true";
+				case "countries":
+					$path = $by;
 					break;
 				case "topclick":
-					$path = "stations/topclick";
-					break;
-				case "votes":
-					$path = "stations/topvote";
+				case "topvote":
+					$path = "stations/".$by;
 					break;
 				case "last":
-					if($this->redis->keyExists('last_stations.'.$this->radioid->getId())){
-						$last = $this->redis->arrayGet('last_stations.'.$this->radioid->getId());
-						// TODO: better storing for Redis (Redis stores Arrays Keys as strings!!)
-						$last = array_reverse($last);
-						foreach($last as $i => $item){
+					$keyLast = 'last_stations.'.$this->radioid->getId();
+					if($this->redis->keyExists($keyLast)){
+						$last = $this->redis->arrayGet($keyLast);
+						$now = time();
+						foreach($last as $uuid => $item){
 							$out->addStation(
-								$item["uuid"], $item["name"], $item["url"],
-								true, "", "", $i+1
+								$uuid, $item["name"], $item["url"], light: true, sortKey: $now-$item["time"]
 							);
 						}
 					}
 					else {
-						$out->addDir("You do not have last stations.", Config::DOMAIN . 'radio-browser?by=none&term=none');
+						$out->addDir("You do not have last stations.", $this->browseUrl());
 					}
 					return; 
 				default:
@@ -201,75 +211,109 @@ class RadioBrowser {
 
 			// build the result
 			switch ($by) {
-				case "country":
-				case "language":
+				case "languages":
 				case "tags":
+				case "countries":
 					foreach($list as $i => $item){
 						$out->addDir(
-							$item["name"],
-							Config::DOMAIN . "radio-browser?by=".$by."&term=".urlencode($item["name"]),
-							false, $i+1
+							( $by == "countries" ? $item["iso_3166_1"] . " - " : '') . $item["name"],
+							$this->browseUrl($by, $item["name"]), sortKey: $i+1
 						);
 					}
 					break;
 				case "topclick":
-				case "votes":
+				case "topvote":
 					foreach($list as $i => $item){
-						$out->addStation(
-							$item["stationuuid"], $item["name"], $item["url"],
-							true, "", "", $i+1
-						);
+						$out->addStation( $item["stationuuid"], $item["name"], $item["url"], light: true, sortKey: $i+1);
 					}
 					break;
 			}
+		}
+		else if ( $by == "countries" ) { // $term != "all" => show states to select from !!
+			$out->prevUrl($this->browseUrl($by));
 
-			// pagination
-			if($offset >= self::RADIO_BROWSER_LIMIT ){
-				$out->addDir(
-					"Previous Page",
-					Config::DOMAIN . "radio-browser?by=".$by."&term=none&offset=" . strval($offset-self::RADIO_BROWSER_LIMIT), 
-					false, 0
-				);
-			}
-			$out->addDir(
-				"Next Page",
-				Config::DOMAIN . "radio-browser?by=".$by."&term=none&offset=" . strval($offset+self::RADIO_BROWSER_LIMIT), 
-				true
+			$out->addDir("All States", $this->browseUrl("country-all", $term), sortKey: 1 );
+
+			$list = $this->run_request(
+				"states/".rawurlencode($term)."/",
+				array(
+					"limit" => self::RADIO_BROWSER_LIMIT,
+					"hidebroken" => "true",
+					"offset" => $offset,
+					"order" => "stationcount",
+					"reverse" => "true"
+				)
 			);
+			if($list === false){
+				$out->addDir("Error fetching data from Radio-Browser API!", Config::DOMAIN . "?go=initial");
+				return;
+			}
+
+			foreach($list as $i => $item){
+				$out->addDir( $item["name"], $this->browseUrl("states", $item["name"]), sortKey: $i+2 );
+			}	
 		}
-		else if ( $by == "language" || $by == "tags" || $by == "state" || $by == "country-all" ){
-			$out->prevUrl(Config::DOMAIN . 'radio-browser?by='.$by.'&term=none');
+		else if ( $by == "languages" || $by == "tags" || $by == "states" || $by == "country-all" ){
+			$out->prevUrl($this->browseUrl($by));
+			if($by == "country-all"){
+				$out->prevUrl($this->browseUrl("countries", $term));
+			}
 
-			// TODO
-			// addStation ...
+			// build query parameters
+			$params = array(
+				"limit" => self::RADIO_BROWSER_LIMIT,
+				"hidebroken" => "true",
+				"offset" => $offset,
+				"order" => "clickcount",
+				"reverse" => "true"
+			);
+			switch ($by) {
+				case "languages":
+					$path = "stations/bylanguageexact";
+					break;
+				case "tags":
+					$path = "stations/bytagexact";
+					break;
+				case "states":
+					$path = "stations/bystateexact";
+					break;
+				case "country-all":
+					$path = "stations/bycountryexact";
+					break;
+			}
 
-			// https://de1.api.radio-browser.info/xml/stations/bycountryexact/germany
-			
-			$out->addDir("TODO!!! language, tags, country all, state", Config::DOMAIN . "?go=initial");
-		}
-		else if ( $by == "country" ) { // $term != "all" => show states to select from !!
-			$out->prevUrl(Config::DOMAIN . 'radio-browser?by='.$by.'&term=none');
+			$list = $this->run_request($path . "/" . rawurlencode($term), $params );
+			if($list === false){
+				$out->addDir("Error fetching data from Radio-Browser API!", Config::DOMAIN . "?go=initial");
+				return;
+			}
 
-			// TODO
-			// addDir "All States" "?by=country-all&term=<country>"
-			// addDir "<State>" "?by=state&term=<state>" 
-			
-			$out->addDir("TODO!!! country states list", Config::DOMAIN . "?go=initial");
+			foreach($list as $i => $item){
+				$out->addStation( $item["stationuuid"], $item["name"], $item["url"], light: true, sortKey: $i+1);
+			}
+
+			// get country of state
+			if( $by == "states" && count($list) > 0 ){
+				$out->prevUrl($this->browseUrl( "countries" , $list[0]["country"]));
+			}
 		}
 		else {
 			$out->addDir("Invalid request!", Config::DOMAIN . "?go=initial");
+			return;
 		}
+
+		// pagination
+		if( $offset > 0 ){
+			$out->addDir("Previous Page", $this->browseUrl($by, $term, max(0, $offset-self::RADIO_BROWSER_LIMIT)), sortKey: 0);
+		}
+		$out->addDir("Next Page", $this->browseUrl($by, $term, $offset+self::RADIO_BROWSER_LIMIT), true);
 	}
 	
 	public function handleStationPlay(Output $out, string $uuid) : void {
 		$this->before_request($out);
 
-		if($this->redis->keyExists('last_browse.'.$this->radioid->getId())){
-			$out->prevUrl(Config::DOMAIN . 'radio-browser?' . $this->redis->get('last_browse.'.$this->radioid->getId()));
-		}
-		else {
-			$out->prevUrl(Config::DOMAIN . 'radio-browser?by=none&term=none');
-		}
+		$keyPrev = 'last_browse.'.$this->radioid->getId();
+		$out->prevUrl($this->redis->keyExists($keyPrev) ? $this->redis->get($keyPrev) : $this->browseUrl());
 
 		if(!self::matchStationID($uuid)){
 			$out->addDir("Invalid Station ID!", Config::DOMAIN . "?go=initial");
@@ -295,31 +339,27 @@ class RadioBrowser {
 
 		// send the click to server to maintain "station clicks"
 		// 	https://at1.api.radio-browser.info/#Count_station_click
-		$this->run_request("url/" . $uuid);
+		$this->run_request("url/" . $uuid, cache: false);
 
-		// store/ update to user's "last stations"
-		if($this->redis->keyExists('last_stations.'.$this->radioid->getId())){
-			$last = $this->redis->arrayGet('last_stations.'.$this->radioid->getId());
+		// get user's "last stations"
+		$keyLast = 'last_stations.'.$this->radioid->getId();
+		$last = $this->redis->keyExists($keyLast) ? $this->redis->arrayGet($keyLast) : array();
+
+		// add station and add current time
+		if(!array_key_exists($station["stationuuid"], $last)){
+			$last[$station["stationuuid"]] = array(
+				"name" => $station["name"],
+				"url" => $station["url"],
+			);
 		}
-		else {
-			$last = array();
-		}
+		$last[$station["stationuuid"]]["time"] = time();
 
-		// TODO: better storing for Redis (Redis stores Arrays Keys as strings!!)
-
-		// remove the current stations first
-		$last = array_values(array_filter($last, fn($l) => $l["uuid"] != $station["stationuuid"]));
-		// add current stations as "latest"
-		$last[] = array(
-			"uuid" => $station["stationuuid"],
-			"name" => $station["name"],
-			"url" => $station["url"]
-		);
 		if (count($last) > self::RADIO_BROWSER_LAST_MAX){
-			$last = array_slice($last, -self::RADIO_BROWSER_LAST_MAX);
+			uasort($last, fn($x, $y) => $y["time"] <=> $x["time"] );
+			$last = array_slice($last, 0, self::RADIO_BROWSER_LAST_MAX);
 		}
 
-		$this->redis->arraySet('last_stations.'.$this->radioid->getId(), $last);
+		$this->redis->arraySet($keyLast, $last);
 	}
 
 

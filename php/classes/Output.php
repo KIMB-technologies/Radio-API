@@ -48,7 +48,7 @@ class Output {
 			'StationId' => $id,
 			'StationName' => self::cleanText($name),
 		);
-		if( $light == false ){
+		if( !$light ){
 			$logo = empty($logo) || substr($logo, 0, 4) != 'http' ? Config::DOMAIN . 'media/default.png' : $logo;
 			$b = array(
 				'StationUrl' => self::cleanUrl($url),
