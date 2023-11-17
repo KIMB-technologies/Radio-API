@@ -38,7 +38,7 @@ class Router {
 	 */
 	public function handleGet(string $uri) : void {
 		if( isset( $_GET['sSearchtype'] ) && $_GET['sSearchtype'] == 3 ){ // only one station (play this)
-			if( !empty($_GET['Search']) && RadioBrowser::matchStationID($_GET['Search']) ){ // is an uuid from Radio-Browser??
+			if( !empty($_GET['Search']) && RadioBrowser::matchStationID($_GET['Search']) ){ // is an id from Radio-Browser??
 				$this->radio_browser->handleStationPlay($this->out, $_GET['Search']);
 			}
 			else { // local ID

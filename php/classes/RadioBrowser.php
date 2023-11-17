@@ -18,10 +18,10 @@ defined('HAMA-Radio') or die('Invalid Endpoint');
  */
 class RadioBrowser {
 
-	private const UUID_REGEX = '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i';
+	private const STATION_ID_REGEX = '/^[0-9a-f]{32}$/i'; // the radio can only memorize IDs of 32 chars, thus remove the - and add them later again
 
 	private const RADIO_BROWSER_API = "all.api.radio-browser.info";
-	private const RADIO_BROWSER_LIMIT = 100;
+	private const RADIO_BROWSER_LIMIT = 50;
 	private const RADIO_BROWSER_LAST_MAX = 40;
 
 	private Id $radioid;
@@ -31,8 +31,21 @@ class RadioBrowser {
 	private bool $initialized = false;
 
 	public static function matchStationID(string $id) : bool {
-		return preg_match(self::UUID_REGEX, $id) === 1;
+		return preg_match(self::STATION_ID_REGEX, $id) === 1;
 	}
+
+	private static function stationIDfromUUID(string $uuid) : string {
+		return str_replace('-', '', $uuid);
+	}
+
+	private static function uuidFromStationID(string $id) : string|false {
+		if(!self::matchStationID($id)) {
+			return false;
+		}
+		return substr($id, 0, 8) . '-' .  substr($id, 8, 4) . '-' .
+			substr($id, 12, 4) . '-' . substr($id, 16, 4) . '-' . substr($id, 20, 12);
+	}
+
 
 	/**
 	 * Create the Radio-Browser object to access https://api.radio-browser.info/
@@ -200,7 +213,7 @@ class RadioBrowser {
 						$now = time();
 						foreach($last as $uuid => $item){
 							$out->addStation(
-								$uuid, $item["name"], $item["url"], light: true, sortKey: $now-$item["time"]
+								self::stationIDfromUUID($uuid), $item["name"], $item["url"], light: true, sortKey: $now-$item["time"]
 							);
 						}
 					}
@@ -235,7 +248,10 @@ class RadioBrowser {
 				case "topclick":
 				case "topvote":
 					foreach($list as $i => $item){
-						$out->addStation( $item["stationuuid"], $item["name"], $item["url"], light: true, sortKey: $i+1);
+						$out->addStation(
+							self::stationIDfromUUID($item["stationuuid"]), $item["name"],
+							$item["url"], light: true, sortKey: $i+1
+						);
 					}
 					break;
 			}
@@ -300,7 +316,10 @@ class RadioBrowser {
 			}
 
 			foreach($list as $i => $item){
-				$out->addStation( $item["stationuuid"], $item["name"], $item["url"], light: true, sortKey: $i+1);
+				$out->addStation(
+					self::stationIDfromUUID($item["stationuuid"]), $item["name"],
+					$item["url"], light: true, sortKey: $i+1
+				);
 			}
 
 			// get country of state
@@ -320,14 +339,16 @@ class RadioBrowser {
 		$out->addDir("Next Page", $this->browseUrl($by, $term, $offset+self::RADIO_BROWSER_LIMIT), true);
 	}
 	
-	public function handleStationPlay(Output $out, string $uuid) : void {
+	public function handleStationPlay(Output $out, string $id) : void {
 		$this->before_request($out);
 
 		$keyPrev = 'last_browse.'.$this->radioid->getId();
 		$out->prevUrl($this->redis->keyExists($keyPrev) ? $this->redis->get($keyPrev) : $this->browseUrl());
 
-		if(!self::matchStationID($uuid)){
-			$out->addDir("Invalid Station ID!", Config::DOMAIN . "?go=initial");
+		$uuid = self::uuidFromStationID($id);
+		if($uuid === false){
+			$out->addDir("Unable to find station by ID!", Config::DOMAIN . "?go=initial");
+			return;
 		}
 
 		// fetch station data
@@ -340,7 +361,7 @@ class RadioBrowser {
 
 		// show to radio
 		$out->addStation(
-			$station["stationuuid"],
+			self::stationIDfromUUID($station["stationuuid"]),
 			$station["name"],
 			$station["url"],
 			false,
