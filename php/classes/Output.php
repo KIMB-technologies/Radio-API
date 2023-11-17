@@ -86,12 +86,12 @@ class Output {
 	/**
 	 * Add a podcast episode
 	 */
-	public function addEpisode( int $podcastid, int $episodeid, string $podcastname, string $episodename,
+	public function addEpisode( int $podcastid, int|null $episodeid, string $podcastname, string $episodename,
 						string $url, string $desc = '', string $logo = '', bool $top = false ) : void {
 		$logo = empty($logo) || substr($logo, 0, 4) != 'http' ? Config::DOMAIN . 'media/default.png' : $logo;
 		$this->items[] = array(
 			'ItemType' => 'ShowEpisode',
-			'ShowEpisodeID' =>  $podcastid . 'X' . $episodeid,	
+			'ShowEpisodeID' =>  $podcastid . (!is_null($episodeid) ? 'X' . $episodeid : ''),	
 			'ShowName' => self::cleanText($podcastname),
 			'Logo' => self::cleanUrl($logo),
 			'ShowEpisodeName' => self::cleanText($episodename),
