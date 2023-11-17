@@ -41,6 +41,14 @@ class RadioBrowser {
 		$this->radioid = $id;
 	}
 
+	private function log(array $data) : void {
+		file_put_contents(
+			__DIR__ . '/../data/log_radiobrowser.txt',
+			date('d.m.Y H:i:s') . " : " . json_encode( $data ) . PHP_EOL,
+			FILE_APPEND
+		);
+	}
+
 	private function before_request(?Output $out = null) : void {
 		if(!$this->initialized){
 			$this->redis = new RedisCache("radio-browser");
@@ -55,6 +63,7 @@ class RadioBrowser {
 				$records = dns_get_record(self::RADIO_BROWSER_API, DNS_A);
 				if($records === false){
 					$out->addDir("Error connecting to Radio-Browser API!", Config::DOMAIN . "?go=initial");
+					$this->log(["Error connecting to Radio-Browser API!", "dns request failed"]);
 					return;
 				}
 		
@@ -121,6 +130,8 @@ class RadioBrowser {
 					return $result;
 				}
 			}
+
+			$this->log(["Error requesting from Radio-Browser API!", $this->api_server, '/json/'. $path, $params, $response ]);
 
 			// error with current server occured
 			$errored_servers[] = $this->api_server;
