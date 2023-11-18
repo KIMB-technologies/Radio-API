@@ -11,23 +11,19 @@ This is an alternative API for Frontier Nuvola (Frontier Silicon) internet radio
 The main idea is to redirect the HTTP request of the radio to another server, where own stations and podcasts can be added.
 This redirect is possible by manipulating the DNS queries.
 
-> This *Radio-API* does not come with a predefined list of stations. 
-> Instead is allows each user to define their own list of radio stations, podcasts and audio streams from Nextcloud shares.  
-> If you are searching for streaming urls of radio station, you may use the search at https://www.radio-browser.info/search and copy the url to Radio-API. 
+> This *Radio-API* uses the [RadioBrowser](https://www.radio-browser.info/) to provide a list of radio stations.
+> In addition, it allows each user to define their *own list of radio stations and podcasts*.
+> Audio streams from Nextcloud shares are supported, too. 
 
 &rarr; [Have a look at **screenshots**](./screenshots/Readme.md)
 
 ## Usage
-- First [set up](#setup) the Docker Container of this *Radio-API* and change the DNS resolver of the radio (e.g. as described in set up, too).
+- First [set up](#setup) the Docker Container of this *Radio-API* and change the DNS resolver of the radio (e.g., as described there).
 - Afterwards start the radio and open "Internet Radio".
 - The *Radio-API* should provide a list of:
-	- **Radio**
-		- This is a list of internet radio stations.
-		- The list of stations can be changed in the GUI.
-		- A radio station should be an URL to some stream like MP3, M3U etc.
-	- **Podcasts**
-		- This is a list of podcasts.
-		- The list of podcasts can be changed using the GUI.
+	- **Podcast**
+		- This is the user defined list of podcasts.
+		- The list available of podcasts can be changed using the GUI.
 		- The list of episodes for each podcast is cached for `CONF_CACHE_EXPIRE` seconds.
 		- The URL of a podcast can be an Atom RSS link or a link to a Nextcloud share.
 		- Nextcloud share:
@@ -37,8 +33,18 @@ This redirect is possible by manipulating the DNS queries.
 			- The share must not have a password.
 			- There is no support for sub folders in shares, only the files in the share are shown.
 		- Episodes get a `*` in front of their name if they have not yet been listened to.
-	- **Stream**
-		- This is a list of custom streams.
+	- **Radio**
+		- This is the user defined list of internet radio stations.
+		- The list of stations can be changed in the GUI.
+		- A radio station should be an URL to some stream like MP3, M3U etc.
+	- **Radio-Browser**
+		- This allows to browse the radio stations in [RadioBrowser](https://www.radio-browser.info/).
+		- Stations can be browsed by country (and state), language, tags, clicks and votes.
+		- The stations recently opened via the radio are shown in *My Last*.
+		- *Using Radio-Browser will send http requests and such usage data to the [RadioBrowser API](https://api.radio-browser.info/)!*
+		- In the GUI it is also possible to search for stations in RadioBrowser and add them to the user defined stations. Stations from *My Last* are shown in the GUI, too.
+	- **Stream** (if enabled in `docker-compose.yml`)
+		- This is a list of server specific streams.
 		- The list is fetched from a custom url, provided in the Docker Container setup.
 		- The list is cached for `CONF_CACHE_EXPIRE` seconds.
 		- The radio streams each item as a radio station.
@@ -56,6 +62,8 @@ This redirect is possible by manipulating the DNS queries.
 ### Notes
 - This is a private project and has no connections to Frontier Nuvola/ Frontier Silicon.
 - There is a limit of 1000 items per list: 1000 radio stations, 1000 streams, 1000 podcasts.
+	Items from RadioBrowser do not count against this limit.
+	Adding more than 200 user defined radio stations or podcasts is not recommended.
 - Nobody should host a public DNS resolver resolving wrong IPs. Some type of access control is recommended.
 
 ## Setup
@@ -92,11 +100,11 @@ The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechn
 		- Create a cron job to `/cron.php`, e.g., `docker exec --user www-data radio_api php /cron.php`. (This will dump the already played episodes to a JSON file in `./data/` and *Radio-API* will load the file into redis on container startup).
 		- Use the data volume of Redis. (Redis will (re-)load its dump files on container startup.)
 3. Done
-	- Start the radio and open `Internet Radio`
-	- There should be a list with three items `Radio, Podcasts, (Streams)` and a GUI-Code.
+	- Start the radio and open `Internet Radio`.
+	- You will see the entries described above at [Usage](#usage).
 	- Use the GUI to define the list of stations and podcasts. It can be accessed with a browser at `CONF_DOMAIN/gui`. 
 	- You will need the code shown by the radio to log into the GUI. 
-	- Each connected radio has is own list of radio stations and podcasts, the *own streams* are global.
+	- Each connected radio has is own list of user defined radio stations and podcasts, the *own streams* are global.
 
 > The API can be placed outside of the local network as well as inside.
 
@@ -106,6 +114,7 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 
 ### Troubleshooting 
 - A log file of (unknown) request received by the Radio-API is created at `./data/log.txt`.  
+- Errors with the RadioBrowser API are logged at `./data/log_radiobrowser.txt`.
 - If the Radio-API is unable to parse a JSON-file in `./data/`, it will initialize a new one, while the old one is renamed to `*.error.json`.
 - PHP error messages are disabled by default, set `DEV=dev` in the environment to enable them.
 - Erase the data folder/ volume of redis and restart Radio-API.

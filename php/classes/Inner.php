@@ -17,12 +17,13 @@ defined('HAMA-Radio') or die('Invalid Endpoint');
 class Inner {
 
 	private $html = array();
-	private $radios, $podcasts, $data;
+	private $radios, $podcasts, $data, $template;
 
-	public function __construct(int $id){
+	public function __construct(int $id, Template $template){
 		$this->data = new Data($id);
 		$this->radios = $this->data->getRadioList();
 		$this->podcasts = $this->data->getPodcastList();
+		$this->template = $template;
 	}
 
 	public function checkPost() : void {
@@ -63,90 +64,58 @@ class Inner {
 		}
 	}
 
-	public function radioForm() : string {
-		$head = '<tr><th>ID</th><td></td><td style="width: 500px; max-width:60%; "></td></tr>';
-		$rows = array();
+	public function radioForm() : void {
+		$radios = array();
 		$count = 0;
 		foreach($this->radios as $key => $radio ){
 			$id = ($key+1000);
 
-			$rows[] = array(  '<b>'. $id .'</b>', '', '' );
-			$rows[] = array(  '', 'Name', '<input delid="d'.$id.'" type="text" value="'.$radio['name'].'" name="name['.$count.']"/>' );
-			$rows[] = array(  '', 'URL', '<input delid="d'.$id.'" type="text" value="'.$radio['url'].'" name="url['.$count.']"/>' );
-			$rows[] = array(  '', 'Proxy',
-				'<input type="radio" value="yes" name="proxy['.$count.']" '. ( $radio['proxy'] ? 'checked="checked"' : '' ) .' /> &check;' .
-				'<input type="radio" value="no" name="proxy['.$count.']" '. ( !$radio['proxy'] ? 'checked="checked"' : '' ) .' /> &cross;',
+			$radios[] = array(
+				"ID" => $id,
+				"COUNT" => $count,
+				"NAME" => $radio['name'],
+				"URL" => $radio['url'],
+				"PROXY_YES" => $radio['proxy'] ? 'checked="checked"' : '',
+				"PROXY_NO" => !$radio['proxy'] ? 'checked="checked"' : '',
+				"TYPE_RADIO" => $radio['type'] != 'nc' ? 'checked="checked"' : '',
+				"TYPE_NC" => $radio['type'] == 'nc' ? 'checked="checked"' : '',
+				"LOGO" => $radio['logo'],
+				"DESC" => $radio['desc'],
 			);
-			$rows[] = array(  '', 'Type',
-				'<input type="radio" value="radio" name="type['.$count.']" '. ( $radio['type'] != 'nc' ? 'checked="checked"' : '' ) .' /> Radio' .
-				'<input type="radio" value="nc" name="type['.$count.']" '. ( $radio['type'] == 'nc' ? 'checked="checked"' : '' ) .' /> Nextcloud',
-			);
-			$rows[] = array(  '', 'Logo', '<input delid="d'.$id.'" type="text" value="'.$radio['logo'].'" name="logo['.$count.']"/>' );
-			$rows[] = array(  '', 'Description',
-				'<input delid="d'.$id.'" type="text" value="'.$radio['desc'].'" name="desc['.$count.']"/>' .
-				'<button class="del" delid="d'.$id.'" type="button" title="Delete">&cross;</button>'
-			);
+			
 			$count++;
 		}
-		$rows[] = array(  '<b>Neu</b>', '', '' );
-		$rows[] = array(  '', 'Name', '<input type="text" placeholder="Name" name="name['.$count.']"/>' );
-		$rows[] = array(  '', 'URL', '<input type="text" placeholder="URL (MP3, ...)" name="url['.$count.']"/>' );
-		$rows[] = array(  '', 'Logo', '<input type="text" placeholder="Logo (PNG, ...)" name="logo['.$count.']"/>' );
-		$rows[] = array(  '', 'Description', '<input type="text" placeholder="Description" name="desc['.$count.']"/>' );
-		$rows[] = array(  '', 'Type',
-				'<input type="radio" value="radio" name="type['.$count.']"  checked="checked" /> Radio' .
-				'<input type="radio" value="nc" name="type['.$count.']" /> Nextcloud'
-		);
-		$rows[] = array('', '', '<input type="hidden" value="no" name="proxy['.$count.']" />');
-		return $head . PHP_EOL . implode( PHP_EOL , array_map( function ($c) {
-			return '<tr><td>' . implode( '</td><td>', $c ) . '</td></tr>';
-		} , $rows ) );
+		$this->template->setMultipleContent('RadioStations', $radios);
+		$this->template->setContent('RADIO_COUNT', $count);
 	}
 
-	public function podcastForm() : string {
-		$head = '<tr><th>ID</th><td></td><td style="width: 500px; max-width:60%;"></td></tr>';
-		$rows = array();
+	public function podcastForm() : void {
+		$podcasts = array();
 		$count = 0;
 		foreach($this->podcasts as $key => $pod ){
 			$id = ($key+3000);
 
-			$rows[] = array(  '<b>'. $id .'</b>', '', '' );
-			$rows[] = array(  '', 'Name', '<input type="text" delid="d'.$id.'" value="'.$pod['name'].'" name="name['.$count.']"/>' );
-			$rows[] = array(  '', 'Type',
-				'<input type="radio" value="rss" value="'.$pod['type'].'" name="type['.$count.']" '.( $pod['type'] == 'rss' ? 'checked="checked"' : '' ).' /> RSS/ Atom' .
-				'<input type="radio" value="nc" value="'.$pod['type'].'" name="type['.$count.']" '.( $pod['type'] == 'nc' ? 'checked="checked"' : '' ).' /> Nextcloud'
+			$podcasts[] = array(
+				"ID" => $id,
+				"COUNT" => $count,
+				"NAME" => $pod['name'],
+				"URL" => $pod['url'],
+				"TYPE_RSS" => $pod['type'] == 'rss' ? 'checked="checked"' : '',
+				"TYPE_NC" => $pod['type'] == 'nc' ? 'checked="checked"' : '',
+				"ENDURL_YES" => $pod['finalurl'] ? 'checked="checked"' : '',
+				"ENDURL_NO" => !$pod['finalurl'] ? 'checked="checked"' : '',
+				"PROXY_YES" => $pod['proxy'] ? 'checked="checked"' : '',
+				"PROXY_NO" => !$pod['proxy'] ? 'checked="checked"' : '',
 			);
-			$rows[] = array(  '', 'URL', '<input type="text" delid="d'.$id.'" value="'.$pod['url'].'" name="url['.$count.']"/>' );
-			$rows[] = array(  '', 'EndURL',
-				'<input type="radio" value="yes" name="finalurl['.$count.']" '. ( $pod['finalurl'] ? 'checked="checked"' : '' ) .' /> &check;' .
-				'<input type="radio" value="no" name="finalurl['.$count.']" '. ( !$pod['finalurl'] ? 'checked="checked"' : '' ) .' /> &cross;'
-			);
-			$rows[] = array(  '', 'Proxy',
-				'<input type="radio" value="yes" name="proxy['.$count.']" '. ( $pod['proxy'] ? 'checked="checked"' : '' ) .' /> &check;' .
-				'<input type="radio" value="no" name="proxy['.$count.']" '. ( !$pod['proxy'] ? 'checked="checked"' : '' ) .' /> &cross;',
-				'<button class="del" delid="d'.$id.'" type="button" title="Delete">&cross;</button>'
-			);
+			
 			$count++;
 		}
-		$rows[] = array( '<b>New</b>', '', '');
-		$rows[] = array( '', 'Name', '<input type="text" placeholder="Name" name="name['.$count.']"/>');
-		$rows[] = array(  '', 'Type',
-				'<input type="radio" value="rss" name="type['.$count.']" checked="checked"  /> RSS/ Atom' .
-				'<input type="radio" value="nc" name="type['.$count.']" /> Nextcloud'
-		);
-		$rows[] = array('', 'URL', '<input type="text" placeholder="URL" name="url['.$count.']"/>');
-		$rows[] = array(  '', 'EndURL',
-				'<input type="radio" value="yes" name="finalurl['.$count.']" /> &check;' .
-				'<input type="radio" value="no" name="finalurl['.$count.']" checked="checked" /> &cross;'
-		);
-		$rows[] = array('', '', '<input type="hidden" value="no" name="proxy['.$count.']" />');
-		return $head . PHP_EOL . implode( PHP_EOL , array_map( function ($c) {
-			return '<tr><td>' . implode( '</td><td>', $c ) . '</td></tr>';
-		} , $rows ) );
+		$this->template->setMultipleContent('Podcasts', $podcasts);
+		$this->template->setContent('PODCAST_COUNT', $count);
 	}
 
-	public function getMessages() : string {
-		return implode(PHP_EOL, $this->html);
+	public function outputMessages() : void {
+		$this->template->setContent('ADD_HTML', implode(PHP_EOL, $this->html));
 	}
 
 	// ==== //

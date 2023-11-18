@@ -31,7 +31,7 @@ class Login {
 
 	public function isLoggedIn() : bool {
 		return isset($_SESSION['login']) && isset( $_SESSION['db_all'] ) &&
-			$_SESSION['login'] && $_SESSION['login_time'] + 600 > time();
+			$_SESSION['login'] && $_SESSION['login_time'] + 1200 > time();
 	}
 
 	public function getId() : int {

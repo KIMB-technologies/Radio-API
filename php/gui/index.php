@@ -32,21 +32,33 @@ if( isset($_GET['login']) || isset( $_GET['err'] )){
 	}
 }
 if( $login->isLoggedIn() ){
-	$mainTemplate->setContent('TITLE', 'List');
-	$mainTemplate->setContent('MOREHEADER', '<script src="viewer.js?v=3"></script>');
-	$listTemplate = new Template('list');
-	$mainTemplate->includeTemplate( $listTemplate );
-
-	$listTemplate->setContent('DOMAIN', Config::DOMAIN);
-
-	$inner = new Inner($login->getId());
-	$inner->checkPost();
-
-	$listTemplate->setContent('PODCAST_FORM', $inner->podcastForm());
-	$listTemplate->setContent('RADIO_FORM', $inner->radioForm());
-	$listTemplate->setContent('ADD_HTML', $inner->getMessages());
-	$listTemplate->setContent('RADIO_MAC', $login->getAll()['mac']);
-	$listTemplate->setContent('LOGIN_CODE', $login->getAll()['code']);
+	// RadioBrowser Search?
+	if(!empty($_GET["search"]) || isset($_GET["last"])){
+		$rb = new RadioBrowser($login->getId());
+		header('Content-Type: application/json;charset=UTF-8');
+		die(json_encode(
+			isset($_GET["last"]) ? $response = $rb->lastStations() : $rb->searchStation($_GET["search"]), 
+			JSON_PRETTY_PRINT
+		));
+	}
+	else {
+		$mainTemplate->setContent('TITLE', Template::getLanguage() == 'de' ? 'Eigene Listen' : 'User defined Lists');
+		$mainTemplate->setContent('MOREHEADER', '<script src="viewer.js?v=3"></script><script src="radio-browser.js"></script>');
+	
+		$listTemplate = new Template('list');
+		$listTemplate->setContent('RADIO_MAC', $login->getAll()['mac']);
+		$listTemplate->setContent('LOGIN_CODE', $login->getAll()['code']);
+	
+		$mainTemplate->includeTemplate( $listTemplate );
+	
+		$inner = new Inner($login->getId(), $listTemplate);
+		$inner->checkPost();
+	
+		$inner->radioForm();
+		$inner->podcastForm();
+	
+		$inner->outputMessages();
+	}
 }
 else{
 	$mainTemplate->setContent('TITLE', 'Login');
@@ -55,11 +67,13 @@ else{
 
 	// Login Error
 	if( !empty($_POST['code']) ){
-		$loginTemplate->setContent('ADD_HTML', '<div class="achtung">Login not successful!</div>');
+		$msg = Template::getLanguage() == 'de' ? 'Login fehlgeschlagen' : 'Login not successful!';
+		$loginTemplate->setContent('ADD_HTML', '<div class="achtung">'.$msg.'</div>');
 	}
 	// Error Page
 	if( isset( $_GET['err'] ) && ( $_GET['err'] == '404' || $_GET['err'] == '403' ) ){
-		$loginTemplate->setContent('ADD_HTML', '<div class="achtung">Error '. $_GET['err'] .'</div>');
+		$msg = Template::getLanguage() == 'de' ? 'Fehler' : 'Error';
+		$loginTemplate->setContent('ADD_HTML', '<div class="achtung">'.$msg.' '. $_GET['err'] .'</div>');
 	}
 }
 echo $mainTemplate->output();
