@@ -22,6 +22,15 @@ input[type=text]{
 	max-width:500px;
 }
 
+dt {
+	font-weight: bold;
+	margin-top: 10px;
+}
+dd {
+	font-weight: normal;
+	font-style: italic;
+}
+
 div#main{
 	border: 1px solid black;
 	margin:auto;
@@ -40,6 +49,15 @@ div#footer a, div#footer a:visited, div#footer a:hover {
 
 div#apiviewer a{
 	text-decoration: none;
+}
+#radioBrowserView {
+	display: none;
+}
+#radioBrowserButtons td:last-child, #radioBrowserView td:last-child {
+	background-color: lightblue;
+	padding: 20px 5px;
+	border: 2px solid darkblue;
+	border-radius: 4px;
 }
 div.achtung {
 	border: 2px solid red;

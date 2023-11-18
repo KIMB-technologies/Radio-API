@@ -62,7 +62,7 @@
 				</tr>
 			<!--MULTIPLE-RadioStations-END-->
 			<tr>
-				<td><b>Neu</b></td>
+				<td><b>New</b></td>
 				<td></td>
 				<td></td>
 			</tr>
@@ -70,6 +70,28 @@
 				<td></td>
 				<td>Name</td>
 				<td><input type="text" placeholder="Name" name="name[%%RADIO_COUNT%%]"/></td>
+			</tr>
+			<tr id="radioBrowserButtons">
+				<td></td>
+				<td>Insert from</td>
+				<td>
+					<input type="button" id="openLast" value="Last listened" /> <small>using RadioBrowser</small><br>
+					<input type="button" id="openSearch" value="Search" /> <small>in RadioBrowser</small>
+				</td>
+			</tr>
+			<tr id="radioBrowserView">
+				<td colspan="2">RadioBrowser</td>
+				<td>
+					<input type="radio" name="radioBrowserType" value="last" /> Last listened
+					<input type="radio" name="radioBrowserType" value="search" /> Search
+					</br>
+					<div id="searchElements">
+						<input type="text" id="searchTerm" placeholder="Name to search for" />
+						<input type="button" id="runSearch" value="Search" />
+					</div>
+					<div id="results">
+					</div>
+				</td>
 			</tr>
 			<tr>
 				<td></td>
@@ -272,4 +294,4 @@
 			Also if something works using a browser, it may not work with the radio.
 			One possible reason is, that the radio does not support SSL.
 		</div>
-		<script> var serverurl = "%%SERVERURL%%", radiomac = "%%RADIO_MAC%%";</script>
+		<script> var serverurl = "%%SERVERURL%%", radiomac = "%%RADIO_MAC%%", radiocount = %%RADIO_COUNT%%;</script>

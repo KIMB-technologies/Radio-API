@@ -50,8 +50,13 @@ class RadioBrowser {
 	/**
 	 * Create the Radio-Browser object to access https://api.radio-browser.info/
 	 */
-	public function __construct( Id $id ){
-		$this->radioid = $id;
+	public function __construct( Id|int $id ){
+		if(is_integer($id)){
+			$this->radioid = new Id( strval($id), Id::ID );
+		}
+		else {
+			$this->radioid = $id;
+		}
 	}
 
 	private function log(array $data) : void {
@@ -75,7 +80,9 @@ class RadioBrowser {
 				// get server ips
 				$records = dns_get_record(self::RADIO_BROWSER_API, DNS_A);
 				if($records === false){
-					$out->addDir("Error connecting to Radio-Browser API!", Config::DOMAIN . "?go=initial");
+					if(!is_null($out)){
+						$out->addDir("Error connecting to Radio-Browser API!", Config::DOMAIN . "?go=initial");
+					}
 					$this->log(["Error connecting to Radio-Browser API!", "dns request failed"]);
 					return;
 				}
@@ -207,17 +214,14 @@ class RadioBrowser {
 					$path = "stations/".$by;
 					break;
 				case "last":
-					$keyLast = 'last_stations.'.$this->radioid->getId();
-					if($this->redis->keyExists($keyLast)){
-						$last = $this->redis->arrayGet($keyLast);
-						$now = time();
-						foreach($last as $uuid => $item){
-							$out->addStation(
-								self::stationIDfromUUID($uuid), $item["name"], $item["url"], light: true, sortKey: $now-$item["time"]
-							);
-						}
+					$last = $this->lastStations();
+					$now = time();
+					foreach($last as $uuid => $item){
+						$out->addStation(
+							self::stationIDfromUUID($uuid), $item["name"], $item["url"], light: true, sortKey: $now-$item["time"]
+						);
 					}
-					else {
+					if(empty($last)){
 						$out->addDir("You do not have last stations.", $this->browseUrl());
 					}
 					return; 
@@ -338,6 +342,39 @@ class RadioBrowser {
 		}
 		$out->addDir("Next Page", $this->browseUrl($by, $term, $offset+self::RADIO_BROWSER_LIMIT), true);
 	}
+
+	public function lastStations() : array {
+		$this->before_request();
+
+		$keyLast = 'last_stations.'.$this->radioid->getId();
+		return $this->redis->keyExists($keyLast) ? $this->redis->arrayGet($keyLast) : array();
+	}
+
+	public function searchStation(string $search) : array {
+		$this->before_request();
+
+		$stations = $this->run_request(
+			"stations/search",
+			array(
+				"name" => trim($search),
+				"order" => "clickcount",
+				"limit" => self::RADIO_BROWSER_LIMIT
+			)
+		);
+		if($stations === false){
+			return array();
+		}
+
+		return array_map(
+			fn($s) => array(
+				"name" => $s["name"],
+				"url" => $s["url"],
+				"logo" => $s["favicon"],
+				"desc" => $s["language"] . ', ' . $s["country"] . ', ' . $s["state"] . ', ' . $s["tags"]
+			),
+			$stations
+		);
+	}
 	
 	public function handleStationPlay(Output $out, string $id) : void {
 		$this->before_request($out);
@@ -374,8 +411,7 @@ class RadioBrowser {
 		$this->run_request("url/" . $uuid, cache: false);
 
 		// get user's "last stations"
-		$keyLast = 'last_stations.'.$this->radioid->getId();
-		$last = $this->redis->keyExists($keyLast) ? $this->redis->arrayGet($keyLast) : array();
+		$last = $this->lastStations();
 
 		// add station and add current time
 		if(!array_key_exists($station["stationuuid"], $last)){
@@ -391,7 +427,7 @@ class RadioBrowser {
 			$last = array_slice($last, 0, self::RADIO_BROWSER_LAST_MAX);
 		}
 
-		$this->redis->arraySet($keyLast, $last);
+		$this->redis->arraySet('last_stations.'.$this->radioid->getId(), $last);
 	}
 
 

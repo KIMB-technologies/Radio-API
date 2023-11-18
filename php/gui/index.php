@@ -32,22 +32,33 @@ if( isset($_GET['login']) || isset( $_GET['err'] )){
 	}
 }
 if( $login->isLoggedIn() ){
-	$mainTemplate->setContent('TITLE', Template::getLanguage() == 'de' ? 'Eigene Listen' : 'User defined Lists');
-	$mainTemplate->setContent('MOREHEADER', '<script src="viewer.js?v=3"></script>');
-
-	$listTemplate = new Template('list');
-	$listTemplate->setContent('RADIO_MAC', $login->getAll()['mac']);
-	$listTemplate->setContent('LOGIN_CODE', $login->getAll()['code']);
-
-	$mainTemplate->includeTemplate( $listTemplate );
-
-	$inner = new Inner($login->getId(), $listTemplate);
-	$inner->checkPost();
-
-	$inner->radioForm();
-	$inner->podcastForm();
-
-	$inner->outputMessages();
+	// RadioBrowser Search?
+	if(!empty($_GET["search"]) || isset($_GET["last"])){
+		$rb = new RadioBrowser($login->getId());
+		header('Content-Type: application/json;charset=UTF-8');
+		die(json_encode(
+			isset($_GET["last"]) ? $response = $rb->lastStations() : $rb->searchStation($_GET["search"]), 
+			JSON_PRETTY_PRINT
+		));
+	}
+	else {
+		$mainTemplate->setContent('TITLE', Template::getLanguage() == 'de' ? 'Eigene Listen' : 'User defined Lists');
+		$mainTemplate->setContent('MOREHEADER', '<script src="viewer.js?v=3"></script><script src="radio-browser.js"></script>');
+	
+		$listTemplate = new Template('list');
+		$listTemplate->setContent('RADIO_MAC', $login->getAll()['mac']);
+		$listTemplate->setContent('LOGIN_CODE', $login->getAll()['code']);
+	
+		$mainTemplate->includeTemplate( $listTemplate );
+	
+		$inner = new Inner($login->getId(), $listTemplate);
+		$inner->checkPost();
+	
+		$inner->radioForm();
+		$inner->podcastForm();
+	
+		$inner->outputMessages();
+	}
 }
 else{
 	$mainTemplate->setContent('TITLE', 'Login');

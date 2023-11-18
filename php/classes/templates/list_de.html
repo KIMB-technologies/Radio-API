@@ -71,6 +71,28 @@
 				<td>Name</td>
 				<td><input type="text" placeholder="Name" name="name[%%RADIO_COUNT%%]"/></td>
 			</tr>
+			<tr id="radioBrowserButtons">
+				<td></td>
+				<td>Einfügen aus</td>
+				<td>
+					<input type="button" id="openLast" value="Zuletzt gehört" /> <small>über RadioBrowser</small><br>
+					<input type="button" id="openSearch" value="Suche" /> <small>mittels RadioBrowser</small>
+				</td>
+			</tr>
+			<tr id="radioBrowserView">
+				<td colspan="2">RadioBrowser</td>
+				<td>
+					<input type="radio" name="radioBrowserType" value="last" /> Zuletzt gehört
+					<input type="radio" name="radioBrowserType" value="search" /> Suche
+					</br>
+					<div id="searchElements">
+						<input type="text" id="searchTerm" placeholder="Name" />
+						<input type="button" id="runSearch" value="Suchen" />
+					</div>
+					<div id="results">
+					</div>
+				</td>
+			</tr>
 			<tr>
 				<td></td>
 				<td>URL</td>
@@ -263,4 +285,4 @@
 			Das Abspielen von einigen Audioformaten klappt in Browsern nicht, dafür aber auf dem Radio.
 			Weiterhin kann das Radio kein SSL ein Browser jedoch schon.
 		</div>
-		<script> var serverurl = "%%SERVERURL%%", radiomac = "%%RADIO_MAC%%";</script>
+		<script> var serverurl = "%%SERVERURL%%", radiomac = "%%RADIO_MAC%%", radiocount = %%RADIO_COUNT%%;</script>
