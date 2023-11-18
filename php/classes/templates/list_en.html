@@ -1,16 +1,113 @@
 %%ADD_HTML%%
 
 <div style="float:right;">
-Logged in as %%LOGIN_CODE%%,
-<a href="%%SERVERURL%%gui/?login">Logout</a>
+	Logged in as %%LOGIN_CODE%%,
+	<a href="%%SERVERURL%%gui/?login">Logout</a>
 </div>
 
-<h3>Radio stations</h3>
-	<form action="%%SERVERURL%%gui/?radios" method="post">
+<h3 id="radio">Radio stations</h3>
+	<form action="%%SERVERURL%%gui/?radios#radio" method="post">
 		<table>
-			%%RADIO_FORM%%
+			<tr>
+				<th>ID</th>
+				<td></td>
+				<td style="width: 500px; max-width:60%; "></td>
+			</tr>
+			<!--MULTIPLE-RadioStations-BEGIN-->
+				<tr>
+					<td><b>%%ID%%</b></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>Name</td>
+					<td><input delid="d%%ID%%" type="text" value="%%NAME%%" name="name[%%COUNT%%]"/></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>URL</td>
+					<td><input delid="d%%ID%%" type="text" value="%%URL%%" name="url[%%COUNT%%]"/></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>Type</td>
+					<td>
+						<input type="radio" value="radio" name="type[%%COUNT%%]" %%TYPE_RADIO%% /> Radio
+						<input type="radio" value="nc" name="type[%%COUNT%%]" %%TYPE_NC%% /> Nextcloud
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>Proxy</td>
+					<td>
+						<input type="radio" value="yes" name="proxy[%%COUNT%%]" %%PROXY_YES%% /> &check;
+						<input type="radio" value="no" name="proxy[%%COUNT%%]" %%PROXY_NO%% /> &cross;
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>Logo</td>
+					<td><input delid="d%%ID%%" type="text" value="%%LOGO%%" name="logo[%%COUNT%%]"/></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>Description</td>
+					<td><input delid="d%%ID%%" type="text" value="%%DESC%%" name="desc[%%COUNT%%]"/></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td></td>
+					<td><button class="del" delid="d%%ID%%" type="button" title="Delete">&cross;</button></td>
+				</tr>
+			<!--MULTIPLE-RadioStations-END-->
+			<tr>
+				<td><b>Neu</b></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>Name</td>
+				<td><input type="text" placeholder="Name" name="name[%%RADIO_COUNT%%]"/></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>URL</td>
+				<td><input type="text" placeholder="URL (MP3, ...)" name="url[%%RADIO_COUNT%%]"/></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>Type</td>
+				<td>
+					<input type="radio" value="radio" name="type[%%RADIO_COUNT%%]"  checked="checked" /> Radio
+					<input type="radio" value="nc" name="type[%%RADIO_COUNT%%]" /> Nextcloud
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>Proxy</td>
+				<td>
+					<input type="radio" value="yes" name="proxy[%%RADIO_COUNT%%]" /> &check;
+					<input type="radio" value="no" name="proxy[%%RADIO_COUNT%%]"checked="checked" /> &cross;
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>Logo</td>
+				<td><input type="text" placeholder="Logo (PNG, ...)" name="logo[%%RADIO_COUNT%%]"/></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>Description</td>
+				<td><input type="text" placeholder="Description" name="desc[%%RADIO_COUNT%%]"/></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="submit" value="Save"></td>
+				<td></td>
+			</tr>
 		</table>
-		<input type="submit" value="Save">
 	</form>
 
 	<div class="note">
@@ -28,17 +125,110 @@ Logged in as %%LOGIN_CODE%%,
 		If the Nextcloud share is only accessible via SSL, the proxy has to be used.
 		<br/>
 		While playing a station the radio shows an image, the image can be specified by giving a custom link (also no SSL support).
-		If no image is specified <a href="%%SERVERURL%%media/default.png" target="_blank"><code>%%DOMAIN%%media/default.png</code></a> will be displayed.
+		If no image is specified <a href="%%SERVERURL%%media/default.png" target="_blank"><code>%%SERVERURL%%media/default.png</code></a> will be displayed.
 		<br />
 		The description holds more information about a station.
 	</div>
 
-<h3>Podcasts</h3>
-	<form action="%%SERVERURL%%gui/?podcasts" method="post">
+<h3 id="podcast">Podcasts</h3>
+	<form action="%%SERVERURL%%gui/?podcasts#podcast" method="post">
 		<table>
-			%%PODCAST_FORM%%
+			<tr>
+				<th>ID</th>
+				<td></td>
+				<td style="width: 500px; max-width:60%;"></td>
+			</tr>
+			<!--MULTIPLE-Podcasts-BEGIN-->
+				<tr>
+					<td><b>%%ID%%</b></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>Name</td>
+					<td><input delid="d%%ID%%" type="text" value="%%NAME%%" name="name[%%COUNT%%]"/></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>URL</td>
+					<td><input delid="d%%ID%%" type="text" value="%%URL%%" name="url[%%COUNT%%]"/></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>Type</td>
+					<td>
+						<input type="radio" value="rss" name="type[%%COUNT%%]" %%TYPE_RSS%% /> RSS/ Atom
+						<input type="radio" value="nc" name="type[%%COUNT%%]" %%TYPE_NC%% /> Nextcloud
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>EndURL</td>
+					<td>
+						<input type="radio" value="yes" name="finalurl[%%COUNT%%]" %%ENDURL_YES%% /> &check;
+						<input type="radio" value="no" name="finalurl[%%COUNT%%]" %%ENDURL_NO%% /> &cross;
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>Proxy</td>
+					<td>
+						<input type="radio" value="yes" name="proxy[%%COUNT%%]" %%PROXY_YES%% /> &check;
+						<input type="radio" value="no" name="proxy[%%COUNT%%]" %%PROXY_NO%% /> &cross;
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><button class="del" delid="d%%ID%%" type="button" title="Delete">&cross;</button></td>
+					<td></td>
+				</tr>
+			<!--MULTIPLE-Podcasts-END-->
+			<tr>
+				<td><b>New</b></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>Name</td>
+				<td><input type="text" placeholder="Name" name="name[%%PODCAST_COUNT%%]"/></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>URL</td>
+				<td><input type="text" placeholder="URL" name="url[%%PODCAST_COUNT%%]"/></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>Type</td>
+				<td>
+					<input type="radio" value="rss" name="type[%%PODCAST_COUNT%%]" checked="checked"  /> RSS/ Atom
+					<input type="radio" value="nc" name="type[%%PODCAST_COUNT%%]" /> Nextcloud
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>EndURL</td>
+				<td>
+					<input type="radio" value="yes" name="finalurl[%%PODCAST_COUNT%%]" /> &check;
+					<input type="radio" value="no" name="finalurl[%%PODCAST_COUNT%%]" checked="checked" /> &cross;
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>Proxy</td>
+				<td>
+					<input type="radio" value="yes" name="proxy[%%PODCAST_COUNT%%]" /> &check;
+					<input type="radio" value="no" name="proxy[%%PODCAST_COUNT%%]" checked="checked" /> &cross;
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="submit" value="Save"></td>
+				<td></td>
+			</tr>
 		</table>
-		<input type="submit" value="Save">
 	</form>	
 
 	<div class="note">

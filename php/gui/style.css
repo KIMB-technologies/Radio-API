@@ -47,7 +47,7 @@ div.achtung {
 	border-radius: 4px;
 	background-color: orange;
 	margin:auto;
-	max-width: 500px;
+	max-width: 750px;
 }
 div.note {
 	border: 2px solid darkblue;
@@ -55,5 +55,5 @@ div.note {
 	border-radius: 4px;
 	background-color: lightblue;
 	margin:auto;
-	max-width: 500px;
+	max-width: 750px;
 }

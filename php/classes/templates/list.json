@@ -1,8 +1,33 @@
 {
-	"%%PODCAST_FORM%%" : "",
-	"%%DOMAIN%%" : "",
-	"%%RADIO_FORM%%" : "",
 	"%%ADD_HTML%%" : "",
 	"%%RADIO_MAC%%" : "",
-	"%%LOGIN_CODE%%" : ""
+	"%%LOGIN_CODE%%" : "",
+	"%%RADIO_COUNT%%" : "",
+	"%%PODCAST_COUNT%%" : "",
+	"multiples" : {
+		"RadioStations" : {
+			"%%ID%%" : "",
+			"%%COUNT%%" : "",
+			"%%NAME%%" : "",
+			"%%URL%%" : "",
+			"%%PROXY_YES%%" : "",
+			"%%PROXY_NO%%" : "",
+			"%%TYPE_RADIO%%" : "",
+			"%%TYPE_NC%%" : "",
+			"%%LOGO%%" : "",
+			"%%DESC%%" : ""
+		},
+		"Podcasts" : {
+			"%%ID%%" : "",
+			"%%COUNT%%" : "",
+			"%%NAME%%" : "",
+			"%%URL%%" : "",
+			"%%TYPE_RSS%%" : "",
+			"%%TYPE_NC%%" : "",
+			"%%ENDURL_YES%%" : "",
+			"%%ENDURL_NO%%" : "",
+			"%%PROXY_YES%%" : "",
+			"%%PROXY_NO%%" : ""
+		} 
+	}
 }
