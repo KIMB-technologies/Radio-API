@@ -43,7 +43,7 @@ if( $login->isLoggedIn() ){
 	}
 	else {
 		$mainTemplate->setContent('TITLE', Template::getLanguage() == 'de' ? 'Eigene Listen' : 'User defined Lists');
-		$mainTemplate->setContent('MOREHEADER', '<script src="viewer.js?v=3"></script><script src="radio-browser.js"></script>');
+		$mainTemplate->setContent('MOREHEADER', '<script src="viewer.js?v=3"></script><script src="radio-browser.js?v=2"></script>');
 	
 		$listTemplate = new Template('list');
 		$listTemplate->setContent('RADIO_MAC', $login->getAll()['mac']);

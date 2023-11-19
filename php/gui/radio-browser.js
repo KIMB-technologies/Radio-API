@@ -65,14 +65,14 @@ function runRequest(term){
 
 	$("div#results").html("Loading ...");
 	$.get(
-		serverurl + '/gui/?' + (
+		serverurl + 'gui/?' + (
 			isSearch ? 'search=' + encodeURIComponent(term) : 'last'
 		),
 		(response) => { 
 
-			if( !isSearch && response.length > 0 ){
-				var data = []
-				Object.getOwnPropertyNames(response).forEach( (k) => {
+			if( !isSearch ){
+				var data = [];
+				Object.keys(response).forEach( (k) => {
 					data.push(response[k])
 				});
 				data.sort((a, b) => b['time'] - a['time'])
