@@ -158,6 +158,31 @@ class Data {
 	}
 
 	/**
+	 * Generate Link for podcast
+	 * @param $id podcast id
+	 * @param $eid episode id
+	 * @param $mac users radio mac
+	 * @param $sloppy (default=false) do not perform endURL lookup
+	 */
+	public function getPodcastURL( int $id, int $eid, string $mac, bool $sloppy = false ) : string {
+		$ed = PodcastLoader::getEpisodeData( $id, $eid, $this );
+
+		if(empty($ed)){
+			return "";
+		}
+
+		if($ed['proxy']){
+			return Config::DOMAIN . 'stream.php?id=' . $id . '&eid=' . $eid . '&mac=' . $mac;
+		}
+		else if($ed['finalurl'] && !$sloppy){
+			return Helper::getFinalUrl($ed['episode']['url']);
+		}
+		else{
+			return $ed['episode']['url'];
+		}
+	}
+
+	/**
 	 * Backend Raw Access
 	 */
 	public function getRadioList() : array {

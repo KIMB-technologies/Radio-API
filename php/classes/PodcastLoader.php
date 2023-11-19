@@ -126,12 +126,13 @@ class PodcastLoader {
 	 */
 	public static function getPodcastByUrl( string $url, bool $nextcloud ) : array {
 		self::loadRedis();
-		if( self::$redis->keyExists( 'url.' . sha1($url) ) ){
-			return self::$redis->arrayGet( 'url.' . sha1($url) );
+		$urlKey = 'url.' . sha1($url);
+		if( self::$redis->keyExists($urlKey) ){
+			return self::$redis->arrayGet($urlKey);
 		}
 
 		$poddata = $nextcloud ? self::loadFromNextcloud( $url ) : self::loadFromFeed( $url );
-		self::$redis->arraySet( 'url.' . sha1($url), $poddata, Config::CACHE_EXPIRE );
+		self::$redis->arraySet($urlKey, $poddata, Config::CACHE_EXPIRE );
 		return $poddata;
 	}
 
@@ -179,15 +180,17 @@ class PodcastLoader {
 		$stat = $data->getById($id);
 		if( !empty($stat) && $stat['type'] == 'nc' ){ // is a nextcloud station
 			self::loadRedis();
-			if( !self::$redis->keyExists( 'm3u.' .  $id ) ){
-				$musik = self::getPodcastByUrl( $stat['url'], true )['episodes'];
-				$urllist = array();
-				foreach( $musik as $m ){
-					$urllist[] = $m['url'];
-				}
-				self::$redis->arraySet( 'm3u.' . $id, $urllist, Config::CACHE_EXPIRE );
+
+			$m3Key = 'm3u.'.sha1($stat['url']);
+			if( !self::$redis->keyExists($m3Key) ){
+				return json_decode(self::$redis->get($m3Key));
 			}
-			return self::$redis->arrayGet( 'm3u.' . $id );
+			
+			$music = self::getPodcastByUrl( $stat['url'], true )['episodes'];
+			$urls = array_values(array_map(fn($i) => $i['url'], $music));
+			self::$redis->set( $m3Key, json_encode($urls), Config::CACHE_EXPIRE );
+			
+			return $urls;
 		}
 		else{
 			return array();
