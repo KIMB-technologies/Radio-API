@@ -16,8 +16,7 @@ defined('HAMA-Radio') or die('Invalid Endpoint');
  */
 define( 'ENV_DOMAIN', $_ENV['CONF_DOMAIN'] . (substr( $_ENV['CONF_DOMAIN'], -1) !== '/' ? '/' : '') );
 define( 'ENV_CACHE_EXPIRE', intval($_ENV['CONF_CACHE_EXPIRE']));
-define( 'ENV_OWN_STREAM', $_ENV['CONF_OWN_STREAM'] == 'true');
-define( 'ENV_PROXY_OWN_STREAM', $_ENV['CONF_PROXY_OWN_STREAM'] == 'true');
+define( 'ENV_STREAM_JSON', !empty($_ENV['CONF_STREAM_JSON']) && $_ENV['CONF_STREAM_JSON'] != 'false' ? $_ENV['CONF_STREAM_JSON'] : false  );
 define( 'ENV_SHUFFLE_MUSIC', $_ENV['CONF_SHUFFLE_MUSIC'] == 'true');
 
 // IP on reverse proxy setup
@@ -44,12 +43,7 @@ class Config {
 	/**
 	 * Own Stream used?
 	 */
-	const OWN_STREAM = ENV_OWN_STREAM;
-
-	/**
-	 * Own Stream Proxy
-	 */
-	const PROXY_OWN_STREAM = ENV_PROXY_OWN_STREAM;
+	const STREAM_JSON = ENV_STREAM_JSON;
 
 	/**
 	 * Random shuffle music station streams from nc
@@ -57,9 +51,9 @@ class Config {
 	CONST SHUFFLE_MUSIC = ENV_SHUFFLE_MUSIC;
 
 	/**
-	 * Store redis cache for ALLOWED_DOMAINS, OWN_STREAM
+	 * Store redis cache for ALLOWED_DOMAINS
 	 */
-	private static $redisAccessDomains = null, $redisOwnStream = null;
+	private static $redisAccessDomains = null;
 
 	/**
 	 * Checks if access allowed (for this request)
@@ -112,71 +106,6 @@ class Config {
 		}
 		else{
 			die('Invalid Access Domains!');
-		}
-	}
-
-	/**
-	 * Returns List of personal MyStreams
-	 * 	[
-	 * 		"key" : {
-	 * 			"name" : "<NAME>"
-	 * 		}, ...
-	 * 	]
-	 */
-	public static function getMyStreamsList() : array {
-		if( self::OWN_STREAM ){
-			if( is_null( self::$redisOwnStream ) ){ // load redis, if not loaded
-				self::$redisOwnStream = new RedisCache( 'own_stream' );
-			}
-			if( self::$redisOwnStream->keyExists( 'list' ) ){
-				return self::$redisOwnStream->arrayGet( 'list' );
-			}
-			else if( !empty($_ENV['CONF_OWN_STREAM_JSON']) ){
-				$data = file_get_contents( $_ENV['CONF_OWN_STREAM_JSON'] );
-				if( !empty($data) ){
-					$list = json_decode( $data, true );
-					if( !empty( $list )){
-						$ok = true;
-						foreach( $list as $key => $val ){
-							if( !preg_match('/^[A-Za-z0-9]+$/', $key) || !isset( $val['name'] ) || !is_string($val['name']) ){
-								$ok = false;
-							} 
-						}
-						if( $ok ){
-							self::$redisOwnStream->arraySet( 'list', $list, self::CACHE_EXPIRE );
-						}
-						else{
-							$list = array("NoKey" => array( "name" => "JSON invalid array form" ));
-						}
-					}
-					else{
-						$list = array("NoKey" => array( "name" => "JSON PARSE Error" ));
-					}
-				}
-				else{
-					$list = array("NoKey" => array( "name" => "Empty Response of JSON URL" ));
-				}
-				
-			}
-			else{
-				$list = array("NoKey" => array( "name" => "No JSON URL" ));
-			}
-			return $list;
-		}
-		else{
-			return array();
-		}
-	}
-
-	/**
-	 * Gets the URL for one of MyStreams based on the key.
-	 */
-	public static function myStreamsListGetURL( string $key ) : string {
-		if( self::OWN_STREAM ){
-			return (!empty($_ENV['CONF_OWN_STREAM_URL']) ? $_ENV['CONF_OWN_STREAM_URL'] : 'CONF_OWN_STREAM_URL' ) . $key;
-		}
-		else{
-			return "";
 		}
 	}
 

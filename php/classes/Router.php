@@ -37,16 +37,26 @@ class Router {
 	 * Handle the get requests
 	 */
 	public function handleGet(string $uri) : void {
-		if( isset( $_GET['sSearchtype'] ) && $_GET['sSearchtype'] == 3 ){ // only one station (play this)
-			if( !empty($_GET['Search']) && RadioBrowser::matchStationID($_GET['Search']) ){ // is an id from Radio-Browser??
+		// only one station or episode (play this)
+		if( isset( $_GET['sSearchtype'] ) && ($_GET['sSearchtype'] == 3 || $_GET['sSearchtype'] == 5 ) && !empty($_GET['Search'])){
+			// is an ID from Radio-Browser??
+			if( RadioBrowser::matchStationID($_GET['Search']) ){ 
 				$this->radio_browser->handleStationPlay($this->out, $_GET['Search']);
 			}
-			else { // local ID
-				$this->listStation();
+			else{ // a local ID (Range 1000 - 3999) possibly with an prefix "X[0-9]+"
+				if( is_numeric( $id ) && preg_replace('/[^0-9]/','', $id ) === $id ){
+					$this->listStation();
+				}
+
+				elseif ( preg_match('/^(\d+)X(\d+)$/', $id, $parts ) === 1 ){
+					$this->listEpisode();
+				}
+
+				
+				// TODO
+				
+
 			}
-		}
-		else if( isset( $_GET['sSearchtype'] ) && $_GET['sSearchtype'] == 5 ){ // only one episode (play this)
-			$this->listEpisode();
 		}
 		else if( $uri == '/cat' && !empty( $_GET['cid'] )  ){ // list of stations by category
 			$this->out->prevUrl(Config::DOMAIN . '?go=initial');
@@ -160,14 +170,7 @@ class Router {
 		
 	private function listDirectories(int $cid){
 		foreach( $this->data->getListOfItems( $cid ) as $id => $item ){
-			if( $cid == 3){
-				$this->out->addPodcast(
-					$id,
-					$item['name'],
-					Config::DOMAIN . 'cat?cid=' . $cid . '&id=' . $id
-				);
-			}
-			else{
+			if($item['cid'] == 1 || ($item['cid'] == 2 && $item['live'])){ // radio station, or live "own stream"
 				$this->out->addStation(
 					$id,
 					$item['name'],
@@ -175,6 +178,21 @@ class Router {
 					true
 				);
 			}
+			else if($item['cid'] == 3){ // podcast
+				$this->out->addPodcast(
+					$id,
+					$item['name'],
+					Config::DOMAIN . 'cat?cid=' . $cid . '&id=' . $id
+				);
+			}
+			else if ($item['cid'] == 2 && !$item['live']) { // file based "own stream"
+				$this->out->addEpisode(
+					$id, null,
+					$item['name'], $item['name'],
+					$this->data->getStationURL($id, $this->radioid->getMac())
+				);
+			}
+		
 		}
 	}
 }
