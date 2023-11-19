@@ -27,7 +27,6 @@ class Data {
 	public function __construct(int $id, bool $preload = false ){
 		$this->id = $id;
 		$this->redis = new RedisCache('radios_podcasts.' . $this->id );
-		$this->redis->removeGroup(); // remove before version commit !!
 		$this->own_streams = new OwnStreams();
 		
 		if( !$this->redis->keyExists( 'categories' ) || $preload ){

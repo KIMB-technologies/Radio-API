@@ -24,8 +24,6 @@ class OwnStreams {
 		if( self::IS_ACTIVE ){
 			$this->redis = new RedisCache( 'own_stream' );
 		}
-
-		$this->redis->removeGroup(); // remove before version commit !!
 	}
 
 	public function getStreams() : array {
