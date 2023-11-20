@@ -152,21 +152,34 @@ server {
 ```
 
 ### Own Streams
-> *TODO*
+By setting `CONF_STREAM_JSON` to a url pointing to a JSON resource, the *Own Streams* can be enabled.
+(`CONF_STREAM_JSON=false` disables the feature completely.)
+*Own Streams* are server specific and shared across all users of one Radio-API server.
 
+The idea of *Own Streams* is to be able to automatically add files for streaming to the Radio when these files are available and created outside of Radio-API.
+E.g. some external service creates audio files by cutting the audio tracks from videos, then this service may provide a `CONF_STREAM_JSON` url to pass the files to Radio-API.
+This makes it easy to listen via the radio to the audio files created.
+
+The JSON resource at `CONF_STREAM_JSON` should look like this:
 ```json
 [
 	{
-		"name": "Name of File",
-		"url": "http://my-stream.url/file.mp3",
+		"name": "Name A",
+		"url": "https://stream.example.com/file.mp3",
 		"live": false,
 		"proxy": true
 	},
 	{
-		"name": "Name of Stream",
-		"url": "http://my-stream.url/live.m3u",
+		"name": "Name B",
+		"url": "http://stream.example.com/live.m3u",
 		"live": true,
 		"proxy": false
 	}
 ]
 ```
+
+JSON list of objects with the following keys each:
+- `name` Contains the name of the file to stream as shown by the radio.
+- `url` Contains the url of the stream (either a file, .e.g., mp3, or a streamable ressource, e.g., m3u).
+- `live` (optional, default `true`) Live streams can not be paused or fast forwarded, for non live streams the entire file needs to be available from the start.
+- `proxy` (optional, default `false`) Use the internal proxy to allow https urls,
