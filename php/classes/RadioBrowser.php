@@ -336,9 +336,9 @@ class RadioBrowser {
 			return;
 		}
 
-		// pagination
-		if( $offset > 0 ){
-			$out->addDir("Previous Page", $this->browseUrl($by, $term, max(0, $offset-self::RADIO_BROWSER_LIMIT)), sortKey: 0);
+		// pagination 
+		if( $offset > 0 ){ // leads to "prevUrl" with smaller offset
+			$out->prevUrl($this->browseUrl($by, $term, max(0, $offset-self::RADIO_BROWSER_LIMIT)));
 		}
 		$out->addDir("Next Page", $this->browseUrl($by, $term, $offset+self::RADIO_BROWSER_LIMIT), true);
 	}
