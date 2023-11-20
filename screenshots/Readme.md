@@ -13,8 +13,6 @@ It also provides a preview of the items shown in the radio's display.
 
 ![Edit Radio Stations](./edit-radio.png)
 
-If you are searching for streaming urls of radio stations, you may use the search at https://www.radio-browser.info/search and copy the url to Radio-API. 
-
 ![Edit Podcasts](./edit-podcast.png)
 
 ### Preview
