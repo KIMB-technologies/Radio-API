@@ -1,4 +1,4 @@
-name: Docker Image Push (on commit and base image update)
+name: Docker Image Push (for tags and on base image update)
 
 on:
   push:

@@ -21,7 +21,7 @@ class M3U {
 
 	public function __construct(Id $id) {
 		$this->radioid = $id;
-		$this->data = new Data($this->radioid->getId());;
+		$this->data = new Data($this->radioid->getId());
 	}
 
 	public function musicStream( $id ) : void {
@@ -30,23 +30,32 @@ class M3U {
 			// get station
 			$stat = $this->data->getById($id);
 			if( !empty($stat) ){ // is a station
-				$urls = array();
 				if( $stat['type'] == 'nc' ){ // nextcloud stattion?
-					$urllist = PodcastLoader::getMusicById( $id, $this->data );
 
-					if( $stat['proxy'] ){ // proxy links
-						foreach( $urllist as $k => $m ){
-							$urls[] = Config::DOMAIN . 'stream.php?id=' . $id . '&track=' . $k . '&mac=' . $this->radioid->getMac();
+					$urls = PodcastLoader::getMusicById( $id, $this->data );
+					if( $stat['proxy'] ){
+						// proxy links
+						$m3uLinks = array();
+						foreach( $urls as $k => $m ){
+							$m3uLinks[] = Config::DOMAIN . 'stream.php?id=' . $id . '&track=' . $k . '&mac=' . $this->radioid->getMac();
 						}
 					}
 					else{ // echo links (no proxy)
-						$urls = $urllist;
+						$m3uLinks = $urls;
+					}
+
+					if( Config::SHUFFLE_MUSIC ){ // different random order each 10 minutes
+						srand(intdiv(time(), 600));
+						shuffle($m3uLinks);
 					}
 				}
 				else{ // normal station? (just echo streaming-link)
-					$urls[] = $stat['url'];
+					$m3uLinks = array(
+						$stat['url']
+					);
 				}
-				$this->outputM3U($urls);
+
+				$this->outputM3U($m3uLinks);
 			}
 		}
 	}

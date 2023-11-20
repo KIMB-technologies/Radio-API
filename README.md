@@ -43,11 +43,9 @@ This redirect is possible by manipulating the DNS queries.
 		- The stations recently opened via the radio are shown in *My Last*.
 		- *Using Radio-Browser will send http requests and such usage data to the [RadioBrowser API](https://api.radio-browser.info/)!*
 		- In the GUI it is also possible to search for stations in RadioBrowser and add them to the user defined stations. Stations from *My Last* are shown in the GUI, too.
-	- **Stream** (if enabled in `docker-compose.yml`)
+	- **Stream** (if enabled in `docker-compose.yml`, see [Own Streams](#own-streams))
 		- This is a list of server specific streams.
 		- The list is fetched from a custom url, provided in the Docker Container setup.
-		- The list is cached for `CONF_CACHE_EXPIRE` seconds.
-		- The radio streams each item as a radio station.
 		- The Streams are shared across all radios using the same *Radio-API* setup.
 	- **GUI-Code**
 		- This code is like a password to access the GUI for this radio and edit the radio stations and streams.
@@ -91,11 +89,8 @@ The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechn
 			You may give a list of multiple allowed host names, divided by `,`.
 			*The API would be public useable, if `CONF_ALLOWED_DOMAIN` is set to `all`.*
 			*If hosted in a local network using `all` is recommended.*
-		- `CONF_OWN_STREAM` Fetch a list of own streams `true/ false`.
-		- `CONF_OWN_STREAM_JSON` URL where the list of own stream can be fetched.
-			Should return JSON like `{ "key1" : { name : "Test 1" }, "key2" : { name : "Test 2" }, ... }`.
-		- `CONF_OWN_STREAM_URL` URL where each audio file can be accessed, the `key` will be appended, i.e, `CONF_OWN_STREAM_URL+"key1"` for `Test 1`.
-		- `CONF_PROXY_OWN_STREAM` Use the builtin HTTP proxy for own streams `true/ false`.
+		- `CONF_STREAM_JSON` Url to a JSON list of streams or `false` to disable (see [Own Streams](#own-streams))
+		- There are some more options, see defaults in [docker-compose.yml](https://github.com/KIMB-technologies/Radio-API/blob/master/docker-compose.yml).
 	- There are two ways to store which episodes of podcasts have already been listened to (new ones are marked by `*`)
 		- Create a cron job to `/cron.php`, e.g., `docker exec --user www-data radio_api php /cron.php`. (This will dump the already played episodes to a JSON file in `./data/` and *Radio-API* will load the file into redis on container startup).
 		- Use the data volume of Redis. (Redis will (re-)load its dump files on container startup.)
@@ -155,3 +150,36 @@ server {
 	# more ssl setup ....
 }
 ```
+
+### Own Streams
+By setting `CONF_STREAM_JSON` to a url pointing to a JSON resource, the *Own Streams* can be enabled.
+(`CONF_STREAM_JSON=false` disables the feature completely.)
+*Own Streams* are server specific and shared across all users of one Radio-API server.
+
+The idea of *Own Streams* is to be able to automatically add files for streaming to the Radio when these files are available and created outside of Radio-API.
+E.g. some external service creates audio files by cutting the audio tracks from videos, then this service may provide a `CONF_STREAM_JSON` url to pass the files to Radio-API.
+This makes it easy to listen via the radio to the audio files created.
+
+The JSON resource at `CONF_STREAM_JSON` should look like this:
+```json
+[
+	{
+		"name": "Name A",
+		"url": "https://stream.example.com/file.mp3",
+		"live": false,
+		"proxy": true
+	},
+	{
+		"name": "Name B",
+		"url": "http://stream.example.com/live.m3u",
+		"live": true,
+		"proxy": false
+	}
+]
+```
+
+JSON list of objects with the following keys each:
+- `name` Contains the name of the file to stream as shown by the radio.
+- `url` Contains the url of the stream (either a file, .e.g., mp3, or a streamable ressource, e.g., m3u).
+- `live` (optional, default `true`) Live streams can not be paused or fast forwarded, for non live streams the entire file needs to be available from the start.
+- `proxy` (optional, default `false`) Use the internal proxy to allow https urls,

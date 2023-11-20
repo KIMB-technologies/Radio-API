@@ -16,7 +16,7 @@ defined('HAMA-Radio') or die('Invalid Endpoint');
  */
 class Data {
 
-	private $id, $redis, $preloaded = false;
+	private $id, $redis, $own_streams, $preloaded = false;
 	private $radio, $stream, $podcasts, $table; 
 
 	/**
@@ -27,7 +27,8 @@ class Data {
 	public function __construct(int $id, bool $preload = false ){
 		$this->id = $id;
 		$this->redis = new RedisCache('radios_podcasts.' . $this->id );
-
+		$this->own_streams = new OwnStreams();
+		
 		if( !$this->redis->keyExists( 'categories' ) || $preload ){
 			$this->preloadAll();
 			if( !$this->redis->keyExists( 'categories' ) ){
@@ -58,31 +59,7 @@ class Data {
 		}
 		$this->podcasts = is_null($podcasts) ?  array() : $podcasts;
 
-		$this->stream = $this->loadStreams();
-
 		$this->preloaded = true;
-	}
-
-	/**
-	 * Load own streams into table
-	 * 	Helper for preloadAll
-	 */
-	private function loadStreams() : array{
-		$stream = array();
-		if( Config::OWN_STREAM ){
-			$mydata = Config::getMyStreamsList();
-			if( !empty($mydata) ) {
-				$stream = array();
-				foreach( $mydata as $key => $val){
-					$stream[] = array(
-						'name' => $key . ( empty( $val['name'] ) ? '' : ' - ' . $val['name'] ),
-						'url' => Config::myStreamsListGetURL( $key ),
-						'proxy' => Config::PROXY_OWN_STREAM
-					);
-				}
-			}
-		}
-		return $stream;
 	}
 
 	/**
@@ -99,19 +76,22 @@ class Data {
 			1 => 'Radio',
 			3 => 'Podcast'
 		);
-
 		$this->table['items'] = array();
+
+		// add radio, podcasts
 		$this->addCategoryToTable( 1, $this->radio );
-		if( Config::OWN_STREAM ){
-			$this->table['categories'][2] = 'Stream';
-			$this->addCategoryToTable( 2, $this->stream );
-		}
 		$this->addCategoryToTable( 3, $this->podcasts );
+
+		// add "own streams"
+		if( Config::STREAM_JSON ){
+			$this->table['categories'][2] = 'Stream';
+			$this->addCategoryToTable( 2, $this->own_streams->getStreams() );
+		}
 
 		// save in redis
 		//	if using own stream, we need to give a ttl, else the system won't reload the list of own streams
-		$this->redis->arraySet( 'categories', $this->table['categories'], Config::OWN_STREAM ? Config::CACHE_EXPIRE : 0 );
-		$this->redis->arraySet( 'items', $this->table['items'], Config::OWN_STREAM ? Config::CACHE_EXPIRE : 0 );
+		$this->redis->arraySet( 'categories', $this->table['categories'], Config::STREAM_JSON ? Config::CACHE_EXPIRE : 0 );
+		$this->redis->arraySet( 'items', $this->table['items'], Config::STREAM_JSON ? Config::CACHE_EXPIRE : 0 );
 	}
 
 	/**
@@ -173,6 +153,31 @@ class Data {
 		}
 		else{
 			return $station['url'];
+		}
+	}
+
+	/**
+	 * Generate Link for podcast
+	 * @param $id podcast id
+	 * @param $eid episode id
+	 * @param $mac users radio mac
+	 * @param $sloppy (default=false) do not perform endURL lookup
+	 */
+	public function getPodcastURL( int $id, int $eid, string $mac, bool $sloppy = false ) : string {
+		$ed = PodcastLoader::getEpisodeData( $id, $eid, $this );
+
+		if(empty($ed)){
+			return "";
+		}
+
+		if($ed['proxy']){
+			return Config::DOMAIN . 'stream.php?id=' . $id . '&eid=' . $eid . '&mac=' . $mac;
+		}
+		else if($ed['finalurl'] && !$sloppy){
+			return Helper::getFinalUrl($ed['episode']['url']);
+		}
+		else{
+			return $ed['episode']['url'];
 		}
 	}
 

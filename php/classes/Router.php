@@ -37,48 +37,63 @@ class Router {
 	 * Handle the get requests
 	 */
 	public function handleGet(string $uri) : void {
-		if( isset( $_GET['sSearchtype'] ) && $_GET['sSearchtype'] == 3 ){ // only one station (play this)
-			if( !empty($_GET['Search']) && RadioBrowser::matchStationID($_GET['Search']) ){ // is an id from Radio-Browser??
+		// only one station or episode (play this)
+		if( isset( $_GET['sSearchtype'] ) && ($_GET['sSearchtype'] == 3 || $_GET['sSearchtype'] == 5 ) && !empty($_GET['Search'])){
+			// is an ID from Radio-Browser??
+			if( RadioBrowser::matchStationID($_GET['Search']) ){ 
 				$this->radio_browser->handleStationPlay($this->out, $_GET['Search']);
 			}
-			else { // local ID
-				$this->listStation();
+			// podcast episode ID? "3000-3999"+"X"+"[0-9]+" 
+			else if( preg_match('/^(3\d\d\d)X(\d+)$/', $_GET['Search'], $parts ) === 1 ){ 
+				$this->listPodcastEpisode(intval($parts[1]), intval($parts[2]));
+			}
+			// radio or "own stream" ID (Range 1000 - 2999)
+			else if( preg_match('/^(1|2)\d\d\d$/', $_GET['Search'], $parts ) === 1){ 
+				$this->listPlayItem(intval($_GET['Search']), $parts[1]);
+			}
+			else {
+				$this->out->addDir( 'No item found for this ID!', Config::DOMAIN . '?go=initial');
 			}
 		}
-		else if( isset( $_GET['sSearchtype'] ) && $_GET['sSearchtype'] == 5 ){ // only one episode (play this)
-			$this->listEpisode();
-		}
-		else if( $uri == '/cat' && !empty( $_GET['cid'] )  ){ // list of stations by category
-			$this->out->prevUrl(Config::DOMAIN . '?go=initial');
-
-			$cid = $_GET['cid'];
-			if( is_numeric( $cid ) && in_array( $cid, array_keys($this->data->getCategories()) ) ){
-				if( $cid == 3 && isset( $_GET['id'] ) && preg_replace('/[^0-9]/','', $_GET['id']  ) === $_GET['id'] ){
-					$this->listPodcast();
-				}
-				else{
-					$this->listDirectories($cid);
-				}
-			}
-		}
+		// radio browser browsing
 		else if( $uri == '/radio-browser' && !empty( $_GET['by'] ) && !empty( $_GET["term"] ) ){
 			$offset = isset($_GET["offset"]) && is_numeric($_GET["offset"]) ? intval($_GET["offset"]) : 0;
 			$this->radio_browser->handleBrowse($this->out, $_GET['by'], $_GET["term"], $offset);
 		}
+		// (Un)Read for podcast episodes (used in GUI)
 		else if( !empty($_GET['toggleUnRead']) && is_string($_GET['toggleUnRead']) ){
 			$this->out->addDir('TOGGLE-UN-READ-' . $this->unread->toggleById($_GET['toggleUnRead'], $this->data), '');
 		}
-		else{ // list of categories (startpage)
+		// list of stations or podcasts depending on category
+		else if( $uri == '/cat' && !empty( $_GET['cid'] ) ){ 
+			$this->out->prevUrl(Config::DOMAIN . '?go=initial');
+
+			$cid = $_GET['cid'];
+			if( is_numeric($cid) && array_key_exists($cid, $this->data->getCategories()) ){
+				if( $cid == 3 && isset($_GET['id']) && preg_match('/^\d+$/', $_GET['id']) === 1 ){
+					$this->listPodcast(intval($_GET['id']));
+				}
+				else{
+					$this->listDirectory(intval($cid));
+				}
+			}
+			else {
+				$this->out->addDir( 'No item found for this cID!', Config::DOMAIN . '?go=initial');
+			}
+		}
+		// list of categories (startpage)
+		else{ 
+			// add local categories
 			foreach( $this->data->getCategories() as $cid => $name ){
 				$this->out->addDir( $name, Config::DOMAIN . 'cat?cid=' . $cid );
 			}
-			// add link to RadioBrowser
+			// add RadioBrowser
 			$this->out->addDir( 'Radio-Browser', Config::DOMAIN . 'radio-browser?by=none&term=none' );
 
 			// add code (for gui)
 			$this->out->addDir( 'GUI-Code: ' . $this->radioid->getCode(), Config::DOMAIN . '?go=initial', true );
 
-			// Log unknown
+			// Log unknown request
 			if(
 				preg_match('/^\/setupapp\/[A-Za-z0-9\-\_]+\/asp\/BrowseXML\/loginXML.asp/i', $uri) === 0 &&
 				(!isset( $_GET['go'] ) || $_GET['go'] != "initial")
@@ -88,12 +103,30 @@ class Router {
 		}
 	}
 
-	private function listStation() : void {
-		$this->out->prevUrl(Config::DOMAIN . '?go=initial');
-		$id = $_GET['Search'];
-		if( is_numeric( $id ) && preg_replace('/[^0-9]/','', $id ) === $id ){
-			$sta = $this->data->getById( $id );
-			if( $sta !== array() ){
+	private function listPodcastEpisode(int $id, int $eid, int $cid = 3) : void {
+		$this->out->prevUrl(Config::DOMAIN . 'cat?cid='.$cid.'&id='.$id);
+		
+		$ed = PodcastLoader::getEpisodeData( $id, $eid, $this->data );
+		if( $ed != array() ){
+			$this->unread->openItem($id, $ed['episode']['url']);
+
+			$this->out->addEpisode(
+				$id, $eid,
+				$ed['title'], $ed['episode']['title'],
+				$this->data->getPodcastURL($id, $eid, $this->radioid->getMac()),
+				$ed['episode']['desc'],
+				$ed['logo']
+			);
+		}
+	}
+
+	private function listPlayItem(int $id, int $cid = 1) : void {
+		$this->out->prevUrl(Config::DOMAIN . 'cat?cid=' . $cid );
+		
+		$sta = $this->data->getById( $id );
+		if( $sta !== array() ){
+			// radio station or stream with "live" == true
+			if( !isset($sta["live"]) || $sta["live"] ){
 				$this->out->addStation(
 					$id,
 					$sta['name'],
@@ -102,72 +135,41 @@ class Router {
 					$sta['desc'] ?? '',
 					$sta['logo'] ?? ''
 				);
-				$this->out->prevUrl(Config::DOMAIN . 'cat?cid=' . $sta['cid'] );
 			}
-		}
-	}
-
-	private function listEpisode() : void {
-		$this->out->prevUrl(Config::DOMAIN . 'cat?cid=3');
-		$id = $_GET['Search'];
-		$parts = array();
-		if( preg_match('/^(\d+)X(\d+)$/', $id, $parts ) === 1 ){
-			$ed = PodcastLoader::getEpisodeData( $parts[1], $parts[2], $this->data );
-			if( $ed != array() ){
-				$this->unread->openItem($parts[1], $ed['episode']['url']);
-				if($ed['proxy']){
-					$url = Config::DOMAIN . 'stream.php?id=' . $parts[1] . '&eid=' . $parts[2] . '&mac=' . $this->radioid->getMac();
-				}
-				else if($ed['finalurl']){
-					$url = Helper::getFinalUrl($ed['episode']['url']);
-				}
-				else{
-					$url = $ed['episode']['url'];
-				}
+			else { // "live" == false
 				$this->out->addEpisode(
-					$parts[1],
-					$parts[2],
-					$ed['title'],
-					$ed['episode']['title'],
-					$url,
-					$ed['episode']['desc'],
-					$ed['logo']
+					$id, null,
+					$sta['name'], $sta['name'],
+					$this->data->getStationURL($id, $this->radioid->getMac()),
+					$sta['desc']  ?? '',
+					$sta['logo'] ?? ''
 				);
-				$this->out->prevUrl(Config::DOMAIN . 'cat?cid=3&id=' . $parts[1]);
 			}
 		}
 	}
 
-	private function listPodcast(){
-		$id = $_GET['id'];
-		$pd = PodcastLoader::getPodcastDataById( $id, $this->data );
-		$proxy = !empty($this->data->getById( $id )['proxy']);
+	private function listPodcast(int $id) : void {
+		$this->out->prevUrl(Config::DOMAIN . 'cat?cid=3');
 		$this->unread->searchItem($id);
+
+		$pd = PodcastLoader::getPodcastDataById( $id, $this->data );
+		
 		foreach( $pd['episodes'] as $eid => $e ){
 			$this->out->addEpisode(
-				$id,
-				$eid,
+				$id, $eid,
 				$pd['title'],
 				$this->unread->knownItemMark($id, $e['url']) . $e['title'],
-				$proxy ? Config::DOMAIN . 'stream.php?id=' . $id . '&eid=' . $eid . '&mac=' . $this->radioid->getMac() : $e['url'],
-				$e['desc'],
-				$pd['logo'],
+				$this->data->getPodcastURL($id, $eid, $this->radioid->getMac(), sloppy: true),
+				$e['desc'], $pd['logo'],
 				!$this->unread->knownItem($id, $e['url'])
 			);
 		}
-		$this->out->prevUrl(Config::DOMAIN . 'cat?cid=3');
+		
 	}
 		
-	private function listDirectories(int $cid){
+	private function listDirectory(int $cid) : void {
 		foreach( $this->data->getListOfItems( $cid ) as $id => $item ){
-			if( $cid == 3){
-				$this->out->addPodcast(
-					$id,
-					$item['name'],
-					Config::DOMAIN . 'cat?cid=' . $cid . '&id=' . $id
-				);
-			}
-			else{
+			if($item['cid'] == 1 || ($item['cid'] == 2 && $item['live'])){ // radio station, or live "own stream"
 				$this->out->addStation(
 					$id,
 					$item['name'],
@@ -175,6 +177,21 @@ class Router {
 					true
 				);
 			}
+			else if($item['cid'] == 3){ // podcast
+				$this->out->addPodcast(
+					$id,
+					$item['name'],
+					Config::DOMAIN . 'cat?cid=' . $cid . '&id=' . $id
+				);
+			}
+			else if ($item['cid'] == 2 && !$item['live']) { // file based "own stream"
+				$this->out->addEpisode(
+					$id, null,
+					$item['name'], $item['name'],
+					$this->data->getStationURL($id, $this->radioid->getMac())
+				);
+			}
+		
 		}
 	}
 }

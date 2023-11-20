@@ -45,21 +45,8 @@ if( !empty( $_GET['id'] ) ){
 		else if(is_numeric( $_GET['track'] ) && preg_replace('/[^0-9]/','', $_GET['track'] ) === $_GET['track'] ){
 			$track = $_GET['track'];
 
-			$urllist = PodcastLoader::getMusicById( $id, $data );
-			if( Config::SHUFFLE_MUSIC ){ // generate random index for each track id (cache via redis)
-				$redis = new RedisCache('shuffle');
-				if( $redis->keyExists( $id . $track ) ){
-					$index = $redis->get( $id . $track );
-				}
-				else{
-					$index = random_int( 0, count( $urllist ) - 1 );
-					$redis->set( $id . $track, $index, Config::CACHE_EXPIRE );
-				}
-			}
-			else{
-				$index = $track;
-			}
-			$url = empty( $urllist[$index] ) ? '' : $urllist[$index];
+			$urls = PodcastLoader::getMusicById( $id, $data );
+			$url = empty( $urls[$track] ) ? '' : $urls[$track];
 		}
 		else{
 			$url = '';
