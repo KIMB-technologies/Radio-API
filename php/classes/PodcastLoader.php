@@ -182,7 +182,7 @@ class PodcastLoader {
 			self::loadRedis();
 
 			$m3Key = 'm3u.'.sha1($stat['url']);
-			if( !self::$redis->keyExists($m3Key) ){
+			if( self::$redis->keyExists($m3Key) ){
 				return json_decode(self::$redis->get($m3Key));
 			}
 			
