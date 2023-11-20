@@ -17,25 +17,40 @@ defined('HAMA-Radio') or die('Invalid Endpoint');
 mb_substitute_character("none");
 class Output {
 
-	private static function cleanText( string $s ): string {
-		return mb_substr( mb_convert_encoding(str_replace( str_split('"&<>/'), '', $s ), 'UTF-8', 'UTF-8'), 0, 100 );
-	}
-	private static function cleanUrl( string $s ): string {
-		$url = mb_convert_encoding(str_replace( str_split('<>'), '', $s ), 'UTF-8', 'UTF-8');
-		return 'http' . ( empty($_SERVER['HTTPS']) ? ':' : 's:' ) . substr( $url, strpos( $url, '//') );
-	}
-
 	private
 		$items = array(),
 		$itemsSortKeys = array(),
-		$prevurl = '';
-
+		$prevurl = '',
+		$language;
+	
 	const MAX_ITEMS = 200; // to many items will cause the radio to crash (one could add paging, but until then, we remove too much items)
+
+	const ALL_LANGUAGES = array(
+		'eng',
+		'ger'
+	);
+	const TRANSLATIONS = array(
+		'Podcast' => ['Podcast', 'Podcast'],
+		'Radio' => ['Radio stations', 'Radiosender'],
+		'Radio-Browser' => ['Radio-Browser', 'Radio-Browser'],
+		'Stream' => ['Stream', 'Stream'],
+		'GUI-Code' => ['GUI-Code', 'GUI-Code'], 
+		//
+		'Countries' => ['Countries', 'Länder'],
+		'All States' => ['All States', 'Alle Bundesländer'],
+		'Languages' => ['Languages', 'Sprachen'],
+		'My Last' => ['My Last', 'Meine zuletzt gehörten'],
+		'Tags' => ['Tags', 'Kategorien'],
+		'Top Click' => ['Top Click', 'Am meisten gehört'],
+		'Top Vote' => ['Top Vote', 'Am höchsten bewertet'],
+		'Next Page' => ['Next Page', 'Nächste Seite'],
+	);
 
 	/**
 	 * Create Outputter
 	 */
-	public function __construct(){
+	public function __construct(string $lang = 'eng'){
+		$this->language = array_search($lang, self::ALL_LANGUAGES) ?? 0;
 	}
 
 	/**
@@ -46,14 +61,14 @@ class Output {
 		$a = array(
 			'ItemType' => 'Station',
 			'StationId' => $id,
-			'StationName' => self::cleanText($name),
+			'StationName' => $this->cleanText($name, true),
 		);
 		if( !$light ){
 			$logo = empty($logo) || substr($logo, 0, 4) != 'http' ? Config::DOMAIN . 'media/default.png' : $logo;
 			$b = array(
-				'StationUrl' => self::cleanUrl($url),
-				'StationDesc' => self::cleanText($desc),
-				'Logo' => self::cleanUrl($logo),
+				'StationUrl' => $this->cleanUrl($url),
+				'StationDesc' => $this->cleanText($desc),
+				'Logo' => $this->cleanUrl($logo),
 				'StationFormat' => 'Radio',
 				'StationLocation' => 'Earth',
 				'StationBandWidth' => 32,
@@ -75,9 +90,9 @@ class Output {
 		$this->items[] = array(
 			'ItemType' => 'ShowOnDemand',
 			'ShowOnDemandID' => $podcastid,
-			'ShowOnDemandName' => self::cleanText($name),
-			'ShowOnDemandURL' => self::cleanUrl( $url ),
-			'ShowOnDemandURLBackUp' => self::cleanUrl( $url ),
+			'ShowOnDemandName' => $this->cleanText($name, true),
+			'ShowOnDemandURL' => $this->cleanUrl($url),
+			'ShowOnDemandURLBackUp' => $this->cleanUrl($url),
 			'BookmarkShow' => ''
 		);
 		$this->itemsSortKeys[] = 'pod==' . ($sortKey === "" ? $name : $sortKey);
@@ -92,12 +107,12 @@ class Output {
 		$this->items[] = array(
 			'ItemType' => 'ShowEpisode',
 			'ShowEpisodeID' =>  $podcastid . (!is_null($episodeid) ? 'X' . $episodeid : ''),	
-			'ShowName' => self::cleanText($podcastname),
-			'Logo' => self::cleanUrl($logo),
-			'ShowEpisodeName' => self::cleanText($episodename),
-			'ShowEpisodeURL' => self::cleanUrl($url),
+			'ShowName' => $this->cleanText($podcastname, true),
+			'Logo' => $this->cleanUrl($logo),
+			'ShowEpisodeName' => $this->cleanText($episodename, true),
+			'ShowEpisodeURL' => $this->cleanUrl($url),
 			'BookmarkShow' => '',
-			'ShowDesc' => self::cleanText( $desc ),
+			'ShowDesc' => $this->cleanText($desc),
 			'ShowFormat' => 'Podcast',
 			'Lang' => 'KIMBisch',
 			'Country' => 'KIMB',
@@ -112,9 +127,9 @@ class Output {
 	public function addDir(string $name, string $url, bool $isLast = false, int|string $sortKey = "") : void {
 		$this->items[] = array(
 			'ItemType' => 'Dir',
-			'Title' => self::cleanText($name),
-			'UrlDir' => self::cleanUrl($url),
-			'UrlDirBackUp' => self::cleanUrl($url)
+			'Title' => $this->cleanText($name, true),
+			'UrlDir' => $this->cleanUrl($url),
+			'UrlDirBackUp' => $this->cleanUrl($url)
 		);
 		$this->itemsSortKeys[] = ($isLast ? 'z' : '') . 'dir==' . ($sortKey === "" ? $name : $sortKey);;
 	}
@@ -123,7 +138,30 @@ class Output {
 	 * Set or override a Previous (<- Back URL)
 	 */
 	public function prevUrl(string $url) : void {
-		$this->prevurl = self::cleanUrl($url);
+		$this->prevurl = $this->cleanUrl($url);
+	}
+
+	private function cleanText( string $s, bool $translate = false ): string {
+		if($translate){
+			$pos = strpos($s, ':');
+			$suffix = '';
+			if($pos !== false){
+				$suffix = substr($s, $pos);
+				$s = substr($s, 0, $pos);
+			}
+
+			if(array_key_exists($s, self::TRANSLATIONS)){
+				$s = self::TRANSLATIONS[$s][$this->language];
+			}
+
+			$s .= $suffix;
+		}
+		return mb_substr( mb_convert_encoding(str_replace( str_split('"&<>/'), '', $s ), 'UTF-8', 'UTF-8'), 0, 100 );
+	}
+
+	private function cleanUrl( string $s ): string {
+		$url = mb_convert_encoding(str_replace( str_split('<>'), '', $s ), 'UTF-8', 'UTF-8');
+		return 'http' . ( empty($_SERVER['HTTPS']) ? ':' : 's:' ) . substr( $url, strpos( $url, '//') );
 	}
 
 	/**

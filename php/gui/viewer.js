@@ -27,7 +27,7 @@ function loadPage( url, elem, play ){
 	reloadPageValues = {url: url, elem:elem, play:play};
 
 	var html = "<ul>";
-	$.get( url + '&mac=' + radiomac , (data) => { 
+	$.get( url + '&mac=' + radiomac + '&dlang=' + dlang_val , (data) => { 
 		var xml = $( $.parseXML( data.replace(/&/g, '&amp;') ) );
 
 		xml.find('Item').each( (k,v) => {

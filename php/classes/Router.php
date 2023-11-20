@@ -27,7 +27,7 @@ class Router {
 	 */
 	public function __construct( Id $id ){
 		$this->radioid = $id;
-		$this->out = new Output();
+		$this->out = new Output(isset($_GET['dlang']) && is_string($_GET['dlang']) ? $_GET['dlang'] : 'eng');
 		$this->data = new Data($this->radioid->getId());
 		$this->unread = new UnRead($this->radioid->getId());
 		$this->radio_browser = new RadioBrowser($this->radioid);
