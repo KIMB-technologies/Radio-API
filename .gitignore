@@ -1,4 +1,5 @@
 /php/data/log.txt
+/php/data/cache
 /data/
 /redis/
 /php/getr.php

@@ -55,8 +55,14 @@ if( !empty( $_GET['id'] ) ){
 		if( !empty($url) && filter_var( $url, FILTER_VALIDATE_URL) !== false ){ 
 			$url = filter_var($url, FILTER_SANITIZE_URL); //clean url
 
+			if(!DOCKER_MODE){ // use a PHP based proxy
+				SimpleProxy::open( $url );
+				die();
+			}
+
 			// the proxy does not support redirects!, so do them before
 			$url = Helper::getFinalUrl($url);
+
 			
 			// get hostname and url parts before and after
 			$matches = array();

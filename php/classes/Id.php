@@ -37,7 +37,7 @@ class Id {
 
 	public function __construct($val, int $type = self::MAC){
 		// load redis
-		$redis = new RedisCache('table.json');
+		$redis = new Cache('table.json');
 		// import table
 		if( !$redis->keyExists('ids') ){
 			$this->loadFileIntoRedis($redis);
@@ -90,7 +90,7 @@ class Id {
 		return $this->data[1];
 	}
 
-	private function loadFileIntoRedis(RedisCache $redis) : void {
+	private function loadFileIntoRedis(Cache $redis) : void {
 		$table = null;
 		if( is_file( __DIR__ . '/../data/table.json' ) ){ // load table form disk?
 			$table = json_decode(file_get_contents( __DIR__ . '/../data/table.json' ), true);
@@ -114,7 +114,7 @@ class Id {
 		$redis->arraySet('codes', $table['codes']);
 	}
 
-	private function generateNewId( string $val, RedisCache $redis ) : int { 
+	private function generateNewId( string $val, Cache $redis ) : int { 
 		//	Load file, as file it the primary storage
 		$table = json_decode(file_get_contents( __DIR__ . '/../data/table.json' ), true);
 		if(is_null($table)){ // error in file, fix this!

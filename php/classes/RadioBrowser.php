@@ -25,7 +25,7 @@ class RadioBrowser {
 	private const RADIO_BROWSER_LAST_MAX = 40;
 
 	private Id $radioid;
-	private RedisCache $redis;
+	private Cache $redis;
 	private array $api_servers;
 	private string $api_server;
 	private bool $initialized = false;
@@ -69,7 +69,7 @@ class RadioBrowser {
 
 	private function before_request(?Output $out = null) : void {
 		if(!$this->initialized){
-			$this->redis = new RedisCache("radio-browser");
+			$this->redis = new Cache("radio-browser");
 
 			// API server selection
 			if($this->redis->keyExists('api_servers') ){
@@ -437,7 +437,7 @@ class RadioBrowser {
 	public static function dumpToDisk() : bool {
 		if( is_file( __DIR__ . '/../data/table.json' ) ){
 			$table = json_decode(file_get_contents( __DIR__ . '/../data/table.json' ), true);
-			$redis = new RedisCache("radio-browser");
+			$redis = new Cache("radio-browser");
 
 			$lasts = array();
 			foreach( $table['ids'] as $id => $data ){
@@ -455,7 +455,7 @@ class RadioBrowser {
 	public static function loadFromDisk() : array {
 		if( is_file(__DIR__ . '/../data/radiobrowser.json') ){
 			$lasts = json_decode(file_get_contents(__DIR__ . '/../data/radiobrowser.json'), true);
-			$redis = new RedisCache("radio-browser");
+			$redis = new Cache("radio-browser");
 
 			foreach( $lasts as $id => $last ){
 				if( !empty($last) ){

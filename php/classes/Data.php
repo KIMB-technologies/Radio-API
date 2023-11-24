@@ -26,7 +26,7 @@ class Data {
 	 */
 	public function __construct(int $id, bool $preload = false ){
 		$this->id = $id;
-		$this->redis = new RedisCache('radios_podcasts.' . $this->id );
+		$this->redis = new Cache('radios_podcasts.' . $this->id );
 		$this->own_streams = new OwnStreams();
 		
 		if( !$this->redis->keyExists( 'categories' ) || $preload ){
@@ -48,7 +48,7 @@ class Data {
 				rename(__DIR__ . '/../data/radios_'. $this->id .'.json', __DIR__ . '/../data/radios_'. $this->id .'.error.json');
 			}
 		}
-		$this->radio = is_null($radio) ?  array() : $radio;
+		$this->radio = is_null($radio) ? array() : $radio;
 
 		$podcasts = null;
 		if(is_file( __DIR__ . '/../data/podcasts_'. $this->id .'.json' )){
