@@ -1,7 +1,7 @@
 # Setup
 
 Radio-API can be run using Docker (recommend way) [&darr;](#setup-using-docker).
-It is also possible to run Radio-API on a webserver with PHP [&darr;](#manual-setup)
+It is also possible to run Radio-API on a simple webserver with PHP [&darr;](#manual-setup).
 
 ## Setup using Docker
 The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechnologies/radio_api).
@@ -35,7 +35,7 @@ The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechn
 		- Use the data volume of Redis. (Redis will (re-)load its dump files on container startup.)
 3. Done
 	- Start the radio and open `Internet Radio`.
-	- You will see the entries described above at [Usage](#usage).
+	- You will see the entries described at [Usage](./Readme.md#usage).
 	- Use the GUI to define the list of stations and podcasts. It can be accessed with a browser at `CONF_DOMAIN/gui`. 
 	- You will need the code shown by the radio to log into the GUI. 
 	- Each connected radio has is own list of user defined radio stations and podcasts, the *own streams* are global.
@@ -47,17 +47,67 @@ The [Docker Image](https://hub.docker.com/r/kimbtechnologies/radio_api) of *Radi
 The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is available for `linux/amd64`, `linux/arm/v7`, `linux/arm64/v8`, and `linux/arm64`.
 
 ## Manual Setup 
-> We recommend the Docker-based setup as the manual setup might be a bit fiddly.
-> The manual setup does not rely on *Redis* (replaced by a file-based caching storage),
-> does not require to set up a cron-job and does not provide the *proxy server* for 
-> radio stations and podcasts!
+> We recommend the Docker-based setup as the manual setup might be a bit fiddly and is less tested.  
+> **This is a *beta* feature.** -- You are welcome to file bug reports as issues or open pull requests!
 
-Make sure PHP is able to write the `./data/` folder!
+1. Redirect the HTTP request of the radio to your server (the *Radio-API*).
+	- This is the same as with the Docker based setup (see [here](#setup-using-docker)).
+2. Run the *Radio-API* on your webserver.
+	- Preface:
+		- The manual setup does not rely on *Redis* (which is replaced by a file-based caching).
+		- The only requirement a current version of PHP (code analysis shows compatibility with PHP > 8.0, code is tested with 8.2 and 8.3).
+		- You do not need a cron job, all data is stored in `./data/` and the cache files in `./data/cache/`.
+		- The proxy feature is provided by PHP, but might be less stable than the NGINX proxy.
+		- The EndURL feature uses the cURL extension of PHP (else it will error!).
+		- Assure, that PHP/ the webserver can write to `./data/`!
+	- Download the lastest source of the *Radio-API* [here](https://github.com/KIMB-technologies/Radio-API/releases/latest).
+	- Extract the zip and place the folder `php` in the web-root of our server (this is our  `./`, other files are not needed).
+	- Configure *Radio-API* in `./data/env.json` (The config values are the same as for the Docker-based mode, always use strings for the values!):
+		- `CONF_DOMAIN` The domain where the system is hosted (will be reached via HTTP).
+		- `CONF_ALLOWED_DOMAIN` You may give a list of multiple allowed host names, divided by `,`.
+			*The API would be public useable, if `CONF_ALLOWED_DOMAIN` is set to `all`.*
+			*If hosted in a local network using `all` is recommended.*
+		- `CONF_SHUFFLE_MUSIC` Randomly shuffle music in Nextcloud radio stations
+		- `CONF_CACHE_EXPIRE` Cache duration of ips, podcasts,  RadioBrowser requests, ...
+		- `CONF_STREAM_JSON` Url to a JSON list of streams or `false` to disable (see [Own Streams](#own-streams)).
+	- Make sure, that *Radio-API* is available at port `80` for requests with the hostname `*.wifiradiofrontier.com` and `CONF_DOMAIN`.
+	- Block HTTP access to `./data/` (and `./classes/`) for security reasons (might be omitted in a local network installation).
+	- Rewrite requests to PHP:
+		- All requests which do not point to an existing file need to be redirected to `./index.php`.
+		- E.g. `http://radio.example.com/setupapp/iden/asp/BrowseXML/loginXML.asp?token=0` must call `./index.php`.
+		- `./index.php` checks the get parameter `uri` for the path value, e.g., `"/setupapp/iden/asp/BrowseXML/loginXML.asp"`.
+			If this fails, `$_SERVER['REQUEST_URI']` is checked and the part before the first `?` is taken as path value.
+		- It is important, that the path value starts with `/` and contains the full path, but without get parameters starting at `?`.
+		- See the example for NGINX below. The built in webserver of PHP may be used for development with the `router.php` in the repository's root.
+3. Done
+	- Start the radio and open `Internet Radio`.
+	- You will see the entries described above at [Usage](./Readme.md#usage)..
 
-*TODO*
+### Rewrite with NGINX 
+
+```nginx 
+# error pages (optional)
+error_page 404 /gui/index.php?err=404;
+error_page 403 /gui/index.php?err=403;
+
+# handle file requests
+location / {
+	try_files $uri $uri/ @nofile;
+}
+
+# block access to configuration
+location ~ ^/(data|classes){
+	deny all;
+	return 403;
+}
+
+# do the path value rewrite to get parameter "uri"
+location @nofile {
+	rewrite ^(.*)$ /index.php?uri=$1 last;
+}
+```
 
 ## General Information
-
 ### Troubleshooting 
 - A log file of (unknown) request received by the Radio-API is created at `./data/log.txt`.  
 - Errors with the RadioBrowser API are logged at `./data/log_radiobrowser.txt`.

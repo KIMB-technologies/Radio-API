@@ -48,7 +48,7 @@ class Data {
 				rename(__DIR__ . '/../data/radios_'. $this->id .'.json', __DIR__ . '/../data/radios_'. $this->id .'.error.json');
 			}
 		}
-		$this->radio = is_null($radio) ?  array() : $radio;
+		$this->radio = is_null($radio) ? array() : $radio;
 
 		$podcasts = null;
 		if(is_file( __DIR__ . '/../data/podcasts_'. $this->id .'.json' )){

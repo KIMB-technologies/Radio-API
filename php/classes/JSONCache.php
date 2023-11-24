@@ -139,11 +139,7 @@ class JSONCache implements CacheInterface {
 	public function output(): void {
 		echo '=================================' . PHP_EOL;
 		foreach($this->getAllKeysOfGroup() as $key){
-			$val = $this->get($key);
-			if(is_array($val)){
-				$val = json_encode($val);
-			}
-			echo $key . "\t\t : " . $val . PHP_EOL;
+			echo $key . "\t\t : " . (is_array( $this->data[$key][0]) ? $this->arrayGet($key) : $this->get($key)) . PHP_EOL;
 		}
 		echo '=================================' . PHP_EOL . PHP_EOL;
 	}

@@ -49,7 +49,7 @@ This redirect is possible by manipulating the DNS queries.
 		- The Streams are shared across all radios using the same *Radio-API* setup.
 	- **GUI-Code**
 		- This code is like a password to access the GUI for this radio and edit the radio stations and streams.
-- Gui:
+- GUI:
 	- The GUI can be opened via a webbrowser at `radio.example.com/gui/`.
 	- The GUI provides the editable lists of radio stations and podcasts.
 	- A preview of the items shown by the radio is provided by the GUI, too.

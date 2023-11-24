@@ -168,7 +168,7 @@ class Config {
 		}
 
 		if($output){
-			$redis->output();
+			self::$redisAccessDomains->output();
 		}
 	}
 }
