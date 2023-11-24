@@ -1,5 +1,7 @@
 {
 	"%%MOREHEADER%%" : "",
 	"%%TITLE%%": "",
-	"%%INNERCONTAINER%%" : ""
+	"%%INNERCONTAINER%%" : "",
+	"%%VERSION%%" : "unknown",
+	"%%UPDATEINFO%%" : "style=\"display:none;\""
 }

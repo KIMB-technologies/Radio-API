@@ -25,6 +25,10 @@ $viewTemplate = new Template('view');
 
 $mainTemplate->setContent('TITLE', Template::getLanguage() == 'de' ? 'Vorschau' : 'Preview');
 $mainTemplate->setContent('MOREHEADER', '<script src="viewer.js?v=4"></script>');
+$mainTemplate->setContent('VERSION', Config::VERSION);
+if(Config::updateAvailable()){
+	$mainTemplate->setContent('UPDATEINFO', '');
+}
 
 // Redirect from /index.php to viewer?
 if( isset( $_GET['redirFromIndex'] ) ){

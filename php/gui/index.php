@@ -21,6 +21,11 @@ Template::detectLanguage();
 
 // Load Main Template
 $mainTemplate = new Template('main');
+$mainTemplate->setContent('VERSION', Config::VERSION);
+if(Config::updateAvailable()){
+	$mainTemplate->setContent('UPDATEINFO', '');
+}
+
 
 // Login Form?
 if( isset($_GET['login']) || isset( $_GET['err'] )){
