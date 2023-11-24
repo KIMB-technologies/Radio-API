@@ -26,7 +26,7 @@ class PodcastLoader {
 	 */
 	private static function loadRedis(){
 		if( is_null(self::$redis) ){
-			self::$redis = new RedisCache('podcast_loader');
+			self::$redis = new Cache('podcast_loader');
 		}
 	}
 

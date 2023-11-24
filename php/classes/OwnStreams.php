@@ -18,11 +18,11 @@ class OwnStreams {
 
 	const IS_ACTIVE = Config::STREAM_JSON !== false;
 
-	private RedisCache $redis;
+	private Cache $redis;
 
 	public function __construct(){
 		if( self::IS_ACTIVE ){
-			$this->redis = new RedisCache( 'own_stream' );
+			$this->redis = new Cache( 'own_stream' );
 		}
 	}
 

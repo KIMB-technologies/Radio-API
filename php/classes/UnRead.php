@@ -16,7 +16,7 @@ defined('HAMA-Radio') or die('Invalid Endpoint');
  */
 class UnRead {
 
-	private RedisCache $redis;
+	private Cache $redis;
 	private bool $dontRemove = false;
 
 	/**
@@ -24,7 +24,7 @@ class UnRead {
 	 * @param $id the id of the user
 	 */
 	public function __construct(int $id){
-		$this->redis = new RedisCache('unread_podcasts.' . $id );
+		$this->redis = new Cache('unread_podcasts.' . $id );
 	}
 
 	/**
@@ -90,7 +90,7 @@ class UnRead {
 
 			$reads = array();
 			foreach( $table['ids'] as $id => $data ){
-				$redis = new RedisCache('unread_podcasts.' . $id );
+				$redis = new Cache('unread_podcasts.' . $id );
 				$reads[$id] = array();
 				foreach($redis->getAllKeysOfGroup() as $key ){
 					if( preg_match('/^.*:([^0-9s].*)$/', $key, $matches) === 1){
@@ -112,7 +112,7 @@ class UnRead {
 			$reads = json_decode(file_get_contents(__DIR__ . '/../data/unread.json'), true);
 			foreach( $reads as $id => $read ){
 				if( !empty($read) ){
-					$redis = new RedisCache('unread_podcasts.' . $id );
+					$redis = new Cache('unread_podcasts.' . $id );
 					foreach( $read as $r ){
 						// update "old" key! "3001-http://..." => "http://..."
 						if( preg_match('/^\d+\-(.*)$/', $r, $matches) === 1 ){

@@ -5,6 +5,12 @@
 	<a href="%%SERVERURL%%gui/?login">Logout</a>
 </div>
 
+<div class="achtung not-docker-mode" style="clear:both;">
+	This installation does not use Docker mode, thus the 
+	proxy is disabled and not shown here!
+</div>
+
+
 <h3 id="radio">Radio stations</h3>
 	<form action="%%SERVERURL%%gui/?radios#radio" method="post">
 		<table>
@@ -37,7 +43,7 @@
 						<input type="radio" value="nc" name="type[%%COUNT%%]" %%TYPE_NC%% /> Nextcloud
 					</td>
 				</tr>
-				<tr>
+				<tr class="only-docker-mode">
 					<td></td>
 					<td>Proxy</td>
 					<td>
@@ -106,7 +112,7 @@
 					<input type="radio" value="nc" name="type[%%RADIO_COUNT%%]" /> Nextcloud
 				</td>
 			</tr>
-			<tr>
+			<tr class="only-docker-mode">
 				<td></td>
 				<td>Proxy</td>
 				<td>
@@ -192,7 +198,7 @@
 						<input type="radio" value="no" name="finalurl[%%COUNT%%]" %%ENDURL_NO%% /> &cross;
 					</td>
 				</tr>
-				<tr>
+				<tr class="only-docker-mode">
 					<td></td>
 					<td>Proxy</td>
 					<td>
@@ -237,7 +243,7 @@
 					<input type="radio" value="no" name="finalurl[%%PODCAST_COUNT%%]" checked="checked" /> &cross;
 				</td>
 			</tr>
-			<tr>
+			<tr class="only-docker-mode">
 				<td></td>
 				<td>Proxy</td>
 				<td>

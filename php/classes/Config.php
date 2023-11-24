@@ -12,12 +12,27 @@
 defined('HAMA-Radio') or die('Invalid Endpoint');
 
 /**
- * Docker ENV setup
+ * Docker or Non-Docker ENV setup
  */
-define( 'ENV_DOMAIN', $_ENV['CONF_DOMAIN'] . (substr( $_ENV['CONF_DOMAIN'], -1) !== '/' ? '/' : '') );
-define( 'ENV_CACHE_EXPIRE', intval($_ENV['CONF_CACHE_EXPIRE']));
-define( 'ENV_STREAM_JSON', !empty($_ENV['CONF_STREAM_JSON']) && $_ENV['CONF_STREAM_JSON'] != 'false' ? $_ENV['CONF_STREAM_JSON'] : false  );
-define( 'ENV_SHUFFLE_MUSIC', $_ENV['CONF_SHUFFLE_MUSIC'] == 'true');
+define( 'DOCKER_MODE', !empty($_ENV['DOCKER_MODE']) && $_ENV['DOCKER_MODE'] == 'true');
+
+// use the env.json
+if( DOCKER_MODE ) {
+	$ENV = $_ENV;
+}
+else{
+	$ENV = json_decode(file_get_contents(__DIR__ . '/../data/env.json'), true);
+	if(is_null($ENV)){
+		die('Error: The non-Docker mode requires a valid env.json file in ./data/!');
+	}
+}
+
+// load ENV values
+define( 'ENV_DOMAIN', $ENV['CONF_DOMAIN'] . (substr( $ENV['CONF_DOMAIN'], -1) !== '/' ? '/' : '') );
+define( 'ENV_ALLOWED_DOMAIN', !empty($ENV['CONF_ALLOWED_DOMAIN']) ? $ENV['CONF_ALLOWED_DOMAIN'] : null );
+define( 'ENV_CACHE_EXPIRE', intval($ENV['CONF_CACHE_EXPIRE']));
+define( 'ENV_STREAM_JSON', !empty($ENV['CONF_STREAM_JSON']) && $ENV['CONF_STREAM_JSON'] != 'false' ? $ENV['CONF_STREAM_JSON'] : false  );
+define( 'ENV_SHUFFLE_MUSIC', $ENV['CONF_SHUFFLE_MUSIC'] == 'true');
 
 // IP on reverse proxy setup
 if( !empty($_SERVER['HTTP_X_REAL_IP']) ){
@@ -61,10 +76,16 @@ class Config {
 	 * @param $mac give the users mac (we will test his last domain first, to speed up things)
 	 */
 	public static function checkAccess( ?string $mac = null ) : void {
-		if( is_null( self::$redisAccessDomains ) ){ // load redis, if not loaded
-			self::setRedisServer();
-			self::$redisAccessDomains = new RedisCache( 'allowed_domains' );
+		if( is_null( self::$redisAccessDomains ) ){ // already loaded?
+			if(DOCKER_MODE){ // use the preloaded values from ./startup.php
+				self::setRedisServer();
+				self::$redisAccessDomains = new Cache( 'allowed_domains' );
+			}
+			else { // load the values from ENV
+				self::parseAllowedDomain();
+			}
 		}
+
 		if( self::$redisAccessDomains->get('type' ) == 'all' ){ // allow all
 			return;
 		}
@@ -114,6 +135,9 @@ class Config {
 	 * Should be always called before creating a RedisCache.
 	 */
 	public static function setRedisServer() : void {
+		if(!DOCKER_MODE){ // Redis only in Docker mode
+			return;
+		}
 		if( isset( $_ENV['CONF_REDIS_HOST'], $_ENV['CONF_REDIS_PORT'], $_ENV['CONF_REDIS_PASS'] ) ){
 			RedisCache::setRedisServer($_ENV['CONF_REDIS_HOST'], $_ENV['CONF_REDIS_PORT'], $_ENV['CONF_REDIS_PASS']);
 		}
@@ -122,6 +146,29 @@ class Config {
 		}
 		else if( isset( $_ENV['CONF_REDIS_HOST'] ) ){
 			RedisCache::setRedisServer($_ENV['CONF_REDIS_HOST']);
+		}
+	}
+
+	public static function parseAllowedDomain(bool $output = false) : void {
+		self::setRedisServer();
+		self::$redisAccessDomains = new Cache( 'allowed_domains' );
+
+		if( ENV_ALLOWED_DOMAIN == 'all' ){
+			self::$redisAccessDomains->set( 'type', 'all' );	
+		}
+		else if( !is_null( ENV_ALLOWED_DOMAIN ) ){
+			self::$redisAccessDomains->set( 'type', 'list' );
+			$allowed = array_map( function ($domain){
+				return trim($domain);
+			}, explode(',', ENV_ALLOWED_DOMAIN ) );
+			self::$redisAccessDomains->arraySet('domains', $allowed);
+		}
+		else{
+			self::$redisAccessDomains->set( 'type', 'error' );	
+		}
+
+		if($output){
+			$redis->output();
 		}
 	}
 }

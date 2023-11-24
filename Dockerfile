@@ -13,3 +13,5 @@ COPY ./startup.php /startup-before.sh ./cron.php  /
 # backup default data dir
 RUN mkdir /data-dir-default/ \
 	&& cp -r /php-code/data/* /data-dir-default
+
+ENV DOCKER_MODE=true

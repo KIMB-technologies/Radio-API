@@ -57,6 +57,12 @@ if( !empty( $_GET['id'] ) ){
 
 			// the proxy does not support redirects!, so do them before
 			$url = Helper::getFinalUrl($url);
+
+			if(!DOCKER_MODE){ // Proxy is only supported in Docker mode, thus do a redirect if in non-Docker mode!
+				header('Location: ' . $url);
+				http_response_code(303);
+				die();
+			}
 			
 			// get hostname and url parts before and after
 			$matches = array();
