@@ -94,7 +94,7 @@ class SimpleProxy {
 				}
 			}
 			if( $ok ){
-				header( preg_replace( "\n|\r/", '', $h ) );
+				header( preg_replace( "/\n|\r/", '', $h ) );
 			}
 		}
 	}

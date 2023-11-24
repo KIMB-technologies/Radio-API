@@ -6,7 +6,7 @@ It is also possible to run Radio-API on a simple webserver with PHP [&darr;](#ma
 ## Setup using Docker
 The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechnologies/radio_api).
 
-1. Redirect the HTTP request of the radio to your server (the *Radio-API*).
+1. Redirect the HTTP requests of the radio to your server (the *Radio-API*).
 	- This is done by altering the DNS queries.
 	- There is a [Docker Image](https://hub.docker.com/r/kimbtechnologies/radio_dns) which provides a DNS server altering all requests to `*.wifiradiofrontier.com`.
 		- It has a feature to define an `ALLOWED_DOMAIN`, only requests from the corresponding IP address will be answered.
@@ -35,7 +35,7 @@ The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechn
 		- Use the data volume of Redis. (Redis will (re-)load its dump files on container startup.)
 3. Done
 	- Start the radio and open `Internet Radio`.
-	- You will see the entries described at [Usage](./Readme.md#usage).
+	- You will see the entries described at [Usage](./#usage).
 	- Use the GUI to define the list of stations and podcasts. It can be accessed with a browser at `CONF_DOMAIN/gui`. 
 	- You will need the code shown by the radio to log into the GUI. 
 	- Each connected radio has is own list of user defined radio stations and podcasts, the *own streams* are global.
@@ -81,7 +81,7 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 		- See the example for NGINX below. The built in webserver of PHP may be used for development with the `router.php` in the repository's root.
 3. Done
 	- Start the radio and open `Internet Radio`.
-	- You will see the entries described above at [Usage](./Readme.md#usage)..
+	- You will see the entries described above at [Usage](./#usage).
 
 ### Rewrite with NGINX 
 

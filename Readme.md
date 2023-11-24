@@ -43,7 +43,7 @@ This redirect is possible by manipulating the DNS queries.
 		- The stations recently opened via the radio are shown in *My Last*.
 		- *Using Radio-Browser will send http requests and such usage data to the [RadioBrowser API](https://api.radio-browser.info/)!*
 		- In the GUI it is also possible to search for stations in RadioBrowser and add them to the user defined stations. Stations from *My Last* are shown in the GUI, too.
-	- **Stream** (if enabled in `docker-compose.yml`, see [Own Streams](#own-streams))
+	- **Stream** (if enabled in `docker-compose.yml`, see [Own Streams](./Setup.md#own-streams))
 		- This is a list of server specific streams.
 		- The list is fetched from a custom url, provided in the Docker Container setup.
 		- The Streams are shared across all radios using the same *Radio-API* setup.

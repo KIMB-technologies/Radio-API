@@ -48,7 +48,7 @@ class Config {
 	/**
 	 * The system's version.
 	 */
-	const VERSION = 'v2.6.0';
+	const VERSION = 'v2.7.0';
 
 	/**
 	 * The real domain which should be used.
@@ -162,7 +162,7 @@ class Config {
 	public static function updateAvailable() : bool {
 		if( is_null( self::$redisUpdateStatus ) ){ // load redis, if not loaded
 			self::setRedisServer();
-			self::$redisUpdateStatus = new RedisCache( 'update_status' );
+			self::$redisUpdateStatus = new Cache( 'update_status' );
 		}
 
 		if(!self::$redisUpdateStatus->keyExists('update_available')){
