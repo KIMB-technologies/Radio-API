@@ -128,7 +128,7 @@ class RadioBrowser {
 							'method'  => 'POST',
 							'header'  =>
 								"Content-Type: application/x-www-form-urlencoded\r\n" . 
-								"User-Agent: KIMB-technologies/Radio-API\r\n",
+								"User-Agent: KIMB-technologies/Radio-API/".Config::VERSION."\r\n",
 							'content' => http_build_query( $params ),
 							'timeout' => 5
 						)

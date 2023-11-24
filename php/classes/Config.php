@@ -31,6 +31,11 @@ if( !empty( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $_SERVER['HTTP_X_FORWARDED_P
 class Config {
 
 	/**
+	 * The system's version.
+	 */
+	const VERSION = 'v2.6.0';
+
+	/**
 	 * The real domain which should be used.
 	 */
 	const DOMAIN = ENV_DOMAIN;
@@ -54,6 +59,11 @@ class Config {
 	 * Store redis cache for ALLOWED_DOMAINS
 	 */
 	private static $redisAccessDomains = null;
+
+	/**
+	 * Store latest version and update available status
+	 */
+	private static $redisUpdateStatus = null;
 
 	/**
 	 * Checks if access allowed (for this request)
@@ -123,6 +133,41 @@ class Config {
 		else if( isset( $_ENV['CONF_REDIS_HOST'] ) ){
 			RedisCache::setRedisServer($_ENV['CONF_REDIS_HOST']);
 		}
+	}
+
+	public static function updateAvailable() : bool {
+		if( is_null( self::$redisUpdateStatus ) ){ // load redis, if not loaded
+			self::setRedisServer();
+			self::$redisUpdateStatus = new RedisCache( 'update_status' );
+		}
+
+		if(!self::$redisUpdateStatus->keyExists('update_available')){
+			$infos = json_decode(file_get_contents(
+					'https://api.github.com/repos/KIMB-technologies/Radio-API/releases/latest', 
+					false,
+					stream_context_create(array('http' =>array(
+						'method'  => 'GET',
+						'header'  => "Content-Type: application/json\r\n". "User-Agent: KIMB-technologies/Radio-API\r\n",
+						'timeout' => 4
+					)))
+				), true);
+			if(is_null($infos)){
+				// error checking latest version
+				return false;
+			}
+			else{	
+				self::$redisUpdateStatus->set('latest_version', $infos["tag_name"]);
+				self::$redisUpdateStatus->set('last_check', date('d.m.Y H:i:s'));
+			}
+
+			self::$redisUpdateStatus->set(
+				'update_available',
+				version_compare(self::VERSION, self::$redisUpdateStatus->get('latest_version'), '<'),
+				60*60*24*3 // check every 3 days
+			);
+		}
+		
+		return self::$redisUpdateStatus->get('update_available');
 	}
 }
 
