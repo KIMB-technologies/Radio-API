@@ -213,8 +213,9 @@ class Template{
 			$htmldata = $a[0] . $middle . $b[1];
 		}
 
-		$this->placeholder['%%SERVERURL%%'] = 'http'. ( empty($_SERVER['HTTPS']) ? '' : 's' ) .':'. substr(Config::DOMAIN, strpos(Config::DOMAIN, '//'));
-		
+		$this->placeholder['%%SERVERURL%%'] = 'http'. ( empty($_SERVER['HTTPS']) ? '' : 's' ) .':'.
+			substr(Config::DOMAIN, strpos(Config::DOMAIN, '//'));
+		$this->placeholder['%%VERSION%%'] = Config::VERSION;
 
 		if( $this->inner !== null ){
 			$this->placeholder['%%INNERCONTAINER%%'] = $this->inner->getOutputString();
