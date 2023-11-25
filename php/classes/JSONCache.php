@@ -16,7 +16,7 @@ defined('HAMA-Radio') or die('Invalid Endpoint');
  */
 class JSONCache implements CacheInterface {
 
-	const BASE_DIR = __DIR__ . '/../data/cache';
+	const BASE_DIR = Config::CACHE_DIR;
 
 	private $file, $data, $cleanupRan = false;
 

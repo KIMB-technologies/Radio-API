@@ -1,6 +1,7 @@
-/php/data/log.txt
+/php/data/*.log
 /php/data/cache
+/php/getr.php
+
 /data/
 /redis/
-/php/getr.php
 .DS_Store

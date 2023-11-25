@@ -98,7 +98,11 @@ class Router {
 				preg_match('/^\/setupapp\/[A-Za-z0-9\-\_]+\/asp\/BrowseXML\/loginXML.asp/i', $uri) === 0 &&
 				(!isset( $_GET['go'] ) || $_GET['go'] != "initial")
 			){
-				file_put_contents( __DIR__ . '/../data/log.txt', date('d.m.Y H:i:s') . " : " . json_encode( $_GET ) . PHP_EOL, FILE_APPEND );
+				file_put_contents(
+					Config::LOG_DIR . '/requests.log',
+					date('d.m.Y H:i:s') . " : " . json_encode( $_GET ) . PHP_EOL,
+					FILE_APPEND
+				);
 			}
 		}
 	}

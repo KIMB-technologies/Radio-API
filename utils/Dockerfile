@@ -7,8 +7,8 @@ RUN apk add --update --no-cache $PHPIZE_DEPS \
 
 # copy php files, nginx conf and startup scripts
 COPY --chown=www-data:www-data ./php/ /php-code/
-COPY ./nginx.conf /etc/nginx/more-server-conf.conf 
-COPY ./startup.php /startup-before.sh ./cron.php  /
+COPY ./utils/nginx.conf /etc/nginx/more-server-conf.conf 
+COPY ./utils/startup.php /utils/startup-before.sh ./utils/cron.php  /
 
 # backup default data dir
 RUN mkdir /data-dir-default/ \

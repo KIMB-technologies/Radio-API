@@ -61,7 +61,7 @@ class RadioBrowser {
 
 	private function log(array $data) : void {
 		file_put_contents(
-			__DIR__ . '/../data/log_radiobrowser.txt',
+			Config::LOG_DIR . '/radiobrowser.log',
 			date('d.m.Y H:i:s') . " : " . json_encode( $data ) . PHP_EOL,
 			FILE_APPEND
 		);
@@ -434,7 +434,7 @@ class RadioBrowser {
 	/**
 	 * Dump all last stations to disk (called by cron)
 	 */
-	public static function dumpToDisk() : bool {
+	public static function dumpToDisk(?string $exportDir = null) : bool {
 		if( is_file( __DIR__ . '/../data/table.json' ) ){
 			$table = json_decode(file_get_contents( __DIR__ . '/../data/table.json' ), true);
 			$redis = new Cache("radio-browser");
@@ -444,7 +444,10 @@ class RadioBrowser {
 				$lasts[$id] = $redis->arrayGet('last_stations.'.$id);
 			}
 
-			return file_put_contents(__DIR__ . '/../data/radiobrowser.json', json_encode( $lasts, JSON_PRETTY_PRINT)) !== false;
+			return file_put_contents(
+					(is_null($exportDir) ? __DIR__ . '/../data' : $exportDir) . '/radiobrowser.json',
+					json_encode( $lasts, JSON_PRETTY_PRINT)
+				) !== false;
 		}
 		return true;
 	}
@@ -452,9 +455,10 @@ class RadioBrowser {
 	/**
 	 * Load dumped last stations into Redis (done on container startup)
 	 */
-	public static function loadFromDisk() : array {
-		if( is_file(__DIR__ . '/../data/radiobrowser.json') ){
-			$lasts = json_decode(file_get_contents(__DIR__ . '/../data/radiobrowser.json'), true);
+	public static function loadFromDisk(?string $exportDir = null) : array {
+		$file = (is_null($exportDir) ? __DIR__ . '/../data' : $exportDir) . '/radiobrowser.json';
+		if( is_file($file) ){
+			$lasts = json_decode(file_get_contents($file), true);
 			$redis = new Cache("radio-browser");
 
 			foreach( $lasts as $id => $last ){

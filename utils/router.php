@@ -14,7 +14,7 @@
  * This file is for running the Radio-API in non-Docker mode using the PHP
  * built in webserver.
  * Start in root of Git repo with, e.g.,:
- * 	php -S localhost:8080 -t ./php/ ./router.php
+ * 	php -S localhost:8080 -t ./php/ ./utils/router.php
  */
 if (php_sapi_name() == 'cli-server') {
 	if (
@@ -26,7 +26,7 @@ if (php_sapi_name() == 'cli-server') {
 	}
 	else { 
 		// else use the index.php as fallback!
-		include(__DIR__ . '/php/index.php');
+		include(__DIR__ . '/../php/index.php');
 	}
 }
 else{

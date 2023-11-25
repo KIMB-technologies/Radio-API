@@ -62,7 +62,7 @@ class RedisCache implements CacheInterface {
 		return $this->prefix . str_replace( ':', '', $key );
 	}
 
-	public function getAllKeysOfGroup() : array {
+	public function getAllKeysOfGroup(bool $trimPrefix = true) : array {
 		$all = array();
 		$lenpref = strlen($this->prefix);
 		$iterator = NULL;
@@ -74,11 +74,14 @@ class RedisCache implements CacheInterface {
 				}));
 			}
 		} while ($iterator > 0);
+		if($trimPrefix){
+			$all = array_map(fn($k) => substr($k, $lenpref), $all);
+		}
 		return $all;
 	}
 
 	public function removeGroup() : bool {
-		$dels = $this->getAllKeysOfGroup();
+		$dels = $this->getAllKeysOfGroup(false);
 		return $this->redis->unlink($dels) == count($dels);
 	}
 
@@ -154,7 +157,7 @@ class RedisCache implements CacheInterface {
 		echo 'Key' . "\t\t : " . 'Value' . PHP_EOL;
 		echo '---------------------------------' . PHP_EOL;
 		$lenpref = strlen($this->prefix);
-		foreach( $this->getAllKeysOfGroup() as $fullkey ){
+		foreach( $this->getAllKeysOfGroup(false) as $fullkey ){
 			$key = substr($fullkey, $lenpref);
 			if( $this->redis->type($fullkey) !== Redis::REDIS_HASH ){
 				$val = $this->get($key);

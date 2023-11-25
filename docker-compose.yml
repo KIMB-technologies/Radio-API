@@ -19,6 +19,7 @@ services:
       # - CONF_REDIS_PORT=6379 # default 6379
       # - CONF_REDIS_PASS= # default no auth
       - CONF_STREAM_JSON=false # to disable or an url where to fetch list of own streams, e.g., http://stream.example.com/list.json 
+      # -CONF_LOG_DIR= # set a custom directory for log files (defaults to ./data/)
     depends_on:
       - redis
   redis:
