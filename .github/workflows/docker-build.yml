@@ -50,7 +50,7 @@ jobs:
     # Multi platform image build and push
 
     - name: Build and push the latest Docker image
-      run: docker buildx build --platform "$PLATFORMS" . --file "Dockerfile" --tag "$IMAGE_OWNER/$IMAGE_NAME:latest" --push
+      run: docker buildx build --platform "$PLATFORMS" . --file "./utils/Dockerfile" --tag "$IMAGE_OWNER/$IMAGE_NAME:latest" --push
       if: ${{ (github.event_name == 'push') || (steps.check.outputs.needs-updating == 'true') }}
      
     - name: Push more tags
@@ -61,6 +61,6 @@ jobs:
               echo "Skipping $TAG";
             else 
               echo "Tagging image as $TAG and pushing";
-              docker buildx build --platform "$PLATFORMS" . --file "Dockerfile" --tag "$IMAGE_OWNER/$IMAGE_NAME:$TAG" --push
+              docker buildx build --platform "$PLATFORMS" . --file "./utils/Dockerfile" --tag "$IMAGE_OWNER/$IMAGE_NAME:$TAG" --push
             fi;
           done;

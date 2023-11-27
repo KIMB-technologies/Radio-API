@@ -13,9 +13,9 @@
 return [
 	'target_php_version' => '8.0',
 	'file_list' => [ 
-		'cron.php',
-		'startup.php',
-		'getr.php'
+		'./utils/cron.php',
+		'./utils/startup.php',
+		'./utils/getr.php'
 	],
 	'directory_list' => [
 		'php'

@@ -28,11 +28,32 @@ else{
 }
 
 // load ENV values
-define( 'ENV_DOMAIN', $ENV['CONF_DOMAIN'] . (substr( $ENV['CONF_DOMAIN'], -1) !== '/' ? '/' : '') );
-define( 'ENV_ALLOWED_DOMAIN', !empty($ENV['CONF_ALLOWED_DOMAIN']) ? $ENV['CONF_ALLOWED_DOMAIN'] : null );
-define( 'ENV_CACHE_EXPIRE', intval($ENV['CONF_CACHE_EXPIRE']));
-define( 'ENV_STREAM_JSON', !empty($ENV['CONF_STREAM_JSON']) && $ENV['CONF_STREAM_JSON'] != 'false' ? $ENV['CONF_STREAM_JSON'] : false  );
-define( 'ENV_SHUFFLE_MUSIC', $ENV['CONF_SHUFFLE_MUSIC'] == 'true');
+define( 'ENV_DOMAIN',
+	$ENV['CONF_DOMAIN'] . (substr( $ENV['CONF_DOMAIN'], -1) !== '/' ? '/' : '')
+);
+define( 'ENV_ALLOWED_DOMAIN',
+	!empty($ENV['CONF_ALLOWED_DOMAIN']) ?
+		strval($ENV['CONF_ALLOWED_DOMAIN']) : null
+);
+define( 'ENV_CACHE_EXPIRE',
+		intval($ENV['CONF_CACHE_EXPIRE'])
+);
+define( 'ENV_STREAM_JSON',
+	!empty($ENV['CONF_STREAM_JSON']) && $ENV['CONF_STREAM_JSON'] != 'false' ?
+		strval($ENV['CONF_STREAM_JSON']) : false
+);
+define( 'ENV_SHUFFLE_MUSIC',
+		$ENV['CONF_SHUFFLE_MUSIC'] == 'true'
+);
+define( 'ENV_LOG_DIR',
+	!empty($ENV['CONF_LOG_DIR']) && realpath($ENV['CONF_LOG_DIR']) ?
+		realpath($ENV['CONF_LOG_DIR']) : __DIR__ . '/../data'
+);
+define(
+	'ENV_CACHE_DIR',
+	!empty($ENV['CONF_CACHE_DIR']) && realpath(substr($ENV['CONF_LOG_DIR'], 0, strrpos($ENV['CONF_LOG_DIR'], '/', -2))) ?
+		$ENV['CONF_CACHE_DIR'] : __DIR__ . '/../data/cache'
+);
 
 // IP on reverse proxy setup
 if( !empty($_SERVER['HTTP_X_REAL_IP']) ){
@@ -48,7 +69,7 @@ class Config {
 	/**
 	 * The system's version.
 	 */
-	const VERSION = 'v2.7.0';
+	const VERSION = 'v2.7.1-dev';
 
 	/**
 	 * The real domain which should be used.
@@ -68,7 +89,17 @@ class Config {
 	/**
 	 * Random shuffle music station streams from nc
 	 */
-	CONST SHUFFLE_MUSIC = ENV_SHUFFLE_MUSIC;
+	const SHUFFLE_MUSIC = ENV_SHUFFLE_MUSIC;
+
+	/**
+	 * The directory where the logfiles are stored.
+	 */
+	const LOG_DIR = ENV_LOG_DIR;
+
+	/**
+	 * The directory used by the json cache (replacement for Redis in non-Docker mode)
+	 */
+	const CACHE_DIR = ENV_CACHE_DIR;
 
 	/**
 	 * Store redis cache for ALLOWED_DOMAINS

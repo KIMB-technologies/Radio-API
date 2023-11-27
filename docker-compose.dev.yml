@@ -8,13 +8,15 @@ services:
   radio_api:
     build:
       context: .
+      dockerfile: ./utils/Dockerfile
     container_name: radio_api_dev
     ports:
       - "8080:80"
     volumes:
       - ./php/:/php-code/
       - ./data/:/php-code/data/
-      - ./getr.php:/php-code/getr.php:ro # redis all values listing
+      - ./utils/getr.php:/php-code/getr.php:ro # redis all values listing
+      - ./utils/backup-restore.php:/backup-restore.php:ro # backup restore tool for cache values
     environment:
       - DEV=dev
       - CONF_DOMAIN=http://localhost:8080/

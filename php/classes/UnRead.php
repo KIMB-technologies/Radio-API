@@ -84,7 +84,7 @@ class UnRead {
 	/**
 	 * Dump all known podcast episodes to disk (called by cron)
 	 */
-	public static function dumpToDisk() : bool {
+	public static function dumpToDisk(?string $exportDir = null) : bool {
 		if( is_file( __DIR__ . '/../data/table.json' ) ){
 			$table = json_decode(file_get_contents( __DIR__ . '/../data/table.json' ), true);
 
@@ -93,13 +93,14 @@ class UnRead {
 				$redis = new Cache('unread_podcasts.' . $id );
 				$reads[$id] = array();
 				foreach($redis->getAllKeysOfGroup() as $key ){
-					if( preg_match('/^.*:([^0-9s].*)$/', $key, $matches) === 1){
-						$reads[$id][] = $matches[1];
-					}
+					$reads[$id][] = $key;
 				}
 			}
 
-			return file_put_contents(__DIR__ . '/../data/unread.json', json_encode( $reads, JSON_PRETTY_PRINT)) !== false;
+			return file_put_contents(
+				 	(is_null($exportDir) ? __DIR__ . '/../data' : $exportDir) . '/unread.json',
+					json_encode( $reads, JSON_PRETTY_PRINT)
+				) !== false;
 		}
 		return true;
 	}
@@ -107,9 +108,10 @@ class UnRead {
 	/**
 	 * Load dumped known episodes into Redis (done on container startup)
 	 */
-	public static function loadFromDisk() : array {
-		if( is_file(__DIR__ . '/../data/unread.json') ){
-			$reads = json_decode(file_get_contents(__DIR__ . '/../data/unread.json'), true);
+	public static function loadFromDisk(?string $exportDir = null) : array {
+		$file = (is_null($exportDir) ? __DIR__ . '/../data' : $exportDir) . '/unread.json';
+		if( is_file($file) ){
+			$reads = json_decode(file_get_contents($file), true);
 			foreach( $reads as $id => $read ){
 				if( !empty($read) ){
 					$redis = new Cache('unread_podcasts.' . $id );

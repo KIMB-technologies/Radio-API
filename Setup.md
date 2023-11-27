@@ -57,9 +57,10 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 		- The manual setup does not rely on *Redis* (which is replaced by a file-based caching).
 		- The only requirement a current version of PHP (code analysis shows compatibility with PHP > 8.0, code is tested with 8.2 and 8.3).
 		- You do not need a cron job, all data is stored in `./data/` and the cache files in `./data/cache/`.
+		- You may change the folder for cache files to, e.g., a ramdisk. If you do so, use the script `./utils/backup-restore.php` to backup data which is only stored by the cache (using Docker this is done by the cron job).
 		- The proxy feature is provided by PHP, but might be less stable than the NGINX proxy.
 		- The EndURL feature uses the cURL extension of PHP (else it will error!).
-		- Assure, that PHP/ the webserver can write to `./data/`!
+		- Assure, that PHP/ the webserver can write to `./data/` (and the folders configured for logs and cache files)!
 	- Download the lastest source of the *Radio-API* [here](https://github.com/KIMB-technologies/Radio-API/releases/latest).
 	- Extract the zip and place the folder `php` in the web-root of our server (this is our  `./`, other files are not needed).
 	- Configure *Radio-API* in `./data/env.json` (The config values are the same as for the Docker-based mode, always use strings for the values!):
@@ -70,6 +71,8 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 		- `CONF_SHUFFLE_MUSIC` Randomly shuffle music in Nextcloud radio stations
 		- `CONF_CACHE_EXPIRE` Cache duration of ips, podcasts,  RadioBrowser requests, ...
 		- `CONF_STREAM_JSON` Url to a JSON list of streams or `false` to disable (see [Own Streams](#own-streams)).
+		- `CONF_LOG_DIR` (optional) Change the folder where log files are written to (defaults to `./data/`).
+		- `CONF_CACHE_DIR` (optional) Change the folder used by the file based cache (defaults to `./data/cache/`).
 	- Make sure, that *Radio-API* is available at port `80` for requests with the hostname `*.wifiradiofrontier.com` and `CONF_DOMAIN`.
 	- Block HTTP access to `./data/` (and `./classes/`) for security reasons (might be omitted in a local network installation).
 	- Rewrite requests to PHP:
@@ -78,10 +81,22 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 		- `./index.php` checks the get parameter `uri` for the path value, e.g., `"/setupapp/iden/asp/BrowseXML/loginXML.asp"`.
 			If this fails, `$_SERVER['REQUEST_URI']` is checked and the part before the first `?` is taken as path value.
 		- It is important, that the path value starts with `/` and contains the full path, but without get parameters starting at `?`.
-		- See the example for NGINX below. The built in webserver of PHP may be used for development with the `router.php` in the repository's root.
+		- See the example for NGINX below. The built in webserver of PHP may be used for development with the `./utils/router.php` in this repository.
 3. Done
 	- Start the radio and open `Internet Radio`.
 	- You will see the entries described above at [Usage](./#usage).
+
+### Updates
+> This is for manual installs, Docker users must make sure to store the redis volume or to run the cron job. 
+> Then Radio-API can be restarted using a newer version of the Docker Image.
+
+- Run the `./utils/backup-restore.php` script to export all relevant data from the cache.
+	This will result in two files, which may be stored in `./data` or somewhere else.
+- Create a copy of files in the folder `./data` (`./data/cache` can be deleted).
+- Install the new version of Radio-API (download zip, extract `./php`  folder to webroot).
+- Copy the previously saved files back to `./data`.
+- Run the `./utils/backup-restore.php` script to import all relevant data to the cache.
+	This will read the two files created during the export.
 
 ### Rewrite with NGINX 
 
@@ -109,8 +124,8 @@ location @nofile {
 
 ## General Information
 ### Troubleshooting 
-- A log file of (unknown) request received by the Radio-API is created at `./data/log.txt`.  
-- Errors with the RadioBrowser API are logged at `./data/log_radiobrowser.txt`.
+- A log file of (unknown) request received by the Radio-API is created at `CONF_LOG_DIR/requests.log`. (`CONF_LOG_DIR` default to `./data`)  
+- Errors with the RadioBrowser API are logged at `CONF_LOG_DIR/radiobrowser.log`.
 - If the Radio-API is unable to parse a JSON-file in `./data/`, it will initialize a new one, while the old one is renamed to `*.error.json`.
 - PHP error messages are disabled by default, set `DEV=dev` in the environment to enable them.
 - Erase the data folder/ volume of redis and restart Radio-API.

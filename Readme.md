@@ -18,7 +18,7 @@ This redirect is possible by manipulating the DNS queries.
 &rarr; [Have a look at **screenshots**](./screenshots/Readme.md)
 
 ## Usage
-- First [set up](./Setup.md) the Docker Container of this *Radio-API* and change the DNS resolver of the radio (e.g., as described there).
+- First [set up](./Setup.md) *Radio-API* and change the DNS resolver of the radio (e.g., as described there).
 - Afterwards start the radio and open "Internet Radio".
 - The *Radio-API* should provide a list of:
 	- **Podcast**
