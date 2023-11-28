@@ -1,0 +1,114 @@
+	
+	<div class="achtung" style="%%FEATUREDISABLED%%">
+		<p>
+			Der Import und Export ist für diese Installation deaktiviert!
+			Bitte setzen Sie in der Konfiguration den Wert <code>CONF_IM_EXPORT_TOKEN</code> auf einen möglichst zufälligen Token mit mindestens 15 Zeichen aus der Menge <em>A-Z</em>, <em>a-z</em> und <em>0-9</em>.
+			Damit wird der Import und Export aktiviert und ist hier mittels des konfigurierten Tokens möglich.
+		</p>
+		<p>
+			Nutzen Sie z.B. den Token <code>%%EXAMPLETOKEN%%</code>.
+		</p>
+	</div>
+	<div style="%%FEATUREENABLED%%">
+		<div class="achtung" style="%%MESSAGEENABLE%%">
+			%%MESSAGE%%
+		</div>
+
+		<h3>Export</h3>
+			<form id="export" action="%%SERVERURL%%gui/im-export.php#export" method="post">
+				<input type="hidden" name="task" value="export">
+
+				<table>
+					<tr id="export-token-row">
+						<td>Token</td>
+						<td><input type="text" name="token" placeholder="YZkJTpzqcLG0zZbhCXF7"></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><input type="submit" value="Export starten"></td>
+					</tr>
+				</table>
+			</form>
+		
+			<div class="note">
+				<p>
+					Ein Export ist eine Export-Datei (<code>*.json</code>).
+					Es werden immer alle bekannten Radios dieser Installation von Radio-API exportiert, d..h, für jedes Radio die Liste der Radiosender, Podcasts, zuletzt per RadioBrowser gehörten Station und bereist gehörten Podcast-Episoden. 
+					Auch wird die Liste zur Zuordnung von GUI-Codes zu Radios exportiert.
+				</p>
+				<p>
+					Sie können den Export auch automatisieren und so z.B. regelmäßige Backups zu erstellen.
+					Der Aufruf von <code>%%SERVERURL%%gui/im-export.php?task=export&amp;token=&lt;token&gt;</token></code> gibt eine Export-Datei zurück.
+				</p>
+			</div>
+
+		<h3>Import</h3>
+			<form id="import" action="%%SERVERURL%%gui/im-export.php#import" method="post" enctype="multipart/form-data">
+				<input type="hidden" name="task" value="import">
+
+				<table>
+					<tr id="file-row">
+						<td>Export-Datei</td>
+						<td><input type="file" name="export" accept=".json"></td>
+					</tr>
+					<tr id="import-token-row">
+						<td>Token</td>
+						<td><input type="text" name="token" placeholder="YZkJTpzqcLG0zZbhCXF7"></td>
+					</tr>
+					<tr>
+						<td>Art</td>
+						<td>
+							<input type="radio" name="kind" value="append" checked> Hinzufügen
+							<input type="radio" name="kind" value="single"> Einzelnes Radio überschreiben
+							<input type="radio" name="kind" value="replace"> Alles ersetzen 
+						</td>
+					<tr>
+					<tr id="single-backup-row" class="kind-single-only" style="display: none;">
+						<td>GUI-Code im Export</td>
+						<td><input type="text" name="code-backup" placeholder="Z...."></td>
+					</tr>
+					<tr id="single-system-row" class="kind-single-only" style="display: none;">
+						<td>GUI-Code im System</td>
+						<td><input type="text" name="code-system" placeholder="Z...."></td>
+					</tr>
+					<tr id="replace-confirm-row" style="display: none;">
+						<td>Bestätigung</td>
+						<td><input type="checkbox" name="replace" value="yes"> Wollen Sie wirklich alles überschreiben?</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><input type="submit" value="Import starten"></td>
+					</tr>
+				</table>
+			</form>
+
+			<div class="note">
+				Bitte wählen Sie eine Export-Datei (<code>*.json</code>) für den Import und geben Sie den Token zur Authentifizierung an.
+				Sie können auswählen, ob Sie die Inhalte aus dem Export beim Import hinzufügen, nur ein einzelnes Radio überschreiben oder alles ersetzen wollen.
+
+				<dl>
+					<dt>Hinzufügen</dt>
+					<dd>
+						Alle Radios und Elemente aus dem Export werden dieser Installation von Radio-API hinzugefügt.
+						Es werden also weitere Radios für diesen Server eingerichtet. 
+						Stellen Sie sicher, dass die Radios (deren Macs) sich vorher noch nicht mit diesem Server verbunden haben.
+					</dd>
+					<dt>Einzelnes Radio überschreiben</dt>
+					<dd>
+						Überschreiben Sie die Inhalte eines einzelnen Radios aus dem Export mit einem einzelnen Radio in dieser Installation von Radio-API. 
+						Geben Sie dazu den GUI-Code des Radios im Export an (was sie importieren wollen) und den GUI-Codes des Radios im System/ Installation an (in das sie importieren wollen).
+						Sie überschreiben damit alle Daten des einen Radios in dieser Installation von Radio-API.
+					</dd>
+					<dt>Alles ersetzen</dt>
+					<dd>
+						Ersetzen Sie die Inhalte dieser Installation von Radio-API vollständig mit den Inhalten des Exports.
+						Es werden alle Daten überschrieben!
+					</dd>
+				</dl>
+
+				Starten Sie den Import schließlich über den Button <em>Import starten</em>, fehlerhaften Felder werden rot markiert.
+			</div>
+	</div>
+
+
+

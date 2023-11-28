@@ -1,0 +1,7 @@
+{
+	"%%FEATUREDISABLED%%" : "display: none;",
+	"%%FEATUREENABLED%%" : "display: none;",
+	"%%EXAMPLETOKEN%%" : "undefined",
+	"%%MESSAGEENABLE%%" : "display: none;",
+	"%%MESSAGE%%" : ""
+}

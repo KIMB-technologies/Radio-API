@@ -54,6 +54,11 @@ define(
 	!empty($ENV['CONF_CACHE_DIR']) && realpath(substr($ENV['CONF_LOG_DIR'], 0, strrpos($ENV['CONF_LOG_DIR'], '/', -2))) ?
 		$ENV['CONF_CACHE_DIR'] : __DIR__ . '/../data/cache'
 );
+define(
+	'ENV_IM_EXPORT_TOKEN',
+	!empty($ENV['CONF_IM_EXPORT_TOKEN']) && Helper::checkFilename($ENV['CONF_IM_EXPORT_TOKEN']) && strlen($ENV['CONF_IM_EXPORT_TOKEN']) > 15 ?
+		$ENV['CONF_IM_EXPORT_TOKEN'] : false
+);
 
 // IP on reverse proxy setup
 if( !empty($_SERVER['HTTP_X_REAL_IP']) ){
@@ -100,6 +105,11 @@ class Config {
 	 * The directory used by the json cache (replacement for Redis in non-Docker mode)
 	 */
 	const CACHE_DIR = ENV_CACHE_DIR;
+
+	/**
+	 * Im- & Export via web GUI (at ./gui/im-export.php)
+	 */
+	const IM_EXPORT_TOKEN = ENV_IM_EXPORT_TOKEN;
 
 	/**
 	 * Store redis cache for ALLOWED_DOMAINS

@@ -1,7 +1,8 @@
 # Setup
 
-Radio-API can be run using Docker (recommend way) [&darr;](#setup-using-docker).
-It is also possible to run Radio-API on a simple webserver with PHP [&darr;](#manual-setup).
+- Radio-API can be run using Docker (recommend way) [&darr;](#setup-using-docker).
+- It is also possible to run Radio-API on a simple webserver with PHP [&darr;](#manual-setup).
+- For backups and migrations see the Im- & Export feature [&darr;](#im---export).
 
 ## Setup using Docker
 The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechnologies/radio_api).
@@ -73,6 +74,7 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 		- `CONF_STREAM_JSON` Url to a JSON list of streams or `false` to disable (see [Own Streams](#own-streams)).
 		- `CONF_LOG_DIR` (optional) Change the folder where log files are written to (defaults to `./data/`).
 		- `CONF_CACHE_DIR` (optional) Change the folder used by the file based cache (defaults to `./data/cache/`).
+		- `CONF_IM_EXPORT_TOKEN` (optional) Define a token for use with the Im- & Export web interface *Im- & Export* [&darr;](#im---export).
 	- Make sure, that *Radio-API* is available at port `80` for requests with the hostname `*.wifiradiofrontier.com` and `CONF_DOMAIN`.
 	- Block HTTP access to `./data/` (and `./classes/`) for security reasons (might be omitted in a local network installation).
 	- Rewrite requests to PHP:
@@ -89,6 +91,8 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 ### Updates
 > This is for manual installs, Docker users must make sure to store the redis volume or to run the cron job. 
 > Then Radio-API can be restarted using a newer version of the Docker Image.
+
+> Generally, the *Im- & Export* [&darr;](#im---export) interface may be used for backups and restores after updates!
 
 - Run the `./utils/backup-restore.php` script to export all relevant data from the cache.
 	This will result in two files, which may be stored in `./data` or somewhere else.
@@ -135,6 +139,20 @@ location @nofile {
 	1. `http://radio.example.com/setupapp/iden/asp/BrowseXML/loginXML.asp?token=0` (returns `<EncryptedToken>3a3f5ac48a1dab4e</EncryptedToken>`)
 	2. `http://radio.example.com/setupapp/iden/asp/BrowseXML/loginXML.asp?gofile=&mac=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&dlang=eng&fver=4&ven=iden00` (returns `<?xml version="1.0" encoding="UTF-8" standalone="yes"?> <ListOfItems> ... </ListOfItems>`) 
 	3. Get the GUI-Code from the preceding response and try to used it to access the GUI at `http://radio.example.com/gui/`
+
+### Im- & Export
+There is an Im- & Export web interface at `./gui/im-export.php`.
+To activate and use it, a token must be set in the configuration as `CONF_IM_EXPORT_TOKEN`.
+This token needs to have at least 15 chars and must consist only of `[A-Za-z0-9]`.
+
+Using the token a JSON file containing all Radio-API data can be created and downloaded.
+This files contains for each radio the list of radio stations, podcasts, stations last listened to via RadioBrowser, and podcast episodes already listened to. 
+It also contains the list for assigning GUI-Codes to radios and the configuration file used in non-Docker mode.
+
+Such an export JSON file can be imported to Radio-API afterwards.
+Thereby, all data can be replaces, appended or only the data for one radio might be overwritten.
+(The configuration file used in non-Docker mode will not be imported.)
+More information is available at the  Im- & Export web interface.
 
 ### Nginx Load Balancer
 An example file to use *Radio-API* behind a nginx load balancer as reverse proxy.
