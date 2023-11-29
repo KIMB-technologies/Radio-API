@@ -93,7 +93,8 @@ class UnRead {
 				$redis = new Cache('unread_podcasts.' . $id );
 				$reads[$id] = array();
 				foreach($redis->getAllKeysOfGroup() as $key ){
-					$reads[$id][] = $key;
+					// redis removes ":", thus keys are "http//" instead of "https://"
+					$reads[$id][] = preg_replace('/^(https?):?(\/\/.*)$/', '$1:$2', $key);
 				}
 			}
 

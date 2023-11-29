@@ -35,6 +35,10 @@ class Id {
 		//code => gui access
 		//data => [mac, code]
 
+	public static function isIdInteger(int $i) : bool {
+		return $i > 0 && $i < 10_000;
+	}
+
 	public function __construct($val, int $type = self::MAC){
 		// load redis
 		$redis = new Cache('table.json');

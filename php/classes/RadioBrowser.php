@@ -34,11 +34,11 @@ class RadioBrowser {
 		return preg_match(self::STATION_ID_REGEX, $id) === 1;
 	}
 
-	private static function stationIDfromUUID(string $uuid) : string {
+	public static function stationIDfromUUID(string $uuid) : string {
 		return str_replace('-', '', $uuid);
 	}
 
-	private static function uuidFromStationID(string $id) : string|false {
+	public static function uuidFromStationID(string $id) : string|false {
 		if(!self::matchStationID($id)) {
 			return false;
 		}
