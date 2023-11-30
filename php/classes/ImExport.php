@@ -75,7 +75,10 @@ class ImExport {
 		RadioBrowser::dumpToDisk($tmpDir);
 
 		// create the export array
-		$export = array();
+		$export = array(
+			"__version__" => Config::VERSION,
+			"__date__" => date('d.m.Y H:i:s')
+		);
 		$this->addToExport(__DIR__ . '/../data', $export);
 		$this->addToExport($tmpDir, $export, true);
 
@@ -123,6 +126,9 @@ class ImExport {
 					$this->msg = Template::getLanguage() == 'de' ? "Fehlerhafte Tabelle" : "Error in table";
 					break;
 				}
+			}
+			else if($f == "__version__" || $f == "__date__"){
+				// ignore
 			}
 			else if(!$this->exportFile($f, "env")){ // env is ignored, other ones not allowed!
 				$ok = false;
@@ -201,18 +207,22 @@ class ImExport {
 				fn($v, $k) => Helper::checkValue( $k, Id::MAC_PREG ) && is_integer($v) && Id::isIdInteger($v),
 				ARRAY_FILTER_USE_BOTH
 			);
+			$ok &= count($macs) === count($content["macs"]);
+
 			$codes = array_filter(
 				$content["codes"],
 				fn($v, $k) => Helper::checkValue( $k, Id::CODE_PREG ) && is_integer($v) && Id::isIdInteger($v),
 				ARRAY_FILTER_USE_BOTH
 			);
+			$ok &= count($codes) === count($content["codes"]);
+
 			$ids = array_filter(
 				$content["ids"],
 				fn($v, $k) => Id::isIdInteger($k) && is_array($v) && count($v) === 2 &&
 					Helper::checkValue( $v[0], Id::MAC_PREG ) && Helper::checkValue( $v[1], Id::CODE_PREG ),
 				ARRAY_FILTER_USE_BOTH
 			);
-			$ok &= count($macs) === count($codes) && count($codes) === count($ids) && count($codes) > 0;
+			$ok &= count($ids) === count($content["ids"]);
 		}
 		return $ok;
 	}
@@ -320,7 +330,7 @@ class ImExport {
 		}
 
 		// invalidate caches
-		foreach($export["table.json"]["codes"] as $id){
+		foreach(Id::getTableData()["codes"] as $id){
 			(new Cache('radios_podcasts.' . $id ))->removeGroup();
 		}
 		(new Cache('table.json'))->removeGroup();
@@ -329,21 +339,94 @@ class ImExport {
 	}
 
 	private function runAppend(array $export) : bool {
-		// TODO
-		$this->msg = "Still TODO!";
+		$mainTable = Id::getTableData();
+		$idShift = count( $mainTable['ids'] );
 
-		return false;
+		// change the data to import in a way such that the items are appended
+		foreach($export as $f => $value){
+			if($this->exportFile($f, "list")){ // increment ids of all list files 
+				$newF = preg_replace_callback(
+					'/^((?:radio|podcast)s_)([0-9]{1,4})(\.json)$/',
+					fn($m) => $m[1] . intval($m[2])+$idShift . $m[3],
+					$f
+				);
 
-		// update export (radios/ podcasts file names increment id, merge tables, change keys for caches)
+				$export[$newF] = $value;
+				unset($export[$f]);
+			}
+			else if($this->exportFile($f, "cache")){ // increment the keys of the cache files 
+				$export[$f] = array();
+				foreach($value as $k => $v){
+					if(!empty($v)){
+						$export[$f][$k+$idShift] = $v;
+					}
+				}
+			}
+			else if($this->exportFile($f, "table")){ // create a new "merged" table.
+				$export[$f] = $mainTable; // set the main table
 
-		$this->runReplace($export, false);
+				// append import to the current main table
+				foreach($value["ids"] as $k => $v){
+					// tamper values to import
+					$id = $k + $idShift;
+					$mac = $v[0];
+					$code = $v[1];
+
+					if(isset($export[$f]["macs"][$mac])){
+						$this->msg .= "<br>" . (Template::getLanguage() == 'de' ? "Radio $code war bereits im System vorhanden, Listen wurden überschrieben!" : "Radio $code was already known to system, list have been overwritten!");
+					}
+
+					// prevent collisions among GUI-Codes
+					while( isset( $export[$f]['codes'][$code] ) ){
+						$code =  'Z' . Helper::randomCode( 4 );
+					}
+
+					// add to table
+					$export[$f]["macs"][$mac] = $id;
+					$export[$f]["ids"][$id] = array($mac, $code);
+					$export[$f]["codes"][$code] = $id;
+				}
+			}
+		}
+
+		// run a replace with changed data (and no clean up of data dir!)
+		return $this->runReplace($export, false);
 		
 	}
 
 	private function runSingle(array $export, string $codeExport, string $codeSystem) : bool {
-		// TODO
-		$this->msg = "Still TODO!";
-		return false;
+		$mainTable = Id::getTableData();
+
+		if( !isset($export["table.json"]["codes"][$codeExport]) || !isset($mainTable["codes"][$codeSystem]) ){
+			$this->msg = Template::getLanguage() == 'de' ? "Bitte prüfen Sie beide Codes!" : "Please make sure both Codes are available!";
+			return false;
+		}
+
+		$idExport = $export["table.json"]["codes"][$codeExport];
+		$idSystem = $mainTable["codes"][$codeSystem];
+
+		$newExport = array();
+		foreach($export as $f => $value){
+			if($this->exportFile($f, "list")){ 
+				preg_match('/^((?:radio|podcast)s_)([0-9]{1,4})(\.json)$/', $f, $matches);
+				$id = intval($matches[2]);
+				
+				if($id == $idExport){ // if this is the id to import, make sure to write this file
+					$newExport[$matches[1] . $idSystem . $matches[3]] = $value;
+				}
+			}
+			else if($this->exportFile($f, "cache")){ 
+				if(!empty($value[$idExport])){
+					$newExport[$f] = array(
+						$idSystem => $value[$idExport]
+					);
+				}
+			}
+			// the table stays unchanged
+		}
+
+		// run a replace with changed data (and no clean up of data dir!)
+		return $this->runReplace($newExport, false);
 	}
 	
 }

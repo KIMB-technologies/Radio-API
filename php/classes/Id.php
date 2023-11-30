@@ -39,6 +39,28 @@ class Id {
 		return $i > 0 && $i < 10_000;
 	}
 
+	public static function getTableData() : array {
+		$table = null;
+		if( is_file( __DIR__ . '/../data/table.json' ) ){ // load table form disk?
+			$table = json_decode(file_get_contents( __DIR__ . '/../data/table.json' ), true);
+
+			if(is_null($table)){ // on json error, move file and create new
+				rename(__DIR__ . '/../data/table.json', __DIR__ . '/../data/table.error.json');
+			}
+		}
+		if ( is_null($table) ) { // init empty table
+			$table = array(
+				'macs' => array(), // mac => id
+				'ids' => array(), // id => [ mac, code ]
+				'codes' => array() // code => id
+			);
+			// save init table
+			file_put_contents( __DIR__ . '/../data/table.json', json_encode($table, JSON_PRETTY_PRINT), LOCK_EX);
+		}
+
+		return $table;
+	}
+
 	public function __construct($val, int $type = self::MAC){
 		// load redis
 		$redis = new Cache('table.json');
@@ -81,7 +103,6 @@ class Id {
 		}
 	}
 
-
 	public function getId() : int {
 		return $this->id;
 	}
@@ -95,23 +116,8 @@ class Id {
 	}
 
 	private function loadFileIntoRedis(Cache $redis) : void {
-		$table = null;
-		if( is_file( __DIR__ . '/../data/table.json' ) ){ // load table form disk?
-			$table = json_decode(file_get_contents( __DIR__ . '/../data/table.json' ), true);
+		$table = self::getTableData();
 
-			if(is_null($table)){ // on json error, move file and create new
-				rename(__DIR__ . '/../data/table.json', __DIR__ . '/../data/table.error.json');
-			}
-		}
-		if ( is_null($table) ) { // init empty table
-			$table = array(
-				'macs' => array(), // mac => id
-				'ids' => array(), // id => [ mac, code ]
-				'codes' => array() // code => id
-			);
-			// save init table
-			file_put_contents( __DIR__ . '/../data/table.json', json_encode($table, JSON_PRETTY_PRINT), LOCK_EX);
-		}
 		// set also in redis
 		$redis->arraySet('macs', $table['macs']);
 		$redis->arraySet('ids', $table['ids']);
@@ -120,11 +126,7 @@ class Id {
 
 	private function generateNewId( string $val, Cache $redis ) : int { 
 		//	Load file, as file it the primary storage
-		$table = json_decode(file_get_contents( __DIR__ . '/../data/table.json' ), true);
-		if(is_null($table)){ // error in file, fix this!
-			$this->loadFileIntoRedis($redis);
-			$table = json_decode(file_get_contents( __DIR__ . '/../data/table.json' ), true);
-		}
+		$table = self::getTableData();
 
 		// new id
 		$id = count( $table['ids'] ) + 1;
