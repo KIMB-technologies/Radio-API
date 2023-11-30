@@ -1,0 +1,116 @@
+
+
+	<div class="achtung" style="%%FEATUREDISABLED%%">
+		<p>
+			The import and export is disabled for this installation!
+			Please set a value for <code>CONF_IM_EXPORT_TOKEN</code> in the configuration. 
+			It should be a random token with at least 15 characters of <em>A-Z</em>, <em>a-z</em> and <em>0-9</em>.
+			This will enable import and export and it will be then possible here using the token.
+		</p>
+		<p>
+			For example use the token <code>%%EXAMPLETOKEN%%</code>.
+		</p>
+	</div>
+	<div style="%%FEATUREENABLED%%">
+		<div class="achtung" style="%%MESSAGEENABLE%%">
+			%%MESSAGE%%
+		</div>
+
+		<h3>Export</h3>
+			<form id="export" action="%%SERVERURL%%gui/im-export.php#export" method="post">
+				<input type="hidden" name="task" value="export">
+
+				<table>
+					<tr id="export-token-row">
+						<td>Token</td>
+						<td><input type="text" name="token" placeholder="YZkJTpzqcLG0zZbhCXF7"></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><input type="submit" value="Start export"></td>
+					</tr>
+				</table>
+			</form>
+		
+			<div class="note">
+				<p>
+					An export is an export file (<code>*.json</code>).
+					All known radios of this installation of Radio-API are always exported, i.e., for each radio the list of radio stations, podcasts, stations last listened to via RadioBrowser, and podcast episodes already listened to. 
+					The list for assigning GUI-Codes to radios is also exported.
+				</p>
+				<p>
+					You can also automate the export and thus create regular backups.
+					The call to <code>%%SERVERURL%%gui/im-export.php?task=export&amp;token=&lt;token&gt;</token></code> returns an export file.
+				</p>
+			</div>
+
+		<h3>Import</h3>
+			<form id="import" action="%%SERVERURL%%gui/im-export.php#import" method="post" enctype="multipart/form-data">
+				<input type="hidden" name="task" value="import">
+
+				<table>
+					<tr id="file-row">
+						<td>Export file</td>
+						<td><input type="file" name="export" accept=".json"></td>
+					</tr>
+					<tr id="import-token-row">
+						<td>Token</td>
+						<td><input type="text" name="token" placeholder="YZkJTpzqcLG0zZbhCXF7"></td>
+					</tr>
+					<tr>
+						<td>Kind</td>
+						<td>
+							<input type="radio" name="kind" value="append" checked> Append
+							<input type="radio" name="kind" value="single"> Overwrite single radio
+							<input type="radio" name="kind" value="replace"> Replace everything
+						</td>
+					<tr>
+					<tr id="single-backup-row" class="kind-single-only" style="display: none;">
+						<td>GUI-Code in Export</td>
+						<td><input type="text" name="code-backup" placeholder="Z...."></td>
+					</tr>
+					<tr id="single-system-row" class="kind-single-only" style="display: none;">
+						<td>GUI-Code in System</td>
+						<td><input type="text" name="code-system" placeholder="Z...."></td>
+					</tr>
+					<tr id="replace-confirm-row" style="display: none;">
+						<td>Confirmation</td>
+						<td><input type="checkbox" name="replace" value="yes"> Do you really want to overwrite everything?</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><input type="submit" value="Start import"></td>
+					</tr>
+				</table>
+			</form>
+
+			<div class="note">
+				Please select an export file (<code>*.json</code>) for the import and enter the token for authentication.
+				You can choose whether you want to append the content from the export during import, overwrite only a single radio or replace everything.
+
+				<dl>
+					<dt>Append</dt>
+					<dd>
+						All radios and elements from the export are added to this installation of Radio-API.
+						This means that additional radios will be set up for this server. 
+						Make sure that the radios (their Macs) have not yet connected to this server.
+					</dd>
+					<dt>Overwrite single radio</dt>
+					<dd>
+						Overwrite the contents of a single radio from the export with a single radio in this installation of Radio-API. 
+						To do this, enter the GUI-Code of the radio in the export (what you want to import) and the GUI code of the radio in the system/installation (into which you want to import).
+						This will overwrite all data of one radio in this installation of Radio-API.
+					</dd>
+					<dt>Replace everything</dt>
+					<dd>
+						Replace the contents of this installation of Radio-API completely with the contents of the export.
+						All data will be overwritten!
+					</dd>
+				</dl>
+
+				Finally, start the import by clicking the <em>Start import</em> button; incorrect fields are highlighted in red.
+			</div>
+	</div>
+
+
+			

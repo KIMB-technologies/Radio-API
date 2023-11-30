@@ -65,4 +65,4 @@ This redirect is possible by manipulating the DNS queries.
 - Nobody should host a public DNS resolver resolving wrong IPs. Some type of access control is recommended.
 
 ## Setup
-See [Setup.md](./Setup.md)!
+See [Setup.md](./Setup.md) including hints regarding updates, backups (i.e., Im- & Export), and troubleshooting.
