@@ -49,7 +49,8 @@ if( $login->isLoggedIn() ){
 		$mainTemplate->setContent('TITLE', Template::getLanguage() == 'de' ? 'Eigene Listen' : 'User defined Lists');
 		$mainTemplate->setContent( 'MOREHEADER',
 			'<script src="viewer.js?'.Config::VERSION.'"></script>'.
-			'<script src="radio-browser.js?'.Config::VERSION.'"></script>'
+			'<script src="radio-browser.js?'.Config::VERSION.'"></script>'. 
+			'<script src="category.js?'.Config::VERSION.'"></script>'
 		);
 	
 		$listTemplate = new Template('list');
