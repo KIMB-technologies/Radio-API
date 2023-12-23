@@ -147,7 +147,7 @@ class Inner {
 		return empty($name) ? 'empty' : $name;
 	}
 
-	public static function filterCategory(string $cat): string{
+	public static function filterCategory(string $cat) : string{
 		$cat = self::filterName($cat);
 		$cat = preg_replace( '/[^0-9A-Za-z \-\,]/', '',  $cat );
 		return empty($cat) ? 'empty' : $cat;
