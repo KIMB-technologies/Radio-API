@@ -85,6 +85,10 @@ function printItem( item, play ){
 		}
 	}
 
+	if( url.startsWith(radiourl)){
+		url = serverurl + url.slice(radiourl.length)
+	}
+
 	return playh == '' ? '<a href="'+ url +'" class="openType" opentype="'+ type +'">'+ name +'</a>' + markAsKnow : playh;
 }
 
@@ -119,6 +123,9 @@ function addOpenTypeListener(elem){
 }
 
 function playFile( url ) {
+	if( url.startsWith(radiourl)){
+		url = serverurl + url.slice(radiourl.length)
+	}
 	var html ='<audio controls="controls" autoplay="autoplay">'
 		+ '<source src="'+ url +'" type="audio/mp3">'
 		+ '</audio>';

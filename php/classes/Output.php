@@ -64,7 +64,7 @@ class Output {
 			'StationName' => $this->cleanText($name, true),
 		);
 		if( !$light ){
-			$logo = empty($logo) || substr($logo, 0, 4) != 'http' ? Config::DOMAIN . 'media/default.png' : $logo;
+			$logo = empty($logo) || substr($logo, 0, 4) != 'http' ? Config::RADIO_DOMAIN . 'media/default.png' : $logo;
 			$b = array(
 				'StationUrl' => $this->cleanUrl($url),
 				'StationDesc' => $this->cleanText($desc),
@@ -103,7 +103,7 @@ class Output {
 	 */
 	public function addEpisode( int $podcastid, int|null $episodeid, string $podcastname, string $episodename,
 						string $url, string $desc = '', string $logo = '', bool $top = false ) : void {
-		$logo = empty($logo) || substr($logo, 0, 4) != 'http' ? Config::DOMAIN . 'media/default.png' : $logo;
+		$logo = empty($logo) || substr($logo, 0, 4) != 'http' ? Config::RADIO_DOMAIN . 'media/default.png' : $logo;
 		$this->items[] = array(
 			'ItemType' => 'ShowEpisode',
 			'ShowEpisodeID' =>  $podcastid . (!is_null($episodeid) ? 'X' . $episodeid : ''),	

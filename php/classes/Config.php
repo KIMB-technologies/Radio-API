@@ -31,6 +31,9 @@ else{
 define( 'ENV_DOMAIN',
 	$ENV['CONF_DOMAIN'] . (substr( $ENV['CONF_DOMAIN'], -1) !== '/' ? '/' : '')
 );
+define( 'ENV_RADIO_DOMAIN',
+	empty($ENV['CONF_RADIO_DOMAIN']) ? ENV_DOMAIN : ($ENV['CONF_RADIO_DOMAIN'] . (substr( $ENV['CONF_RADIO_DOMAIN'], -1) !== '/' ? '/' : ''))
+);
 define( 'ENV_ALLOWED_DOMAIN',
 	!empty($ENV['CONF_ALLOWED_DOMAIN']) ?
 		strval($ENV['CONF_ALLOWED_DOMAIN']) : null
@@ -74,12 +77,19 @@ class Config {
 	/**
 	 * The system's version.
 	 */
-	const VERSION = 'v2.7.2';
+	const VERSION = 'v2.8-dev';
 
 	/**
 	 * The real domain which should be used.
+	 * 	Used for GUI
 	 */
 	const DOMAIN = ENV_DOMAIN;
+
+	/**
+	 * The real domain which should be used.
+	 * 	Used for access of the radio.
+	 */
+	const RADIO_DOMAIN = ENV_RADIO_DOMAIN;
 
 	/**
 	 * Seconds for cache lifetime

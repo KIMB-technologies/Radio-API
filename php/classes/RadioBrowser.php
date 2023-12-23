@@ -81,7 +81,7 @@ class RadioBrowser {
 				$records = dns_get_record(self::RADIO_BROWSER_API, DNS_A);
 				if($records === false){
 					if(!is_null($out)){
-						$out->addDir("Error connecting to Radio-Browser API!", Config::DOMAIN . "?go=initial");
+						$out->addDir("Error connecting to Radio-Browser API!", Config::RADIO_DOMAIN . "?go=initial");
 					}
 					$this->log(["Error connecting to Radio-Browser API!", "dns request failed"]);
 					return;
@@ -167,7 +167,7 @@ class RadioBrowser {
 	}
 
 	private function browseUrl(string $by = "none", string $term = "none", int $offset = 0) : string {
-		return Config::DOMAIN . "radio-browser?". 
+		return Config::RADIO_DOMAIN . "radio-browser?". 
 			"by=" . rawurlencode($by) .
 			"&term=" . rawurlencode($term) .
 			( $offset > 0 ? "&offset=".$offset : '');
@@ -181,7 +181,7 @@ class RadioBrowser {
 		$this->redis->set($keyPrev, $this->browseUrl($by, $term, $offset));		
 
 		if($by == "none" && $term == "none"){
-			$out->prevUrl(Config::DOMAIN . "?go=initial");
+			$out->prevUrl(Config::RADIO_DOMAIN . "?go=initial");
 
 			$out->addDir("Languages", $this->browseUrl("languages"));
 			$out->addDir("Tags", $this->browseUrl("tags"));
@@ -226,14 +226,14 @@ class RadioBrowser {
 					}
 					return; 
 				default:
-					$out->addDir("Invalid request!", Config::DOMAIN . "?go=initial");
+					$out->addDir("Invalid request!", Config::RADIO_DOMAIN . "?go=initial");
 					return;
 			}
 
 			// run the query
 			$list = $this->run_request($path, $params);
 			if($list === false){
-				$out->addDir("Error fetching data from Radio-Browser API!", Config::DOMAIN . "?go=initial");
+				$out->addDir("Error fetching data from Radio-Browser API!", Config::RADIO_DOMAIN . "?go=initial");
 				return;
 			}
 
@@ -276,7 +276,7 @@ class RadioBrowser {
 				)
 			);
 			if($list === false){
-				$out->addDir("Error fetching data from Radio-Browser API!", Config::DOMAIN . "?go=initial");
+				$out->addDir("Error fetching data from Radio-Browser API!", Config::RADIO_DOMAIN . "?go=initial");
 				return;
 			}
 
@@ -315,7 +315,7 @@ class RadioBrowser {
 
 			$list = $this->run_request($path . "/" . rawurlencode($term), $params );
 			if($list === false){
-				$out->addDir("Error fetching data from Radio-Browser API!", Config::DOMAIN . "?go=initial");
+				$out->addDir("Error fetching data from Radio-Browser API!", Config::RADIO_DOMAIN . "?go=initial");
 				return;
 			}
 
@@ -332,7 +332,7 @@ class RadioBrowser {
 			}
 		}
 		else {
-			$out->addDir("Invalid request!", Config::DOMAIN . "?go=initial");
+			$out->addDir("Invalid request!", Config::RADIO_DOMAIN . "?go=initial");
 			return;
 		}
 
@@ -384,14 +384,14 @@ class RadioBrowser {
 
 		$uuid = self::uuidFromStationID($id);
 		if($uuid === false){
-			$out->addDir("Unable to find station by ID!", Config::DOMAIN . "?go=initial");
+			$out->addDir("Unable to find station by ID!", Config::RADIO_DOMAIN . "?go=initial");
 			return;
 		}
 
 		// fetch station data
 		$stations = $this->run_request("stations/byuuid", array("uuids" => $uuid));
 		if($stations === false){
-			$out->addDir("Error fetching data from Radio-Browser API!", Config::DOMAIN . "?go=initial");
+			$out->addDir("Error fetching data from Radio-Browser API!", Config::RADIO_DOMAIN . "?go=initial");
 			return;
 		}
 		$station = $stations[0];

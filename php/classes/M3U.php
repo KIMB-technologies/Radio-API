@@ -37,7 +37,7 @@ class M3U {
 						// proxy links
 						$m3uLinks = array();
 						foreach( $urls as $k => $m ){
-							$m3uLinks[] = Config::DOMAIN . 'stream.php?id=' . $id . '&track=' . $k . '&mac=' . $this->radioid->getMac();
+							$m3uLinks[] = Config::RADIO_DOMAIN . 'stream.php?id=' . $id . '&track=' . $k . '&mac=' . $this->radioid->getMac();
 						}
 					}
 					else{ // echo links (no proxy)

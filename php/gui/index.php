@@ -55,6 +55,7 @@ if( $login->isLoggedIn() ){
 		$listTemplate = new Template('list');
 		$listTemplate->setContent('RADIO_MAC', $login->getAll()['mac']);
 		$listTemplate->setContent('LOGIN_CODE', $login->getAll()['code']);
+		$listTemplate->setContent('RADIO_DOMAIN', Config::RADIO_DOMAIN);
 	
 		$mainTemplate->includeTemplate( $listTemplate );
 	

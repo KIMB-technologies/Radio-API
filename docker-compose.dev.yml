@@ -12,6 +12,7 @@ services:
     container_name: radio_api_dev
     ports:
       - "8080:80"
+      - "80:80"
     volumes:
       - ./php/:/php-code/
       - ./data/:/php-code/data/
@@ -20,6 +21,7 @@ services:
     environment:
       - DEV=dev
       - CONF_DOMAIN=http://localhost:8080/
+      - CONF_RADIO_DOMAIN=http://127.0.0.1/
       - CONF_ALLOWED_DOMAIN=all
       - CONF_SHUFFLE_MUSIC=true
       - CONF_CACHE_EXPIRE=1200

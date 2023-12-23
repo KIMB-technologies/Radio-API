@@ -29,6 +29,8 @@ if(Config::updateAvailable()){
 	$mainTemplate->setContent('UPDATEINFO', '');
 }
 
+$viewTemplate->setContent('RADIO_DOMAIN', Config::RADIO_DOMAIN);
+
 // Redirect from /index.php to viewer?
 if( isset( $_GET['redirFromIndex'] ) ){
 	$viewTemplate->setContent('NOTESTYLE', '');

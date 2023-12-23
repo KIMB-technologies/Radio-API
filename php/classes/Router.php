@@ -52,7 +52,7 @@ class Router {
 				$this->listPlayItem(intval($_GET['Search']), $parts[1]);
 			}
 			else {
-				$this->out->addDir( 'No item found for this ID!', Config::DOMAIN . '?go=initial');
+				$this->out->addDir( 'No item found for this ID!', Config::RADIO_DOMAIN . '?go=initial');
 			}
 		}
 		// radio browser browsing
@@ -66,7 +66,7 @@ class Router {
 		}
 		// list of stations or podcasts depending on category
 		else if( $uri == '/cat' && !empty( $_GET['cid'] ) ){ 
-			$this->out->prevUrl(Config::DOMAIN . '?go=initial');
+			$this->out->prevUrl(Config::RADIO_DOMAIN . '?go=initial');
 
 			$cid = $_GET['cid'];
 			if( is_numeric($cid) && array_key_exists($cid, $this->data->getCategories()) ){
@@ -78,20 +78,20 @@ class Router {
 				}
 			}
 			else {
-				$this->out->addDir( 'No item found for this cID!', Config::DOMAIN . '?go=initial');
+				$this->out->addDir( 'No item found for this cID!', Config::RADIO_DOMAIN . '?go=initial');
 			}
 		}
 		// list of categories (startpage)
 		else{ 
 			// add local categories
 			foreach( $this->data->getCategories() as $cid => $name ){
-				$this->out->addDir( $name, Config::DOMAIN . 'cat?cid=' . $cid );
+				$this->out->addDir( $name, Config::RADIO_DOMAIN . 'cat?cid=' . $cid );
 			}
 			// add RadioBrowser
-			$this->out->addDir( 'Radio-Browser', Config::DOMAIN . 'radio-browser?by=none&term=none' );
+			$this->out->addDir( 'Radio-Browser', Config::RADIO_DOMAIN . 'radio-browser?by=none&term=none' );
 
 			// add code (for gui)
-			$this->out->addDir( 'GUI-Code: ' . $this->radioid->getCode(), Config::DOMAIN . '?go=initial', true );
+			$this->out->addDir( 'GUI-Code: ' . $this->radioid->getCode(), Config::RADIO_DOMAIN . '?go=initial', true );
 
 			// Log unknown request
 			if(
@@ -108,7 +108,7 @@ class Router {
 	}
 
 	private function listPodcastEpisode(int $id, int $eid, int $cid = 3) : void {
-		$this->out->prevUrl(Config::DOMAIN . 'cat?cid='.$cid.'&id='.$id);
+		$this->out->prevUrl(Config::RADIO_DOMAIN . 'cat?cid='.$cid.'&id='.$id);
 		
 		$ed = PodcastLoader::getEpisodeData( $id, $eid, $this->data );
 		if( $ed != array() ){
@@ -125,7 +125,7 @@ class Router {
 	}
 
 	private function listPlayItem(int $id, int $cid = 1) : void {
-		$this->out->prevUrl(Config::DOMAIN . 'cat?cid=' . $cid );
+		$this->out->prevUrl(Config::RADIO_DOMAIN . 'cat?cid=' . $cid );
 		
 		$sta = $this->data->getById( $id );
 		if( $sta !== array() ){
@@ -153,7 +153,7 @@ class Router {
 	}
 
 	private function listPodcast(int $id) : void {
-		$this->out->prevUrl(Config::DOMAIN . 'cat?cid=3');
+		$this->out->prevUrl(Config::RADIO_DOMAIN . 'cat?cid=3');
 		$this->unread->searchItem($id);
 
 		$pd = PodcastLoader::getPodcastDataById( $id, $this->data );
@@ -185,7 +185,7 @@ class Router {
 				$this->out->addPodcast(
 					$id,
 					$item['name'],
-					Config::DOMAIN . 'cat?cid=' . $cid . '&id=' . $id
+					Config::RADIO_DOMAIN . 'cat?cid=' . $cid . '&id=' . $id
 				);
 			}
 			else if ($item['cid'] == 2 && !$item['live']) { // file based "own stream"

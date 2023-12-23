@@ -12,6 +12,7 @@ services:
       #- ./media/:/php-code/media/:ro # directory to add images for stations
     environment:
       - CONF_DOMAIN=http://radio.example.com/ # the domain where the system is hosted
+      # - CONF_RADIO_DOMAIN=http://hama.wifiradiofrontier.com # different domain to use for connections of the radio (if set CONF_DOMAIN is for GUI)
       - CONF_ALLOWED_DOMAIN=all # allowed ips for access, list of DynDNS domainnames (divided by ','), or 'all' to allow all ips
       - CONF_SHUFFLE_MUSIC=true # random shuffle music in nextcloud radio stations
       - CONF_CACHE_EXPIRE=1200 # cache expire time of ips, podcasts, ...

@@ -1,6 +1,7 @@
 {
 	"%%ADD_HTML%%" : "",
 	"%%RADIO_MAC%%" : "",
+	"%%RADIO_DOMAIN%%" : "",
 	"%%LOGIN_CODE%%" : "",
 	"%%RADIO_COUNT%%" : "",
 	"%%PODCAST_COUNT%%" : "",

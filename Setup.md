@@ -66,6 +66,9 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 	- Extract the zip and place the folder `php` in the web-root of our server (this is our  `./`, other files are not needed).
 	- Configure *Radio-API* in `./data/env.json` (The config values are the same as for the Docker-based mode, always use strings for the values!):
 		- `CONF_DOMAIN` The domain where the system is hosted (will be reached via HTTP).
+		- `CONF_RADIO_DOMAIN` (optional) A different domain used for connections from the radio.
+			This allow to use Radio-API with two domains, one for GUI access and one for access by the radios.
+			Will default to `CONF_DOMAIN` if not set.
 		- `CONF_ALLOWED_DOMAIN` You may give a list of multiple allowed host names, divided by `,`.
 			*The API would be public useable, if `CONF_ALLOWED_DOMAIN` is set to `all`.*
 			*If hosted in a local network using `all` is recommended.*
@@ -75,7 +78,7 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 		- `CONF_LOG_DIR` (optional) Change the folder where log files are written to (defaults to `./data/`).
 		- `CONF_CACHE_DIR` (optional) Change the folder used by the file based cache (defaults to `./data/cache/`).
 		- `CONF_IM_EXPORT_TOKEN` (optional) Define a token for use with the Im- & Export web interface *Im- & Export* [&darr;](#im---export).
-		- **Attention:** Optional parameters have a leading `_` in the default `env.json`, make sure to remove them.
+		- **Attention:** Optional parameters have a leading `____` in the default `env.json`, make sure to remove them.
 	- Make sure, that *Radio-API* is available at port `80` for requests with the hostname `*.wifiradiofrontier.com` and `CONF_DOMAIN`.
 	- Block HTTP access to `./data/` (and `./classes/`) for security reasons (might be omitted in a local network installation).
 	- Rewrite requests to PHP:

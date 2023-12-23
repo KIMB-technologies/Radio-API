@@ -1,3 +1,4 @@
 {
-	"%%NOTESTYLE%%" : "display: none;"
+	"%%NOTESTYLE%%" : "display: none;",
+	"%%RADIO_DOMAIN%%" : ""
 }

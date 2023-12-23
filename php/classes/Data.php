@@ -146,10 +146,10 @@ class Data {
 			return "";
 		}
 		if(!empty($station['type']) && $station['type'] == 'nc' ){
-			return Config::DOMAIN . 'm3u.php?id=' . $id . '&mac=' . $mac;
+			return Config::RADIO_DOMAIN . 'm3u.php?id=' . $id . '&mac=' . $mac;
 		}
 		else if(!empty($station['proxy'])){
-			return Config::DOMAIN . 'stream.php?id=' . $id . '&mac=' . $mac;
+			return Config::RADIO_DOMAIN . 'stream.php?id=' . $id . '&mac=' . $mac;
 		}
 		else{
 			return $station['url'];
@@ -171,7 +171,7 @@ class Data {
 		}
 
 		if($ed['proxy']){
-			return Config::DOMAIN . 'stream.php?id=' . $id . '&eid=' . $eid . '&mac=' . $mac;
+			return Config::RADIO_DOMAIN . 'stream.php?id=' . $id . '&eid=' . $eid . '&mac=' . $mac;
 		}
 		else if($ed['finalurl'] && !$sloppy){
 			return Helper::getFinalUrl($ed['episode']['url']);
