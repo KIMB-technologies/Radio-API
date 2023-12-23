@@ -29,6 +29,8 @@ class Id {
 		MAC_PREG = '/^[0-9a-f]{28,40}$/',
 		CODE_PREG = '/^Z[0-9A-Za-z]{4}$/';
 
+	const CACHE_TTL = 60 * 60 * 6; // 6 hours
+
 	private $id, $data;
 		//id => podcasts files
 		//mac => radio id
@@ -119,9 +121,9 @@ class Id {
 		$table = self::getTableData();
 
 		// set also in redis
-		$redis->arraySet('macs', $table['macs']);
-		$redis->arraySet('ids', $table['ids']);
-		$redis->arraySet('codes', $table['codes']);
+		$redis->arraySet('macs', $table['macs'], self::CACHE_TTL);
+		$redis->arraySet('ids', $table['ids'], self::CACHE_TTL);
+		$redis->arraySet('codes', $table['codes'], self::CACHE_TTL);
 	}
 
 	private function generateNewId( string $val, Cache $redis ) : int { 
@@ -148,9 +150,9 @@ class Id {
 		//	File
 		file_put_contents( __DIR__ . '/../data/table.json', json_encode($table, JSON_PRETTY_PRINT), LOCK_EX);
 		//	Redis
-		$redis->arraySet('macs', $table['macs']);
-		$redis->arraySet('ids', $table['ids']);
-		$redis->arraySet('codes', $table['codes']);
+		$redis->arraySet('macs', $table['macs'], self::CACHE_TTL);
+		$redis->arraySet('ids', $table['ids'], self::CACHE_TTL);
+		$redis->arraySet('codes', $table['codes'], self::CACHE_TTL);
 
 		return $id;
 	}

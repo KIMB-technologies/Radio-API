@@ -49,7 +49,7 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 
 ## Manual Setup 
 > We recommend the Docker-based setup as the manual setup might be a bit fiddly and is less tested.  
-> **This is a *beta* feature.** -- You are welcome to file bug reports as issues or open pull requests!
+> You are welcome to file bug reports as issues or open pull requests!
 
 1. Redirect the HTTP request of the radio to your server (the *Radio-API*).
 	- This is the same as with the Docker based setup (see [here](#setup-using-docker)).
@@ -132,10 +132,11 @@ location @nofile {
 
 ## General Information
 ### Troubleshooting 
-- A log file of (unknown) request received by the Radio-API is created at `CONF_LOG_DIR/requests.log`. (`CONF_LOG_DIR` default to `./data`)  
+- A log file of (unknown) request received by the Radio-API is created at `CONF_LOG_DIR/requests.log`. (`CONF_LOG_DIR` defaults to `./data`)  
 - Errors with the RadioBrowser API are logged at `CONF_LOG_DIR/radiobrowser.log`.
 - If the Radio-API is unable to parse a JSON-file in `./data/`, it will initialize a new one, while the old one is renamed to `*.error.json`.
 - PHP error messages are disabled by default, set `DEV=dev` in the environment to enable them.
+- Restart Radio-API (e.g., the Docker container will reload the radio mac/ id table).
 - Erase the data folder/ volume of redis and restart Radio-API.
 - Check the outputs from the Docker Container `docker-compose logs`
 	- Make sure, that your radio sends the requests to Radio-API (i.e., the DNS setup works)

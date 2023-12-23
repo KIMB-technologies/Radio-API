@@ -24,6 +24,11 @@ require_once( '/php-code/classes/autoload.php' );
 Config::parseAllowedDomain(true);
 
 /**
+ * Reset the 'table.json' cache
+ */
+(new Cache('table.json'))->removeGroup();
+
+/**
  * load un/read episodes into Redis Cache
  */
 echo "Load (Un-)Read: " . PHP_EOL;
