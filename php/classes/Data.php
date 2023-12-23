@@ -103,7 +103,7 @@ class Data {
 			$idd = $id + 1000 * $tid;
 			$this->table['items'][$idd] = $d;
 			$this->table['items'][$idd]['tid'] = $tid;
-			if( $id >= 999 ){ // only 999 per cat!!
+			if( $id >= 999 ){ // only 999 per type!!
 				break;
 			}
 		}

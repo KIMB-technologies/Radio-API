@@ -86,7 +86,7 @@ class Router {
 				$this->out->addDir( 'No item found for this tID!', Config::RADIO_DOMAIN . '?go=initial');
 			}
 		}
-		// list of categories (startpage)
+		// list of types (startpage)
 		else{ 
 			// add local types
 			foreach( $this->data->getTypes() as $tid => $name ){
