@@ -5,6 +5,8 @@
 	"%%LOGIN_CODE%%" : "",
 	"%%RADIO_COUNT%%" : "",
 	"%%PODCAST_COUNT%%" : "",
+	"%%RADIO_OPTIONS%%" : "",
+	"%%PODCAST_OPTIONS%%" : "",
 	"multiples" : {
 		"RadioStations" : {
 			"%%ID%%" : "",
@@ -16,7 +18,8 @@
 			"%%TYPE_RADIO%%" : "",
 			"%%TYPE_NC%%" : "",
 			"%%LOGO%%" : "",
-			"%%DESC%%" : ""
+			"%%DESC%%" : "",
+			"%%CAT_OPTIONS%%" : ""
 		},
 		"Podcasts" : {
 			"%%ID%%" : "",
@@ -28,7 +31,8 @@
 			"%%ENDURL_YES%%" : "",
 			"%%ENDURL_NO%%" : "",
 			"%%PROXY_YES%%" : "",
-			"%%PROXY_NO%%" : ""
+			"%%PROXY_NO%%" : "",
+			"%%CAT_OPTIONS%%" : ""
 		} 
 	}
 }

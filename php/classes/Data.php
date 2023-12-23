@@ -29,9 +29,9 @@ class Data {
 		$this->redis = new Cache('radios_podcasts.' . $this->id );
 		$this->own_streams = new OwnStreams();
 		
-		if( !$this->redis->keyExists( 'categories' ) || $preload ){
+		if( !$this->redis->keyExists( 'types' ) || $preload ){
 			$this->preloadAll();
-			if( !$this->redis->keyExists( 'categories' ) ){
+			if( !$this->redis->keyExists( 'types' ) ){
 				$this->constructTable();
 			}
 		}
@@ -72,61 +72,74 @@ class Data {
 
 		// generate Table
 		$this->table = array();
-		$this->table['categories'] = array(
+		$this->table['types'] = array(
 			1 => 'Radio',
 			3 => 'Podcast'
 		);
 		$this->table['items'] = array();
 
 		// add radio, podcasts
-		$this->addCategoryToTable( 1, $this->radio );
-		$this->addCategoryToTable( 3, $this->podcasts );
+		$this->addTypeToTable( 1, $this->radio );
+		$this->addTypeToTable( 3, $this->podcasts );
 
 		// add "own streams"
 		if( Config::STREAM_JSON ){
-			$this->table['categories'][2] = 'Stream';
-			$this->addCategoryToTable( 2, $this->own_streams->getStreams() );
+			$this->table['types'][2] = 'Stream';
+			$this->addTypeToTable( 2, $this->own_streams->getStreams() );
 		}
 
 		// save in redis
 		//	if using own stream, we need to give a ttl, else the system won't reload the list of own streams
-		$this->redis->arraySet( 'categories', $this->table['categories'], Config::STREAM_JSON ? Config::CACHE_EXPIRE : 0 );
+		$this->redis->arraySet( 'types', $this->table['types'], Config::STREAM_JSON ? Config::CACHE_EXPIRE : 0 );
 		$this->redis->arraySet( 'items', $this->table['items'], Config::STREAM_JSON ? Config::CACHE_EXPIRE : 0 );
 	}
 
 	/**
-	 * Add a category to table
+	 * Add a type to table
 	 * 	Helper for constructTable
 	 */
-	private function addCategoryToTable( int $cid, array $data ) : void{
+	private function addTypeToTable( int $tid, array $data ) : void{
 		foreach( $data as $id => $d ){
-			$idd = $id + 1000 * $cid;
+			$idd = $id + 1000 * $tid;
 			$this->table['items'][$idd] = $d;
-			$this->table['items'][$idd]['cid'] = $cid;
-			if( $id >= 999 ){ // only 999 per cat!!
+			$this->table['items'][$idd]['tid'] = $tid;
+			if( $id >= 999 ){ // only 999 per type!!
 				break;
 			}
 		}
 	}
 
 	/**
-	 * Returns List of category, indexed by catID
+	 * Returns List of type, indexed by typeID
 	 */
-	public function getCategories() : array {
-		return $this->redis->arrayGet('categories');
+	public function getTypes() : array {
+		return $this->redis->arrayGet('types');
 	}
 
 	/**
-	 * Returns list of items in this cat, indexed by id!
+	 * Returns List of categories for a typeID
 	 */
-	public function getListOfItems( int $cid ) : array {
-		return array_filter( $this->redis->arrayGet('items'), function($i) use (&$cid){
-			return $cid == $i['cid'];
-		});
+	public function getCategories(int $tid) : array {
+		$cats = array_filter(
+			$this->redis->arrayGet('items'),
+			fn($i) => $tid == $i['tid'] && !empty($i["category"])
+		);
+		return array_unique(array_map(fn($i) => $i["category"], $cats));
 	}
 
 	/**
-	 * Get data of one item by his id.
+	 * Returns list of items in this type, indexed by id!
+	 * 	Filter for a category or set "null" to return all categories
+	 */
+	public function getListOfItems( int $tid, ?string $cat = null ) : array {
+		return array_filter(
+			$this->redis->arrayGet('items'),
+			fn($i) => $tid == $i['tid'] && ( (is_null($cat) && empty($i['category'])) || $cat == $i['category'])
+		);
+	}
+
+	/**
+	 * Get data of one item by its id.
 	 */
 	public function getById( int $id ) : array {
 		if( !$this->redis->arrayKeyExists('items', $id) ){

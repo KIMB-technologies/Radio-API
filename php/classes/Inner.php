@@ -40,6 +40,7 @@ class Inner {
 						'desc' => self::filterName( $_POST['desc'][$id] ),
 						'proxy' => isset($_POST['proxy'][$id]) && $_POST['proxy'][$id] == 'yes',
 						'type' => !empty($_POST['type'][$id]) && $_POST['type'][$id] == 'nc' ? 'nc' : 'radio',
+						'category' => $this->getCategory($id)
 					);
 				}
 			}
@@ -56,7 +57,8 @@ class Inner {
 						'url' => self::filterURL( $_POST['url'][$id] ),
 						'finalurl' => isset($_POST['finalurl'][$id]) && $_POST['finalurl'][$id] == 'yes',
 						'proxy' => isset($_POST['proxy'][$id]) && $_POST['proxy'][$id] == 'yes',
-						'type' => isset($_POST['type'][$id]) && $_POST['type'][$id] == 'nc' ? 'nc' : 'rss'
+						'type' => isset($_POST['type'][$id]) && $_POST['type'][$id] == 'nc' ? 'nc' : 'rss',
+						'category' => $this->getCategory($id)
 					);
 				}
 			}
@@ -65,6 +67,7 @@ class Inner {
 	}
 
 	public function radioForm() : void {
+		$categories = array_filter(array_unique(array_column($this->radios, 'category')));
 		$radios = array();
 		$count = 0;
 		foreach($this->radios as $key => $radio ){
@@ -81,15 +84,22 @@ class Inner {
 				"TYPE_NC" => $radio['type'] == 'nc' ? 'checked="checked"' : '',
 				"LOGO" => $radio['logo'],
 				"DESC" => $radio['desc'],
+				"CAT_OPTIONS" => array_reduce(
+					$categories,
+					fn($c, $i) => $c.'<option value="'.$i.'" '.($i === $radio['category'] ? 'selected' : '').'>'.$i.'</option>',
+					''
+				)
 			);
 			
 			$count++;
 		}
 		$this->template->setMultipleContent('RadioStations', $radios);
 		$this->template->setContent('RADIO_COUNT', $count);
+		$this->template->setContent('RADIO_OPTIONS', array_reduce($categories, fn($c, $i) => $c.'<option value="'.$i.'">'.$i.'</option>', '' ));
 	}
 
 	public function podcastForm() : void {
+		$categories = array_filter(array_unique(array_column($this->podcasts, 'category')));
 		$podcasts = array();
 		$count = 0;
 		foreach($this->podcasts as $key => $pod ){
@@ -106,12 +116,18 @@ class Inner {
 				"ENDURL_NO" => !$pod['finalurl'] ? 'checked="checked"' : '',
 				"PROXY_YES" => $pod['proxy'] ? 'checked="checked"' : '',
 				"PROXY_NO" => !$pod['proxy'] ? 'checked="checked"' : '',
+				"CAT_OPTIONS" => array_reduce(
+						$categories,
+						fn($c, $i) => $c.'<option value="'.$i.'" '.($i === $pod['category'] ? 'selected' : '').'>'.$i.'</option>',
+						''
+					)
 			);
 			
 			$count++;
 		}
 		$this->template->setMultipleContent('Podcasts', $podcasts);
 		$this->template->setContent('PODCAST_COUNT', $count);
+		$this->template->setContent('PODCAST_OPTIONS', array_reduce($categories, fn($c, $i) => $c.'<option value="'.$i.'">'.$i.'</option>', '' ));
 	}
 
 	public function outputMessages() : void {
@@ -129,6 +145,24 @@ class Inner {
 		$name = str_replace( ['ä','ü','ß','ö','Ä','Ü','Ö'], ['ae','ue','ss','oe','Ae','Ue','Oe'], $name);
 		$name = substr( preg_replace( '/[^0-9A-Za-z \.\-\_\,\&\;\/\(\)]/', '',  $name ), 0, 200 );
 		return empty($name) ? 'empty' : $name;
+	}
+
+	public static function filterCategory(string $cat) : string{
+		$cat = self::filterName($cat);
+		$cat = preg_replace( '/[^0-9A-Za-z \-\,]/', '',  $cat );
+		return empty($cat) ? 'empty' : $cat;
+	}
+
+	private function getCategory(int $post_id): string {
+		if($_POST['cat'][$post_id] === '*root') {
+			return "";
+		}
+		else {
+			return self::filterCategory(
+				$_POST['cat'][$post_id] === '*new' ?
+					$_POST['new_cat'][$post_id] : $_POST['cat'][$post_id]
+			);
+		}
 	}
 }
 ?>

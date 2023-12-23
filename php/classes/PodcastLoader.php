@@ -141,7 +141,7 @@ class PodcastLoader {
 	 */
 	public static function getEpisodeData( int $id, int $eid, Data $data ) : array{
 		$pod = $data->getById( $id );
-		if( $pod['cid'] !== 3 ){
+		if( $pod['tid'] !== 3 ){
 			return array();
 		}
 		$poddata = self::getPodcastByUrl( $pod['url'], !empty($pod['type']) && $pod['type'] == 'nc' );
@@ -167,7 +167,7 @@ class PodcastLoader {
 	 */
 	public static function getPodcastDataById( int $id, Data $data ) : array {
 		$pod = $data->getById( $id );
-		if( $pod['cid'] !== 3 ){
+		if( $pod['tid'] !== 3 ){
 			return array();
 		}
 		return self::getPodcastByUrl( $pod['url'], !empty($pod['type']) && $pod['type'] == 'nc' );

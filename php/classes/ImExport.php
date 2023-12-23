@@ -152,6 +152,9 @@ class ImExport {
 					case "desc":
 						$ok &= Inner::filterName($v) === $v;
 						break;
+					case "category":
+						$ok &= ($v === "" || Inner::filterCategory($v) === $v);
+						break;
 					case "logo":
 					case "url":
 						$ok &= Inner::filterURL($v) === $v;

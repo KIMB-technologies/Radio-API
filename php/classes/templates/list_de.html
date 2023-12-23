@@ -57,6 +57,19 @@
 				</tr>
 				<tr>
 					<td></td>
+					<td>Kategorie</td>
+					<td>
+						<select class="cat_select" delid="d%%ID%%" name="cat[%%COUNT%%]"/>
+							<option value="*root">Keine Kategorie</option>
+							%%CAT_OPTIONS%%
+							<option value="*new">Neue Kategorie</option>
+						</select>
+						<input  class="new_cat" delid="d%%ID%%" type="text" placeholder="Name der neuen Kategorie"
+							name="new_cat[%%COUNT%%]" style="display: none;"/>
+					</td>
+				</tr>
+				<tr>
+					<td></td>
 					<td><button class="del" delid="d%%ID%%" type="button" title="Löschen">&cross;</button></td>
 					<td></td>
 				</tr>
@@ -123,6 +136,19 @@
 				<td></td>
 				<td>Beschreibung</td>
 				<td><input type="text" placeholder="Description" name="desc[%%RADIO_COUNT%%]"/></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>Kategorie</td>
+				<td>
+					<select class="cat_select" delid="new_radio" name="cat[%%RADIO_COUNT%%]"/>
+						<option value="*root">Keine Kategorie</option>
+						%%RADIO_OPTIONS%%
+						<option value="*new">Neue Kategorie</option>
+					</select>
+					<input class="new_cat" delid="new_radio" type="text" placeholder="Name der neuen Kategorie"
+						name="new_cat[%%RADIO_COUNT%%]" style="display: none;"/>
+				</td>
 			</tr>
 			<tr>
 				<td></td>
@@ -201,6 +227,19 @@
 				</tr>
 				<tr>
 					<td></td>
+					<td>Kategorie</td>
+					<td>
+						<select class="cat_select" delid="d%%ID%%" name="cat[%%COUNT%%]"/>
+							<option value="*root">Keine Kategorie</option>
+							%%CAT_OPTIONS%%
+							<option value="*new">Neue Kategorie</option>
+						</select>
+						<input  class="new_cat" delid="d%%ID%%" type="text" placeholder="Name der neuen Kategorie"
+							name="new_cat[%%COUNT%%]" style="display: none;"/>
+					</td>
+				</tr>
+				<tr>
+					<td></td>
 					<td><button class="del" delid="d%%ID%%" type="button" title="Löschen">&cross;</button></td>
 					<td></td>
 				</tr>
@@ -242,6 +281,19 @@
 				<td>
 					<input type="radio" value="yes" name="proxy[%%PODCAST_COUNT%%]" /> &check;
 					<input type="radio" value="no" name="proxy[%%PODCAST_COUNT%%]" checked="checked" /> &cross;
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>Kategorie</td>
+				<td>
+					<select class="cat_select" delid="new_podcast" name="cat[%%PODCAST_COUNT%%]"/>
+						<option value="*root">Keine Kategorie</option>
+						%%PODCAST_OPTIONS%%
+						<option value="*new">Neue Kategorie</option>
+					</select>
+					<input class="new_cat" delid="new_podcast" type="text" placeholder="Name der neuen Kategorie"
+						name="new_cat[%%PODCAST_COUNT%%]" style="display: none;"/>
 				</td>
 			</tr>
 			<tr>
