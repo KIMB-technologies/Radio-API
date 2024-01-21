@@ -34,9 +34,13 @@ class PodcastLoader {
 	 * Nextcloud share loader
 	 */
 	private static function loadFromNextcloud( string $url ) : array {
-		$server = substr( $url, 0, strrpos( $url , '/s/' )+1 );
-		$share = substr( $url, strlen($server)+2 );
-		$share = preg_replace( '/[^0-9A-Za-z]/', '', $share );
+		// "<server base path> / <possibly index.php> /s/ <token>"
+		if(preg_match('/^(https?\:\/\/.*)(?<!index\.php)(\/index\.php)?\/s\/([0-9A-Za-z]+)/', $url, $matches) !== 1){
+			return array();
+		}
+		$server = $matches[1]; // the base path to nextcloud
+		$useindex = !empty($matches[2]); // used index.php to access files?
+		$share = $matches[3]; // the token/ name of share
 
 		$cont = stream_context_create( array(
 			"http" => array(
@@ -44,7 +48,7 @@ class PodcastLoader {
 				"header" => "Authorization: Basic " . base64_encode($share . ':')
 			)
 		));
-		$data = file_get_contents( $server . 'public.php/webdav/', false, $cont );
+		$data = file_get_contents( $server . '/public.php/webdav/', false, $cont );
 		$data = explode( '<d:href>', $data );
 		
 		$poddata = array(
@@ -63,7 +67,7 @@ class PodcastLoader {
 				$poddata['episodes'][$eid] = array(
 					'title' => $fina,
 					'desc'  => '',
-					'url' => $server . 's/'. $share .'/download?path=%2F&files=' . rawurlencode( $fina ) 
+					'url' => $server . ($useindex ? '/index.php' : '') . '/s/'. $share .'/download?path=%2F&files=' . rawurlencode( $fina ) 
 				);
 				$eid++;
 			}
