@@ -76,14 +76,14 @@ class Inner {
 			$radios[] = array(
 				"ID" => $id,
 				"COUNT" => $count,
-				"NAME" => $radio['name'],
+				"NAME" => htmlspecialchars($radio['name'], encoding: 'UTF-8'),
 				"URL" => $radio['url'],
 				"PROXY_YES" => $radio['proxy'] ? 'checked="checked"' : '',
 				"PROXY_NO" => !$radio['proxy'] ? 'checked="checked"' : '',
 				"TYPE_RADIO" => $radio['type'] != 'nc' ? 'checked="checked"' : '',
 				"TYPE_NC" => $radio['type'] == 'nc' ? 'checked="checked"' : '',
 				"LOGO" => $radio['logo'],
-				"DESC" => $radio['desc'],
+				"DESC" => htmlspecialchars($radio['desc'], encoding: 'UTF-8'),
 				"CAT_OPTIONS" => array_reduce(
 					$categories,
 					fn($c, $i) => $c.'<option value="'.$i.'" '.($i === $radio['category'] ? 'selected' : '').'>'.$i.'</option>',
@@ -108,7 +108,7 @@ class Inner {
 			$podcasts[] = array(
 				"ID" => $id,
 				"COUNT" => $count,
-				"NAME" => $pod['name'],
+				"NAME" => htmlspecialchars($pod['name'], encoding: 'UTF-8'),
 				"URL" => $pod['url'],
 				"TYPE_RSS" => $pod['type'] == 'rss' ? 'checked="checked"' : '',
 				"TYPE_NC" => $pod['type'] == 'nc' ? 'checked="checked"' : '',
@@ -142,8 +142,15 @@ class Inner {
 	}
 
 	public static function filterName(string $name): string{
-		$name = str_replace( ['ä','ü','ß','ö','Ä','Ü','Ö'], ['ae','ue','ss','oe','Ae','Ue','Oe'], $name);
-		$name = substr( preg_replace( '/[^0-9A-Za-z \.\-\_\,\&\;\/\(\)]/', '',  $name ), 0, 200 );
+		// $name = str_replace( ['ä','ü','ß','ö','Ä','Ü','Ö'], ['ae','ue','ss','oe','Ae','Ue','Oe'], $name);
+		$name = substr( preg_replace(
+			'/[^ -\x{2122}]/u',
+			// pattern inspired from
+			//	https://stackoverflow.com/a/43106144 by mickmackusa
+			//	CC BY-SA, https://creativecommons.org/licenses/by-sa/3.0/
+			'', $name
+		), 0, 200 );
+		
 		return empty($name) ? 'empty' : $name;
 	}
 
