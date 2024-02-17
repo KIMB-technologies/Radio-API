@@ -57,6 +57,7 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 	- Preface:
 		- The manual setup does not rely on *Redis* (which is replaced by a file-based caching).
 		- The only requirement a current version of PHP (code analysis shows compatibility with PHP > 8.0, code is tested with 8.2 and 8.3).
+		- In most cases the default extensions of PHP are sufficient for Radio-API. Is uses among others `php-mbstring`.
 		- You do not need a cron job, all data is stored in `./data/` and the cache files in `./data/cache/`.
 		- You may change the folder for cache files to, e.g., a ramdisk. If you do so, use the script `./utils/backup-restore.php` to backup data which is only stored by the cache (using Docker this is done by the cron job).
 		- The proxy feature is provided by PHP, but might be less stable than the NGINX proxy.
