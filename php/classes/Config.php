@@ -81,7 +81,7 @@ class Config {
 	/**
 	 * The system's version.
 	 */
-	const VERSION = 'v2.8.3';
+	const VERSION = 'v2.8.4-dev';
 
 	/**
 	 * The real domain which should be used.
@@ -226,7 +226,14 @@ class Config {
 			self::$redisUpdateStatus = new Cache( 'update_status' );
 		}
 
-		if(!self::$redisUpdateStatus->keyExists('update_available')){
+		// remove values of "old" update indicator
+		if(self::$redisUpdateStatus->keyExists('update_available')){
+			self::$redisUpdateStatus->remove('update_available');
+			self::$redisUpdateStatus->remove('latest_version');
+		}
+
+		// check for new information from GitHub API
+		if(!self::$redisUpdateStatus->keyExists('latest_version')){
 			$infos = json_decode(file_get_contents(
 					'https://api.github.com/repos/KIMB-technologies/Radio-API/releases/latest', 
 					false,
@@ -236,23 +243,25 @@ class Config {
 						'timeout' => 4
 					)))
 				), true);
+
 			if(is_null($infos)){
 				// error checking latest version
 				return false;
 			}
-			else{	
-				self::$redisUpdateStatus->set('latest_version', $infos["tag_name"]);
-				self::$redisUpdateStatus->set('last_check', date('d.m.Y H:i:s'));
+			else{
+				self::$redisUpdateStatus->set(
+					'latest_version',
+					$infos["tag_name"],
+					60*60*24*3 // check every 3 days
+				);
+				self::$redisUpdateStatus->set(
+					'last_check',
+					date('d.m.Y H:i:s')
+				);
 			}
-
-			self::$redisUpdateStatus->set(
-				'update_available',
-				version_compare(self::VERSION, self::$redisUpdateStatus->get('latest_version'), '<'),
-				60*60*24*3 // check every 3 days
-			);
 		}
 		
-		return self::$redisUpdateStatus->get('update_available');
+		return version_compare(self::VERSION, self::$redisUpdateStatus->get('latest_version'), '<');
 	}
 
 	public static function parseAllowedDomain(bool $output = false) : void {
