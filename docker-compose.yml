@@ -16,6 +16,7 @@ services:
       - CONF_ALLOWED_DOMAIN=all # allowed ips for access, list of DynDNS domainnames (divided by ','), or 'all' to allow all ips
       - CONF_SHUFFLE_MUSIC=true # random shuffle music in nextcloud radio stations
       - CONF_CACHE_EXPIRE=1200 # cache expire time of ips, podcasts, ...
+      - CONF_USE_JSON_CACHE=false # set to 'true' to disable redis cache and use a simple file-based cache
       - CONF_REDIS_HOST=redis # the redis hostname
       # - CONF_REDIS_PORT=6379 # default 6379
       # - CONF_REDIS_PASS= # default no auth
@@ -24,6 +25,8 @@ services:
       # -CONF_IM_EXPORT_TOKEN= # define a token for use with the im-, export web interface at ./gui/im-export.php
     depends_on:
       - redis
+  
+  # remove the following part, if 'CONF_USE_JSON_CACHE=true', i.e., redis is not used!
   redis:
     image: redis:alpine
     container_name: radio_api_redis

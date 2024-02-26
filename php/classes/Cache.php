@@ -128,7 +128,7 @@ class Cache implements CacheInterface {
 	private $s;
 
 	public function __construct(string $group){
-		$this->s = DOCKER_MODE ? new RedisCache($group) : new JSONCache($group);
+		$this->s = DOCKER_MODE && !Config::USE_JSON_CACHE ? new RedisCache($group) : new JSONCache($group);
 	}
 	public function getAllKeysOfGroup() : array {
 		return $this->s->getAllKeysOfGroup();

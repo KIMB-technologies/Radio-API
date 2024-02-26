@@ -44,6 +44,7 @@ class Output {
 		'Top Click' => ['Top Click', 'Am meisten gehört'],
 		'Top Vote' => ['Top Vote', 'Am höchsten bewertet'],
 		'Next Page' => ['Next Page', 'Nächste Seite'],
+		'You do not have last stations.' => ['You do not have last stations.', 'Sie haben keine zuletzt gehörten Sender!']
 	);
 
 	/**

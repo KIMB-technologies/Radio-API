@@ -25,6 +25,7 @@ services:
       - CONF_ALLOWED_DOMAIN=all
       - CONF_SHUFFLE_MUSIC=true
       - CONF_CACHE_EXPIRE=1200
+      #- CONF_USE_JSON_CACHE=true
       - CONF_REDIS_HOST=redis
       - CONF_STREAM_JSON=false #http://192.168.0.10:8081/list.json
       - CONF_IM_EXPORT_TOKEN=LP75Djdj195DL8SZnfY3

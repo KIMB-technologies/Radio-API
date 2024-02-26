@@ -62,6 +62,10 @@ define(
 	!empty($ENV['CONF_IM_EXPORT_TOKEN']) && Helper::checkFilename($ENV['CONF_IM_EXPORT_TOKEN']) && strlen($ENV['CONF_IM_EXPORT_TOKEN']) > 15 ?
 		$ENV['CONF_IM_EXPORT_TOKEN'] : false
 );
+define(
+	'ENV_USE_JSON_CACHE',
+		!empty($_ENV['CONF_USE_JSON_CACHE']) && $_ENV['CONF_USE_JSON_CACHE'] == 'true'
+);
 
 // IP on reverse proxy setup
 if( !empty($_SERVER['HTTP_X_REAL_IP']) ){
@@ -77,7 +81,7 @@ class Config {
 	/**
 	 * The system's version.
 	 */
-	const VERSION = 'v2.8.2';
+	const VERSION = 'v2.8.3';
 
 	/**
 	 * The real domain which should be used.
@@ -120,6 +124,11 @@ class Config {
 	 * Im- & Export via web GUI (at ./gui/im-export.php)
 	 */
 	const IM_EXPORT_TOKEN = ENV_IM_EXPORT_TOKEN;
+
+	/**
+	 * Always use json cache, even in Docker-Mode
+	 */
+	const USE_JSON_CACHE = ENV_USE_JSON_CACHE;
 
 	/**
 	 * Store redis cache for ALLOWED_DOMAINS
@@ -192,21 +201,22 @@ class Config {
 	}
 
 	/**
-	 * Sets the redis server copnnection details using the env vars. 
+	 * Sets the redis server connection details using the env vars. 
 	 * Should be always called before creating a RedisCache.
 	 */
 	public static function setRedisServer() : void {
-		if(!DOCKER_MODE){ // Redis only in Docker mode
-			return;
-		}
-		if( isset( $_ENV['CONF_REDIS_HOST'], $_ENV['CONF_REDIS_PORT'], $_ENV['CONF_REDIS_PASS'] ) ){
-			RedisCache::setRedisServer($_ENV['CONF_REDIS_HOST'], $_ENV['CONF_REDIS_PORT'], $_ENV['CONF_REDIS_PASS']);
-		}
-		else if( isset( $_ENV['CONF_REDIS_HOST'], $_ENV['CONF_REDIS_PORT'] ) ){
-			RedisCache::setRedisServer($_ENV['CONF_REDIS_HOST'], $_ENV['CONF_REDIS_PORT']);
-		}
-		else if( isset( $_ENV['CONF_REDIS_HOST'] ) ){
-			RedisCache::setRedisServer($_ENV['CONF_REDIS_HOST']);
+		// Redis only in Docker mode and if not USE_JSON_CACHE
+		if(DOCKER_MODE && !self::USE_JSON_CACHE){ 
+			// configure redis
+			if( isset( $_ENV['CONF_REDIS_HOST'], $_ENV['CONF_REDIS_PORT'], $_ENV['CONF_REDIS_PASS'] ) ){
+				RedisCache::setRedisServer($_ENV['CONF_REDIS_HOST'], $_ENV['CONF_REDIS_PORT'], $_ENV['CONF_REDIS_PASS']);
+			}
+			else if( isset( $_ENV['CONF_REDIS_HOST'], $_ENV['CONF_REDIS_PORT'] ) ){
+				RedisCache::setRedisServer($_ENV['CONF_REDIS_HOST'], $_ENV['CONF_REDIS_PORT']);
+			}
+			else if( isset( $_ENV['CONF_REDIS_HOST'] ) ){
+				RedisCache::setRedisServer($_ENV['CONF_REDIS_HOST']);
+			}
 		}
 	}
 

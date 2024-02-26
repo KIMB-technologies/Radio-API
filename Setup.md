@@ -31,6 +31,7 @@ The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechn
 			*If hosted in a local network using `all` is recommended.*
 		- `CONF_STREAM_JSON` Url to a JSON list of streams or `false` to disable (see [Own Streams](#own-streams))
 		- There are some more options, see defaults in [docker-compose.yml](https://github.com/KIMB-technologies/Radio-API/blob/master/docker-compose.yml).
+		- The default setup uses Redis for fast caching of values. Redis may be disable by setting `CONF_USE_JSON_CACHE=true`, which enables an json file based caching as fallback (cached items are then stored in `./data/cache`).
 	- There are two ways to store which episodes of podcasts have already been listened to (new ones are marked by `*`)
 		- Create a cron job to `/cron.php`, e.g., `docker exec --user www-data radio_api php /cron.php`. (This will dump the already played episodes to a JSON file in `./data/` and *Radio-API* will load the file into redis on container startup).
 		- Use the data volume of Redis. (Redis will (re-)load its dump files on container startup.)
@@ -80,6 +81,7 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 		- `CONF_CACHE_DIR` (optional) Change the folder used by the file based cache (defaults to `./data/cache/`).
 		- `CONF_IM_EXPORT_TOKEN` (optional) Define a token for use with the Im- & Export web interface *Im- & Export* [&darr;](#im---export).
 		- **Attention:** Optional parameters have a leading `____` in the default `env.json`, make sure to remove them.
+		- The `CONF_REDIS_*` values are ignored and `CONF_USE_JSON_CACHE` is always `true`.
 	- Make sure, that *Radio-API* is available at port `80` for requests with the hostname `*.wifiradiofrontier.com` and `CONF_DOMAIN`.
 	- Block HTTP access to `./data/` (and `./classes/`) for security reasons (might be omitted in a local network installation).
 	- Rewrite requests to PHP:
