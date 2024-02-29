@@ -8,8 +8,8 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./data/:/php-code/data/
-      #- ./media/:/php-code/media/:ro # directory to add images for stations
+      - ./data/:/php-code/data/ # directory storing data, cache, and setting od Radio-API
+      - ./media/:/php-code/media/ # directory storing images for stations
     environment:
       - CONF_DOMAIN=http://radio.example.com/ # the domain where the system is hosted
       # - CONF_RADIO_DOMAIN=http://hama.wifiradiofrontier.com # different domain to use for connections of the radio (if set CONF_DOMAIN is for GUI)

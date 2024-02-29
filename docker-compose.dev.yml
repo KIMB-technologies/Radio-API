@@ -16,6 +16,7 @@ services:
     volumes:
       - ./php/:/php-code/
       - ./data/:/php-code/data/
+      - ./media/:/php-code/media/
       - ./utils/getr.php:/php-code/getr.php:ro # redis all values listing
       - ./utils/backup-restore.php:/backup-restore.php:ro # backup restore tool for cache values
     environment:

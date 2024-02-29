@@ -14,3 +14,4 @@ php /startup.php
 
 #	file permissions
 chown -R www-data:www-data /php-code/data/
+chown -R www-data:www-data /php-code/media/

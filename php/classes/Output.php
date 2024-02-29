@@ -52,6 +52,7 @@ class Output {
 	 */
 	public function __construct(string $lang = 'eng'){
 		$this->language = array_search($lang, self::ALL_LANGUAGES) ?? 0;
+		$this->logo = RadioLogo();
 	}
 
 	/**
@@ -65,11 +66,10 @@ class Output {
 			'StationName' => $this->cleanText($name, true),
 		);
 		if( !$light ){
-			$logo = empty($logo) || substr($logo, 0, 4) != 'http' ? Config::RADIO_DOMAIN . 'media/default.png' : $logo;
 			$b = array(
 				'StationUrl' => $this->cleanUrl($url),
 				'StationDesc' => $this->cleanText($desc),
-				'Logo' => $this->cleanUrl($logo),
+				'Logo' => $this->cleanUrl($this->logo->logoUrl($logo)),
 				'StationFormat' => 'Radio',
 				'StationLocation' => 'Earth',
 				'StationBandWidth' => 32,
@@ -104,12 +104,11 @@ class Output {
 	 */
 	public function addEpisode( int $podcastid, int|null $episodeid, string $podcastname, string $episodename,
 						string $url, string $desc = '', string $logo = '', bool $top = false ) : void {
-		$logo = empty($logo) || substr($logo, 0, 4) != 'http' ? Config::RADIO_DOMAIN . 'media/default.png' : $logo;
 		$this->items[] = array(
 			'ItemType' => 'ShowEpisode',
 			'ShowEpisodeID' =>  $podcastid . (!is_null($episodeid) ? 'X' . $episodeid : ''),	
 			'ShowName' => $this->cleanText($podcastname, true),
-			'Logo' => $this->cleanUrl($logo),
+			'Logo' => $this->cleanUrl($this->logo->logoUrl($logo)),
 			'ShowEpisodeName' => $this->cleanText($episodename, true),
 			'ShowEpisodeURL' => $this->cleanUrl($url),
 			'BookmarkShow' => '',

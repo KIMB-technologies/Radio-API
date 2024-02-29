@@ -5,6 +5,9 @@ RUN apk add --update --no-cache $PHPIZE_DEPS \
 	&& pecl install redis \
 	&& docker-php-ext-enable redis
 
+# SVG -> PNG convert
+RUN apk add --update --no-cache rsvg-convert
+
 # copy php files, nginx conf and startup scripts
 COPY --chown=www-data:www-data ./php/ /php-code/
 COPY ./utils/nginx.conf /etc/nginx/more-server-conf.conf 
