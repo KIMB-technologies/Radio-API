@@ -44,7 +44,7 @@ else {
 	finfo_close($finfo);
 
 	//Header
-	header( 'Content-type: '.$mimetype.'; charset=utf-8' );
+	header( 'Content-Type: '.$mimetype );
 	header( 'Content-Disposition: inline; filename="'.$namehash.'.image"' );
 	header( 'Content-Length: '.$filesize);
 
