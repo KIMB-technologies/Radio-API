@@ -21,7 +21,8 @@ class Output {
 		$items = array(),
 		$itemsSortKeys = array(),
 		$prevurl = '',
-		$language;
+		$language,
+		$logo;
 	
 	const MAX_ITEMS = 200; // to many items will cause the radio to crash (one could add paging, but until then, we remove too much items)
 
@@ -52,7 +53,7 @@ class Output {
 	 */
 	public function __construct(string $lang = 'eng'){
 		$this->language = array_search($lang, self::ALL_LANGUAGES) ?? 0;
-		$this->logo = RadioLogo();
+		$this->logo = new RadioLogo();
 	}
 
 	/**

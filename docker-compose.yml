@@ -23,6 +23,7 @@ services:
       - CONF_STREAM_JSON=false # to disable or an url where to fetch list of own streams, e.g., http://stream.example.com/list.json 
       # -CONF_LOG_DIR= # set a custom directory for log files (defaults to ./data/)
       # -CONF_IM_EXPORT_TOKEN= # define a token for use with the im-, export web interface at ./gui/im-export.php
+      - CONF_USE_LOGO_CACHE=true # cache logos (make them accessible without ssl and convert svgs to pngs for the radio, stores files in ./media/)
     depends_on:
       - redis
   

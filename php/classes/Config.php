@@ -66,6 +66,10 @@ define(
 	'ENV_USE_JSON_CACHE',
 		!empty($_ENV['CONF_USE_JSON_CACHE']) && $_ENV['CONF_USE_JSON_CACHE'] == 'true'
 );
+define(
+	'ENV_USE_LOGO_CACHE',
+		!empty($_ENV['CONF_USE_LOGO_CACHE']) && $_ENV['CONF_USE_LOGO_CACHE'] == 'true'
+);
 
 // IP on reverse proxy setup
 if( !empty($_SERVER['HTTP_X_REAL_IP']) ){
@@ -129,6 +133,11 @@ class Config {
 	 * Always use json cache, even in Docker-Mode
 	 */
 	const USE_JSON_CACHE = ENV_USE_JSON_CACHE;
+
+	/**
+	 * Cache logos and make them accessible without ssl.
+	 */
+	const USE_LOGO_CACHE = ENV_USE_LOGO_CACHE;
 
 	/**
 	 * Store redis cache for ALLOWED_DOMAINS

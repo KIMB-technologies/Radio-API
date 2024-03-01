@@ -3,5 +3,6 @@
 /php/getr.php
 
 /data/
+/media/
 /redis/
 .DS_Store

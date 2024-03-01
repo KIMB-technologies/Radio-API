@@ -49,7 +49,7 @@ function printItem( item, play ){
 	if( type == "Station" ){
 		if(play){
 			playh += $(item).find('StationName').text();
-			playFile( $(item).find('StationUrl').text() );
+			playFile( $(item).find('StationUrl').text(), $(item).find('Logo').text() );
 		}
 		else{
 			var name = $(item).find('StationName').text();
@@ -71,7 +71,7 @@ function printItem( item, play ){
 	else if( type == "ShowEpisode" ){
 		if( play ){
 			playh += $(item).find('ShowEpisodeName').text();
-			playFile( $(item).find('ShowEpisodeURL').text() );
+			playFile( $(item).find('ShowEpisodeURL').text(),  $(item).find('Logo').text() );
 		}
 		else{
 			var name = $(item).find('ShowEpisodeName').text();
@@ -122,12 +122,17 @@ function addOpenTypeListener(elem){
 	});
 }
 
-function playFile( url ) {
+function playFile( url, logo ) {
 	if( url.startsWith(radiourl)){
 		url = serverurl + url.slice(radiourl.length)
 	}
+	if( logo.startsWith(radiourl)){
+		logo = serverurl + logo.slice(radiourl.length)
+	}
+
 	var html ='<audio controls="controls" autoplay="autoplay">'
 		+ '<source src="'+ url +'" type="audio/mp3">'
-		+ '</audio>';
+		+ '</audio>'
+		+ '<img src="'+logo+'" width="48" height="48" style="margin-left:20px; border: solid 1px grey;">';
 	$("div#audiodiv").html(html);
 }
