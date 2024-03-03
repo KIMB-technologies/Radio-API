@@ -64,11 +64,11 @@ define(
 );
 define(
 	'ENV_USE_JSON_CACHE',
-		!empty($_ENV['CONF_USE_JSON_CACHE']) && $_ENV['CONF_USE_JSON_CACHE'] == 'true'
+		!empty($ENV['CONF_USE_JSON_CACHE']) && $ENV['CONF_USE_JSON_CACHE'] == 'true'
 );
 define(
 	'ENV_USE_LOGO_CACHE',
-		!empty($_ENV['CONF_USE_LOGO_CACHE']) && $_ENV['CONF_USE_LOGO_CACHE'] == 'true'
+		!empty($ENV['CONF_USE_LOGO_CACHE']) && $ENV['CONF_USE_LOGO_CACHE'] == 'true'
 );
 
 // IP on reverse proxy setup
@@ -85,7 +85,7 @@ class Config {
 	/**
 	 * The system's version.
 	 */
-	const VERSION = 'v2.9.0-alpha';
+	const VERSION = 'v2.9.0';
 
 	/**
 	 * The real domain which should be used.
