@@ -63,7 +63,7 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 		- You may change the folder for cache files to, e.g., a ramdisk. If you do so, use the script `./utils/backup-restore.php` to backup data which is only stored by the cache (using Docker this is done by the cron job).
 		- The proxy feature is provided by PHP, but might be less stable than the NGINX proxy.
 		- The EndURL feature uses the cURL extension of PHP (else it will error!).
-		- Assure, that PHP/ the webserver can write to `./data/` (and the folders configured for logs and cache files)!
+		- Assure, that PHP/ the webserver can write to `./data/` (and the folders configured for logs and cache files)! If you use logo caching, also `./media/` needs to be writable.
 	- Download the lastest source of the *Radio-API* [here](https://github.com/KIMB-technologies/Radio-API/releases/latest).
 	- Extract the zip and place the folder `php` in the web-root of our server (this is our  `./`, other files are not needed).
 	- Configure *Radio-API* in `./data/env.json` (The config values are the same as for the Docker-based mode, always use strings for the values!):
@@ -80,6 +80,7 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 		- `CONF_LOG_DIR` (optional) Change the folder where log files are written to (defaults to `./data/`).
 		- `CONF_CACHE_DIR` (optional) Change the folder used by the file based cache (defaults to `./data/cache/`).
 		- `CONF_IM_EXPORT_TOKEN` (optional) Define a token for use with the Im- & Export web interface *Im- & Export* [&darr;](#im---export).
+		- `CONF_USE_LOGO_CACHE` (optional, default `false`) Cache logos of radio stations. This will make sure logos are served without https and convert svg file to png (assuming [`rsvg-convert`](https://pkgs.alpinelinux.org/package/v3.19/community/x86_64/rsvg-convert) is available on system). Logos are stored in `./media/`.
 		- **Attention:** Optional parameters have a leading `____` in the default `env.json`, make sure to remove them.
 		- The `CONF_REDIS_*` values are ignored and `CONF_USE_JSON_CACHE` is always `true`.
 	- Make sure, that *Radio-API* is available at port `80` for requests with the hostname `*.wifiradiofrontier.com` and `CONF_DOMAIN`.

@@ -3,7 +3,7 @@
  * Radio-API
  * https://github.com/KIMB-technologies/Radio-API
  * 
- * (c) 2019 - 2023 KIMB-technologies 
+ * (c) 2019 - 2024 KIMB-technologies 
  * https://github.com/KIMB-technologies/
  * 
  * released under the terms of GNU Public License Version 3
@@ -64,7 +64,11 @@ define(
 );
 define(
 	'ENV_USE_JSON_CACHE',
-		!empty($_ENV['CONF_USE_JSON_CACHE']) && $_ENV['CONF_USE_JSON_CACHE'] == 'true'
+		!empty($ENV['CONF_USE_JSON_CACHE']) && $ENV['CONF_USE_JSON_CACHE'] == 'true'
+);
+define(
+	'ENV_USE_LOGO_CACHE',
+		!empty($ENV['CONF_USE_LOGO_CACHE']) && $ENV['CONF_USE_LOGO_CACHE'] == 'true'
 );
 
 // IP on reverse proxy setup
@@ -81,7 +85,7 @@ class Config {
 	/**
 	 * The system's version.
 	 */
-	const VERSION = 'v2.8.4';
+	const VERSION = 'v2.9.0';
 
 	/**
 	 * The real domain which should be used.
@@ -129,6 +133,11 @@ class Config {
 	 * Always use json cache, even in Docker-Mode
 	 */
 	const USE_JSON_CACHE = ENV_USE_JSON_CACHE;
+
+	/**
+	 * Cache logos and make them accessible without ssl.
+	 */
+	const USE_LOGO_CACHE = ENV_USE_LOGO_CACHE;
 
 	/**
 	 * Store redis cache for ALLOWED_DOMAINS

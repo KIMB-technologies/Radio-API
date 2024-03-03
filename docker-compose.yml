@@ -8,8 +8,8 @@ services:
     ports:
       - "80:80" # make sure, Radio-API is avaliable at port 80
     volumes:
-      - ./data/:/php-code/data/
-      #- ./media/:/php-code/media/:ro # directory to add images for stations
+      - ./data/:/php-code/data/ # directory storing data, cache, and setting od Radio-API
+      - ./media/:/php-code/media/ # directory storing images for stations
     environment:
       - CONF_DOMAIN=http://radio.example.com/ # the domain where the system is hosted
       # - CONF_RADIO_DOMAIN=http://hama.wifiradiofrontier.com # different domain to use for connections of the radio (if set CONF_DOMAIN is for GUI)
@@ -23,6 +23,7 @@ services:
       - CONF_STREAM_JSON=false # to disable or an url where to fetch list of own streams, e.g., http://stream.example.com/list.json 
       # -CONF_LOG_DIR= # set a custom directory for log files (defaults to ./data/)
       # -CONF_IM_EXPORT_TOKEN= # define a token for use with the im-, export web interface at ./gui/im-export.php
+      - CONF_USE_LOGO_CACHE=true # cache logos (make them accessible without ssl and convert svgs to pngs for the radio, stores files in ./media/)
     depends_on:
       - redis
   

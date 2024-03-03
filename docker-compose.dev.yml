@@ -16,6 +16,7 @@ services:
     volumes:
       - ./php/:/php-code/
       - ./data/:/php-code/data/
+      - ./media/:/php-code/media/
       - ./utils/getr.php:/php-code/getr.php:ro # redis all values listing
       - ./utils/backup-restore.php:/backup-restore.php:ro # backup restore tool for cache values
     environment:
@@ -29,6 +30,7 @@ services:
       - CONF_REDIS_HOST=redis
       - CONF_STREAM_JSON=false #http://192.168.0.10:8081/list.json
       - CONF_IM_EXPORT_TOKEN=LP75Djdj195DL8SZnfY3
+      - CONF_USE_LOGO_CACHE=true
     depends_on:
       - redis
   redis:
