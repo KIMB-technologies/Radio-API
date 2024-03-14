@@ -83,11 +83,12 @@ class RadioLogo {
 			return false;
 		}
 
+		$tmpName = tempnam(sys_get_temp_dir(), 'conv');
 		if($mimetype == 'image/svg+xml'){
 			if(
-				self::svg2png($filename, $filename . '.cv')
+				self::svg2png($filename, $tmpName)
 				&&
-				@rename($filename . '.cv', $filename)
+				@rename($tmpName, $filename)
 			){
 				return true;
 			}
@@ -97,6 +98,11 @@ class RadioLogo {
 			}
 		}
 		else {
+
+			// resize file (radio does not like huge images)
+			self::resize($filename, $mimetype, $tmpName);
+			@rename($tmpName, $filename);
+
 			return true;
 		}
 	}
@@ -107,11 +113,54 @@ class RadioLogo {
 			'--width', '256',
 			'--height', '256',
 			'--keep-aspect-ratio',
+			'--background-color', 'white',
 			'--format', 'png',
 			'-o', '"'.$outputPNG.'"',
 			'"'.$inputSVG.'"'
 		);
 		return exec(implode(' ', $command)) !== false;
+	}
+
+	private static function imageDimensions(string $file) : array {
+		$info = exec('file --brief "'.$file.'"');
+		if(preg_match(',(\d+)x(\d+),', str_replace(' ', '', $info), $matches) === 1){
+			$width = intval($matches[1]);
+			$height = intval($matches[2]);
+
+			return [$width, $height];
+		}
+		else{
+			return [0, 0];
+		}
+	}
+
+	private static function resize(string $inputFile, string $inputMime, string $outputPNG) : bool {
+		// determine image dimensions
+		list($width, $height) = self::imageDimensions($inputFile);
+
+		// error
+		if($width == 0 || $height == 0){
+			return false;
+		}
+
+		// do not resize if smaller than 256 px
+		if( $width <= 256 && $height <= 256 ){
+			return true;
+		}
+	
+		// create an svg with image
+		$svgFile = "<svg xmlns='http://www.w3.org/2000/svg'
+				width='".$width."' height='".$height."' version='1.1'>
+			<image href='data:".$inputMime.";base64,".base64_encode(file_get_contents($inputFile))."'
+				width='".$width."' height='".$height."' />
+		</svg>";
+
+		// write to tmp
+		$inputSVG = tempnam(sys_get_temp_dir(), 'svg');
+		file_put_contents($inputSVG, $svgFile);
+
+		// create small png
+		return self::svg2png($inputSVG, $outputPNG);
 	}
 
 }
