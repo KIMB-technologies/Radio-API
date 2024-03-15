@@ -62,6 +62,7 @@ if( $login->isLoggedIn() ){
 	
 		$inner = new Inner($login->getId(), $listTemplate);
 		$inner->checkPost();
+		$inner->clearCache();
 	
 		$inner->radioForm();
 		$inner->podcastForm();

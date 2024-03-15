@@ -22,6 +22,19 @@ class RadioLogo {
 		// check if image cache active and if cache folder writable
 		$this->useImageCache = Config::USE_LOGO_CACHE && is_writable(self::BASE_DIR);
 	}
+
+	public function clearCache() : bool {
+		if($this->useImageCache){
+			$ok = true;
+			foreach(scandir(self::BASE_DIR) as $d){
+				if(preg_match('/^[a-f0-9]{40}\.(image|error)$/', $d) === 1){
+					$ok &= unlink(self::BASE_DIR . '/' . $d);
+				}
+			}
+			return $ok;
+		}
+		return false;
+	}
 	
 	public function logoUrl(string $logo) : string {
 		// empty or no url

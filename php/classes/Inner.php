@@ -26,6 +26,18 @@ class Inner {
 		$this->template = $template;
 	}
 
+	public function clearCache() : void {
+		if(Config::USE_LOGO_CACHE){
+			$this->template->setContent('CLEAR_CACHE', '');
+
+			if(isset($_GET['clear-logo-cache'])){
+				$this->html[] = '<span style="color:' . (
+						(new RadioLogo())->clearCache() ?  'green;">Cleared logo cache!' : 'red;">Error clearing logo cache!'
+					) .'</span>';
+			}
+		}
+	}
+
 	public function checkPost() : void {
 		if(isset( $_GET['radios'] ) && isset( $_POST['name'] )){
 			$this->html[] = '<span style="color:green;">Changed Radio stations!</span>';
