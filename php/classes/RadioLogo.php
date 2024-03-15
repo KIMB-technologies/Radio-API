@@ -85,12 +85,8 @@ class RadioLogo {
 
 		$tmpName = tempnam(sys_get_temp_dir(), 'conv');
 		if($mimetype == 'image/svg+xml'){
-			if(
-				self::svg2png($filename, $tmpName)
-				&&
-				@rename($tmpName, $filename)
-			){
-				return true;
+			if( self::svg2png($filename, $tmpName) ){
+				return rename($tmpName, $filename);
 			}
 			else {
 				unlink($filename);
@@ -99,9 +95,11 @@ class RadioLogo {
 		}
 		else {
 
-			// resize file (radio does not like huge images)
-			self::resize($filename, $mimetype, $tmpName);
-			@rename($tmpName, $filename);
+			// resize file 
+			//	will only return true if resize done (false on error or if already small enough)
+			if(self::resize($filename, $mimetype, $tmpName)){
+				rename($tmpName, $filename);
+			}
 
 			return true;
 		}
@@ -118,12 +116,17 @@ class RadioLogo {
 			'-o', '"'.$outputPNG.'"',
 			'"'.$inputSVG.'"'
 		);
-		return exec(implode(' ', $command)) !== false;
+		exec(implode(' ', $command), result_code:$rs);
+		return $rs === 0;
 	}
 
 	private static function imageDimensions(string $file) : array {
-		$info = exec('file --brief "'.$file.'"');
-		if(preg_match(',(\d+)x(\d+),', str_replace(' ', '', $info), $matches) === 1){
+		$finfo = finfo_open(FILEINFO_CONTINUE);
+		$info = finfo_file($finfo, $file);
+		finfo_close($finfo);
+		
+		// file info (including dimensions as ", 000 x 000,")
+		if(preg_match('/,(\d+)x(\d+),/', str_replace(' ', '', $info), $matches) === 1){
 			$width = intval($matches[1]);
 			$height = intval($matches[2]);
 
@@ -140,12 +143,14 @@ class RadioLogo {
 
 		// error
 		if($width == 0 || $height == 0){
+			// no resize 
 			return false;
 		}
 
 		// do not resize if smaller than 256 px
 		if( $width <= 256 && $height <= 256 ){
-			return true;
+			// resize not necessary
+			return false;
 		}
 	
 		// create an svg with image
