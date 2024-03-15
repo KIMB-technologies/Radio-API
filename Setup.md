@@ -210,13 +210,15 @@ The JSON resource at `CONF_STREAM_JSON` should look like this:
 		"name": "Name A",
 		"url": "https://stream.example.com/file.mp3",
 		"live": false,
-		"proxy": true
+		"proxy": true,
+		"logo" : "https://stream.example.com/logo.png"
 	},
 	{
 		"name": "Name B",
 		"url": "http://stream.example.com/live.m3u",
 		"live": true,
-		"proxy": false
+		"proxy": false,
+		"logo" : "http://stream.example.com/live.png"
 	}
 ]
 ```
@@ -226,3 +228,4 @@ JSON list of objects with the following keys each:
 - `url` Contains the url of the stream (either a file, .e.g., mp3, or a streamable ressource, e.g., m3u).
 - `live` (optional, default `true`) Live streams can not be paused or fast forwarded, for non live streams the entire file needs to be available from the start.
 - `proxy` (optional, default `false`) Use the internal proxy to allow https urls.
+- `logo` (optional) Url to an image to display as logo in the radio's display.

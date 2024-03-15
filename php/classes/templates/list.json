@@ -1,5 +1,6 @@
 {
 	"%%ADD_HTML%%" : "",
+	"%%CLEAR_CACHE%%" : " display: none; ",
 	"%%RADIO_MAC%%" : "",
 	"%%RADIO_DOMAIN%%" : "",
 	"%%LOGIN_CODE%%" : "",

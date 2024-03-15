@@ -43,16 +43,21 @@ class OwnStreams {
 			if( !empty( $list ) ){
 
 				foreach( $list as $item ){
-
 					$urlOK = isset( $item['url'] ) && filter_var($item['url'], FILTER_VALIDATE_URL) !== false;
-					$streams[] = array(
+
+					$stream = array(
 						"name" => (!$urlOK ? "(url invalid!)" : '')
 							. (isset( $item['name'] ) && is_string($item['name']) ? $item["name"]  : 'Invalid Name'),
 						"url" =>  $urlOK ? $item['url'] : '',
 						"live" => isset($item['live']) && is_bool($item['live']) ? $item['live'] : true,
 						"proxy" => isset($item['proxy']) && is_bool($item['proxy']) ? $item['proxy'] : false
 					);
+					// add logo if in json
+					if(isset($item['logo']) && filter_var($item['logo'], FILTER_VALIDATE_URL) !== false){
+						$stream['logo'] = $item['logo'];
+					}
 
+					$streams[] = $stream;
 				}
 				$this->redis->arraySet( 'list', $list, Config::CACHE_EXPIRE );
 			}

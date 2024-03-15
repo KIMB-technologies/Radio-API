@@ -42,6 +42,7 @@ class PodcastLoader {
 		$useindex = !empty($matches[2]); // used index.php to access files?
 		$share = $matches[3]; // the token/ name of share
 
+		// do webdav request
 		$cont = stream_context_create( array(
 			"http" => array(
 				'method' => "PROPFIND",
@@ -49,8 +50,12 @@ class PodcastLoader {
 			)
 		));
 		$data = file_get_contents( $server . '/public.php/webdav/', false, $cont );
-		$data = explode( '<d:href>', $data );
-		
+
+		// parse webdav XML
+		$data = json_decode(json_encode(
+				simplexml_load_string( $data, 'SimpleXMLElement', 0, "d", true)
+			), true );
+	
 		$poddata = array(
 			'title' => '',
 			'logo' => '',
@@ -58,18 +63,30 @@ class PodcastLoader {
 		);
 		$eid = 1;
 
-		foreach($data as $d){
-			if( strpos( $d, 'audio' ) !== false ){
-				$fina = substr( $d, 0, strpos( $d, '</d:href>') );
-				$fina = substr( $fina, strrpos( $fina, '/' ) + 1 );
-				$fina = urldecode( $fina );
+		// iterate files
+		foreach($data["response"] as $r){
 
+			// get data from xml
+			$mime = $r["propstat"]["prop"]["getcontenttype"] ?? '';
+			$href = $r["href"] ?? '';
+
+			// get filename
+			$filename = urldecode(substr( $href, strrpos( $href, '/' ) + 1 ));
+			// get streaming/ web url
+			$streamurl = $server . ($useindex ? '/index.php' : '') . '/s/'. $share .'/download?path=%2F&files=' . rawurlencode( $filename );
+
+			// is this an audio file?
+			if( str_starts_with($mime, 'audio/') ){
 				$poddata['episodes'][$eid] = array(
-					'title' => $fina,
+					'title' => $filename,
 					'desc'  => '',
-					'url' => $server . ($useindex ? '/index.php' : '') . '/s/'. $share .'/download?path=%2F&files=' . rawurlencode( $fina ) 
+					'url' => $streamurl
 				);
 				$eid++;
+			}
+			// it this a logo?
+			else if(str_starts_with($mime, 'image/') && str_starts_with($filename, "logo") ){
+				$poddata['logo'] = $streamurl;
 			}
 		}
 
