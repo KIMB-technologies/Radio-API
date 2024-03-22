@@ -7,21 +7,20 @@
 ## Setup using Docker
 The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechnologies/radio_api).
 
-1. Redirect the HTTP requests of the radio to your server (the *Radio-API*).
-	- This is done by altering the DNS queries.
-	- There is a [Docker Image](https://hub.docker.com/r/kimbtechnologies/radio_dns) which provides a DNS server altering all requests to `*.wifiradiofrontier.com`.
+1. Redirect the HTTP requests of the radio to your server (running *Radio-API*).
+	- This is can be done by altering the DNS queries or other techniques depending on your network setup and router.
+	- In the end, the HTTP request of the radio to `*.wifiradiofrontier.com` need to be routed to *Radio-API*.
+		Besides the HTTP requests, the radio fetches the current time via NTP and expects an NTP server at `time.wifiradiofrontier.com`.
+	- The [Radio-DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) Docker Image is a an all-inclusive solution
+		- [Radio-DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) provides a DNS server altering requests for `*.wifiradiofrontier.com`.
 		- It has a feature to define an `ALLOWED_DOMAIN`, only requests from the corresponding IP address will be answered.
-		- Use a DynDNS hostname as your `ALLOWED_DOMAIN`.
-		- If hosted in the local network `ALLOWED_DOMAIN` can be `all`.
-	- *Not everybody has to setup a own DNS resolver, some routers provide such features.
-		The radio just has to send its HTTP request to the server where *Radio-API* (this repositories Docker Container) is running.*
-	- **Change the DNS server in the configuration of your radio to the IP of your DNS resolver.**
-		(This may be done via the web interface of the radio, accessible at the local IP address of the radio.)
+			Use a DynDNS hostname as your `ALLOWED_DOMAIN`. If hosted in the local network `ALLOWED_DOMAIN` can be `all`.
+		- **Change the DNS server in the configuration of your radio to the IP of your DNS resolver.**
+			(This may be done via the web interface of the radio, accessible at the local IP address of the radio.)
 2. Run the Docker Container of *Radio-API*.
 	- See [docker-compose.yml](https://github.com/KIMB-technologies/Radio-API/blob/master/docker-compose.yml)
 		for Docker configuration and [below](#nginx-load-balancer) for reverse proxy setup.
-	- It is recommended to save the folder `/php-code/data/` als volume, because all stations and podcasts
-		are stored there.
+	- It is recommended to save the folder `/php-code/data/` als volume, because all stations and podcasts are stored there.
 	- Configure the image
 		- `CONF_DOMAIN` The domain where the system is hosted (will be reached via HTTP).
 		- `CONF_ALLOWED_DOMAIN` Like `ALLOWED_DOMAIN` in the DNS image, only requests from the corresponding IP address will be answered.
@@ -32,6 +31,7 @@ The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechn
 		- `CONF_STREAM_JSON` Url to a JSON list of streams or `false` to disable (see [Own Streams](#own-streams))
 		- There are some more options, see defaults in [docker-compose.yml](https://github.com/KIMB-technologies/Radio-API/blob/master/docker-compose.yml).
 		- The default setup uses Redis for fast caching of values. Redis may be disable by setting `CONF_USE_JSON_CACHE=true`, which enables an json file based caching as fallback (cached items are then stored in `./data/cache`).
+	- Make sure, that *Radio-API* is available at port `80` for requests with the hostname `*.wifiradiofrontier.com` and `CONF_DOMAIN`.
 	- There are two ways to store which episodes of podcasts have already been listened to (new ones are marked by `*`)
 		- Create a cron job to `/cron.php`, e.g., `docker exec --user www-data radio_api php /cron.php`. (This will dump the already played episodes to a JSON file in `./data/` and *Radio-API* will load the file into redis on container startup).
 		- Use the data volume of Redis. (Redis will (re-)load its dump files on container startup.)
@@ -52,7 +52,7 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 > We recommend the Docker-based setup as the manual setup might be a bit fiddly and is less tested.  
 > You are welcome to file bug reports as issues or open pull requests!
 
-1. Redirect the HTTP request of the radio to your server (the *Radio-API*).
+1. Redirect the HTTP request of the radio to your server (running *Radio-API*).
 	- This is the same as with the Docker based setup (see [here](#setup-using-docker)).
 2. Run the *Radio-API* on your webserver.
 	- Preface:
@@ -80,7 +80,7 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 		- `CONF_LOG_DIR` (optional) Change the folder where log files are written to (defaults to `./data/`).
 		- `CONF_CACHE_DIR` (optional) Change the folder used by the file based cache (defaults to `./data/cache/`).
 		- `CONF_IM_EXPORT_TOKEN` (optional) Define a token for use with the Im- & Export web interface *Im- & Export* [&darr;](#im---export).
-		- `CONF_USE_LOGO_CACHE` (optional, default `false`) Cache logos of radio stations. This will make sure logos are served without https and convert svg file to png (assuming [`rsvg-convert`](https://pkgs.alpinelinux.org/package/v3.19/community/x86_64/rsvg-convert) is available on system). Logos are stored in `./media/`.
+		- `CONF_USE_LOGO_CACHE` (optional, default `false`) Cache logos of radio stations. This will make sure logos are served without https and convert svg files to png (assuming [`rsvg-convert`](https://pkgs.alpinelinux.org/package/v3.19/community/x86_64/rsvg-convert) is available on system). Logos are stored in `./media/`.
 		- **Attention:** Optional parameters have a leading `____` in the default `env.json`, make sure to remove them.
 		- The `CONF_REDIS_*` values are ignored and `CONF_USE_JSON_CACHE` is always `true`.
 	- Make sure, that *Radio-API* is available at port `80` for requests with the hostname `*.wifiradiofrontier.com` and `CONF_DOMAIN`.
@@ -159,9 +159,9 @@ This files contains for each radio the list of radio stations, podcasts, station
 It also contains the list for assigning GUI-Codes to radios and the configuration file used in non-Docker mode.
 
 Such an export JSON file can be imported to Radio-API afterwards.
-Thereby, all data can be replaces, appended or only the data for one radio might be overwritten.
+Thereby, all data can be replaced, appended, or only the data for one radio might be overwritten.
 (The configuration file used in non-Docker mode will not be imported.)
-More information is available at the  Im- & Export web interface.
+More information is available at the Im- & Export web interface.
 
 ### Nginx Load Balancer
 An example file to use *Radio-API* behind a nginx load balancer as reverse proxy.
