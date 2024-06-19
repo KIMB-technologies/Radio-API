@@ -119,10 +119,10 @@ class Data {
 	/**
 	 * Returns List of categories for a typeID
 	 */
-	public function getCategories(int $tid) : array {
+	public function getCategories(?int $tid = null) : array {
 		$cats = array_filter(
 			$this->redis->arrayGet('items'),
-			fn($i) => $tid == $i['tid'] && !empty($i["category"])
+			fn($i) => (is_null($tid) || $tid == $i['tid']) && !empty($i["category"])
 		);
 		return array_unique(array_map(fn($i) => $i["category"], $cats));
 	}
@@ -131,10 +131,10 @@ class Data {
 	 * Returns list of items in this type, indexed by id!
 	 * 	Filter for a category or set "null" to return all categories
 	 */
-	public function getListOfItems( int $tid, ?string $cat = null ) : array {
+	public function getListOfItems(?int $tid = null, ?string $cat = null ) : array {
 		return array_filter(
 			$this->redis->arrayGet('items'),
-			fn($i) => $tid == $i['tid'] && ( (is_null($cat) && empty($i['category'])) || $cat == $i['category'])
+			fn($i) => (is_null($tid) || $tid == $i['tid']) && ( (is_null($cat) && empty($i['category'])) || $cat == $i['category'])
 		);
 	}
 

@@ -65,25 +65,29 @@ class Router {
 			$this->out->addDir('TOGGLE-UN-READ-' . $this->unread->toggleById($_GET['toggleUnRead'], $this->data), '');
 		}
 		// list of stations or podcasts (= the type) and possibly selecting a category
-		else if( $uri == '/list' && !empty( $_GET['tid'] ) ){ 
+		else if( $uri == '/list' ){ 
 			$this->out->prevUrl(Config::RADIO_DOMAIN . '?go=initial');
 
-			$tid = $_GET['tid'];
-			if( is_numeric($tid) && array_key_exists($tid, $this->data->getTypes()) ){
-				// list a single podcast
-				if( $tid == 3 && isset($_GET['id']) && preg_match('/^\d+$/', $_GET['id']) === 1 ){
-					$this->listPodcast(intval($_GET['id']));
-				}
-				// list items of type, possibly filter by category
-				else{
-					$this->listDirectory(
-						intval($tid), 
-						isset($_GET['cat']) && preg_match( '/^[0-9A-Za-z \-\,]{0,200}$/', $_GET['cat'] ) === 1 ? $_GET['cat'] : null
-					);
-				}
+			if( !empty($_GET['tid']) && is_numeric($_GET['tid']) && array_key_exists($_GET['tid'], $this->data->getTypes()) ){
+				$tid = intval($_GET['tid']);
 			}
-			else {
-				$this->out->addDir( 'No item found for this tID!', Config::RADIO_DOMAIN . '?go=initial');
+			else if( empty($_GET['tid']) && !empty($_GET['cat']) ) {
+				$tid = null; 
+			}
+			else{
+				$this->out->addDir( 'No item found for this tID or Category!', Config::RADIO_DOMAIN . '?go=initial');
+			}
+			
+			// list items of a podcast
+			if( $tid == 3 && isset($_GET['id']) && preg_match('/^\d+$/', $_GET['id']) === 1 ){
+				$this->listPodcast(intval($_GET['id']));
+			}
+			// list items of type (or all of category), possibly filter by category
+			else{
+				$this->listDirectory(
+					$tid, 
+					isset($_GET['cat']) && preg_match( '/^[0-9A-Za-z \-\,]{0,200}$/', $_GET['cat'] ) === 1 ? $_GET['cat'] : null
+				);
 			}
 		}
 		// list of types (startpage)
@@ -97,6 +101,13 @@ class Router {
 
 			// add code (for gui)
 			$this->out->addDir( 'GUI-Code: ' . $this->radioid->getCode(), Config::RADIO_DOMAIN . '?go=initial', true );
+
+			// add Favorites category, if exists
+			$allCats = $this->data->getCategories();
+			if( in_array( 'Favorites', $allCats ) || in_array( 'Favoriten', $allCats ) ) {
+				$name = in_array( 'Favoriten', $allCats ) ? 'Favoriten' : 'Favorites';
+				$this->out->addDir( $name, Config::RADIO_DOMAIN . 'list?cat=' . $name );
+			}
 
 			// Log unknown request
 			if(
@@ -185,15 +196,15 @@ class Router {
 		
 	}
 		
-	private function listDirectory(int $tid, ?string $cat = null) : void {
+	private function listDirectory(?int $tid = null, ?string $cat = null) : void {
 		// first add categories if in "root" folder of type
-		if(is_null($cat)){
+		if(is_null($cat) && !is_null($tid)){
 			foreach( $this->data->getCategories( $tid ) as $category ){
 				$this->out->addDir( $category, Config::RADIO_DOMAIN . 'list?tid=' . $tid . '&cat=' . rawurlencode($category) );
 			}
 		}
 		else{
-			$this->out->prevUrl(Config::RADIO_DOMAIN . 'list?tid=' . $tid);
+			$this->out->prevUrl(Config::RADIO_DOMAIN . (is_null($tid) ? '?go=initial' : 'list?tid=' . $tid));
 		}
 
 		// then add items
@@ -210,7 +221,7 @@ class Router {
 				$this->out->addPodcast(
 					$id,
 					$item['name'],
-					Config::RADIO_DOMAIN . 'list?tid=' . $tid . '&id=' . $id
+					Config::RADIO_DOMAIN . 'list?tid=3&id=' . $id
 				);
 			}
 			else if ($item['tid'] == 2 && !$item['live']) { // file based "own stream"
