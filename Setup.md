@@ -81,6 +81,7 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 		- `CONF_CACHE_DIR` (optional) Change the folder used by the file based cache (defaults to `./data/cache/`).
 		- `CONF_IM_EXPORT_TOKEN` (optional) Define a token for use with the Im- & Export web interface *Im- & Export* [&darr;](#im---export).
 		- `CONF_USE_LOGO_CACHE` (optional, default `false`) Cache logos of radio stations. This will make sure logos are served without https and convert svg files to png (assuming [`rsvg-convert`](https://pkgs.alpinelinux.org/package/v3.19/community/x86_64/rsvg-convert) is available on system). Logos are stored in `./media/`.
+		- `CONF_FAVORITE_ITEMS` (optional, default empty) Comma separated list of items to be favorites and shown on top of list by radio, e.g.,  `Radio,Radio-Browser`
 		- **Attention:** Optional parameters have a leading `____` in the default `env.json`, make sure to remove them.
 		- The `CONF_REDIS_*` values are ignored and `CONF_USE_JSON_CACHE` is always `true`.
 	- Make sure, that *Radio-API* is available at port `80` for requests with the hostname `*.wifiradiofrontier.com` and `CONF_DOMAIN`.

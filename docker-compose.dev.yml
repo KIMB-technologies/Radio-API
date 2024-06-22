@@ -31,6 +31,7 @@ services:
       - CONF_STREAM_JSON=false #http://192.168.0.10:8081/list.json
       - CONF_IM_EXPORT_TOKEN=LP75Djdj195DL8SZnfY3
       - CONF_USE_LOGO_CACHE=true
+      #- CONF_FAVORITE_ITEMS=Radio,Radio-Browser
     depends_on:
       - redis
   redis:
