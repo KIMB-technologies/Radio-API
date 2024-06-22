@@ -165,11 +165,29 @@ class Output {
 		return 'http' . ( empty($_SERVER['HTTPS']) ? ':' : 's:' ) . substr( $url, strpos( $url, '//') );
 	}
 
+	private function applyFavorites() : void {
+		$favorites = array_map( 'trim', explode(',', Config::FAVORITE_ITEMS));
+		foreach($this->items as $id => $item ){
+			list($type, $name) = explode( '==', $this->itemsSortKeys[$id] );
+
+			if(
+				in_array($name, $favorites) ||
+					(isset($item['Title']) && in_array($item['Title'], $favorites) ) ||
+					(isset($item['StationName']) && in_array($item['StationName'], $favorites) ) ||
+					(isset($item['ShowOnDemandName']) && in_array($item['ShowOnDemandName'], $favorites) ) ||
+					(isset($item['ShowEpisodeName']) && in_array($item['ShowEpisodeName'], $favorites) )
+			){
+				$this->itemsSortKeys[$id] = 'A'. $type . '==' . $name;
+			}
+		}
+	}
+
 	/**
 	 * Creates the xml response 
 	 * and sends it!
 	 */
 	public function __destruct(){
+		$this->applyFavorites();
 		array_multisort($this->itemsSortKeys, SORT_ASC, SORT_NATURAL|SORT_FLAG_CASE, $this->items);
 		if( count( $this->items ) > self::MAX_ITEMS ){
 			$this->items = array_slice($this->items, 0, self::MAX_ITEMS);

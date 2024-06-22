@@ -70,6 +70,10 @@ define(
 	'ENV_USE_LOGO_CACHE',
 		!empty($ENV['CONF_USE_LOGO_CACHE']) && $ENV['CONF_USE_LOGO_CACHE'] == 'true'
 );
+define( 'ENV_FAVORITE_ITEMS',
+	!empty($ENV['CONF_FAVORITE_ITEMS']) ? 
+		strval($ENV['CONF_FAVORITE_ITEMS']) : ''
+);
 
 // IP on reverse proxy setup
 if( !empty($_SERVER['HTTP_X_REAL_IP']) ){
@@ -138,6 +142,11 @@ class Config {
 	 * Cache logos and make them accessible without ssl.
 	 */
 	const USE_LOGO_CACHE = ENV_USE_LOGO_CACHE;
+
+	/**
+	 * A list of items to move up in list, because they are favorites.
+	 */
+	const FAVORITE_ITEMS = ENV_FAVORITE_ITEMS;
 
 	/**
 	 * Store redis cache for ALLOWED_DOMAINS
