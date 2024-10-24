@@ -114,6 +114,9 @@ class SimpleProxy {
 		
 		if( $f !== false ){
 			self::sendHeader($header);
+			// unset the execution limit (long time proxying)
+			set_time_limit(0);
+			// while something to proxy and still a client
 			while(!feof($f) && !connection_aborted() ){
 				echo fread($f, 128);
 				flush();
