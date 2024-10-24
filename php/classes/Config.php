@@ -89,7 +89,7 @@ class Config {
 	/**
 	 * The system's version.
 	 */
-	const VERSION = 'v2.9.2';
+	const VERSION = 'v2.9.3';
 
 	/**
 	 * The real domain which should be used.
