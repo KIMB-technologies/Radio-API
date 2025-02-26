@@ -73,7 +73,12 @@ class PodcastLoader {
 			// get filename
 			$filename = urldecode(substr( $href, strrpos( $href, '/' ) + 1 ));
 			// get streaming/ web url
-			$streamurl = $server . ($useindex ? '/index.php' : '') . '/s/'. $share .'/download?path=%2F&files=' . rawurlencode( $filename );
+			if(Config::LEGACY_NEXTCLOUD){ // old NC share download link (before v31)
+				$streamurl = $server . ($useindex ? '/index.php' : '') . '/s/'. $share .'/download?path=%2F&files=' . rawurlencode( $filename );
+			}
+			else{ // new NC share download link (starting v31)
+				$streamurl = $server . '/public.php/dav/files/' . $share . '/' . rawurlencode( $filename );
+			}
 
 			// is this an audio file?
 			if( str_starts_with($mime, 'audio/') ){

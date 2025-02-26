@@ -32,6 +32,7 @@ services:
       - CONF_IM_EXPORT_TOKEN=LP75Djdj195DL8SZnfY3
       - CONF_USE_LOGO_CACHE=true
       #- CONF_FAVORITE_ITEMS=Radio,Radio-Browser
+      #- CONF_LEGACY_NEXTCLOUD=false # set to true for using nextcloud streams with nextcloud version < 31
     depends_on:
       - redis
   redis:

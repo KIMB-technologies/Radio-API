@@ -74,6 +74,10 @@ define( 'ENV_FAVORITE_ITEMS',
 	!empty($ENV['CONF_FAVORITE_ITEMS']) ? 
 		strval($ENV['CONF_FAVORITE_ITEMS']) : ''
 );
+define(
+	'ENV_LEGACY_NEXTCLOUD',
+		!empty($ENV['CONF_LEGACY_NEXTCLOUD']) && $ENV['CONF_LEGACY_NEXTCLOUD'] == 'true'
+);
 
 // IP on reverse proxy setup
 if( !empty($_SERVER['HTTP_X_REAL_IP']) ){
@@ -147,6 +151,11 @@ class Config {
 	 * A list of items to move up in list, because they are favorites.
 	 */
 	const FAVORITE_ITEMS = ENV_FAVORITE_ITEMS;
+
+	/**
+	 * Nextcloud version 31.0.0 changes how files can be downloaded from shares, use the old way required by older version of Nextcloud servers?
+	 */
+	const LEGACY_NEXTCLOUD = ENV_LEGACY_NEXTCLOUD;
 
 	/**
 	 * Store redis cache for ALLOWED_DOMAINS
