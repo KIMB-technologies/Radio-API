@@ -10,7 +10,7 @@
  * released under the terms of GNU Public License Version 3
  * https://www.gnu.org/licenses/gpl-3.0.txt
  */
-define('HAMA-Radio', 'Radio');
+define('HAMARadio', 'Radio');
 error_reporting(E_ALL);
 
 // load Radio-API

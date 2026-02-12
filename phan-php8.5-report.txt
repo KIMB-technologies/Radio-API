@@ -1,0 +1,80 @@
+./utils/cron.php:25 PhanTypeMismatchArgumentNullableInternal Argument 1 ($string) is shell_exec('whoami') of type ?string but \trim() takes string (expected type to be non-nullable)
+php/classes/Cache.php:27 PhanTypeMismatchDeclaredReturn Doc-block of getAllKeysOfGroup contains declared return type \The which is incompatible with the return type array declared in the signature
+php/classes/Cache.php:44 PhanUnextractableAnnotationElementName Saw possibly unextractable annotation for a fragment of comment '* @param The time to live for the value.': after The, did not see an element name (will guess based on comment order)
+php/classes/Cache.php:45 PhanTypeMismatchDeclaredReturn Doc-block of set contains declared return type \The which is incompatible with the return type bool declared in the signature
+php/classes/Cache.php:52 PhanTypeMismatchDeclaredReturn Doc-block of get contains declared return type \The which is incompatible with the return type string declared in the signature
+php/classes/Cache.php:59 PhanTypeMismatchDeclaredReturn Doc-block of keyExists contains declared return type \exists which is incompatible with the return type bool declared in the signature
+php/classes/Cache.php:59 PhanUnextractableAnnotationSuffix Saw a token Phan may have failed to parse after '* @return exists?': after exists, saw '?'
+php/classes/Cache.php:65 PhanTypeMismatchDeclaredReturn Doc-block of remove contains declared return type \successful which is incompatible with the return type bool declared in the signature
+php/classes/Cache.php:65 PhanUnextractableAnnotationSuffix Saw a token Phan may have failed to parse after '* @return successful?': after successful, saw '?'
+php/classes/Cache.php:79 PhanTypeMismatchDeclaredReturn Doc-block of arraySet contains declared return type \successful which is incompatible with the return type bool declared in the signature
+php/classes/Cache.php:86 PhanTypeMismatchDeclaredReturn Doc-block of arrayGet contains declared return type \The which is incompatible with the return type array declared in the signature
+php/classes/Cache.php:94 PhanTypeMismatchDeclaredReturn Doc-block of arrayKeyExists contains declared return type \Does which is incompatible with the return type bool declared in the signature
+php/classes/Cache.php:104 PhanUndeclaredTypeReturnType Return type of arrayKeyGet() is undeclared type \The
+php/classes/Cache.php:112 PhanTypeMismatchDeclaredReturn Doc-block of arrayKeySet contains declared return type \successful which is incompatible with the return type bool declared in the signature
+php/classes/Cache.php:169 PhanUndeclaredTypeReturnType Return type of arrayKeyGet() is undeclared type \The
+php/classes/Data.php:145 PhanTypeMismatchArgument Argument 2 ($arrayKey) is $id of type int but \Cache::arrayKeyExists() takes string defined at php/classes/Cache.php:165
+php/classes/Data.php:148 PhanTypeMismatchArgument Argument 2 ($arrayKey) is $id of type int but \Cache::arrayKeyGet() takes string defined at php/classes/Cache.php:169
+php/classes/Data.php:148 PhanTypeMismatchReturn Returning $this->redis->arrayKeyGet('items', $id) of type \The but getById() is declared to return array
+php/classes/Id.php:100 PhanTypeMismatchArgument Argument 2 ($arrayKey) is $this->id of type \The|int but \Cache::arrayKeyExists() takes string defined at php/classes/Cache.php:165
+php/classes/Id.php:101 PhanTypeMismatchArgument Argument 2 ($arrayKey) is $this->id of type \The|int but \Cache::arrayKeyGet() takes string defined at php/classes/Cache.php:169
+php/classes/Id.php:113 PhanTypeArraySuspicious Suspicious array access to $this->data of type \The
+php/classes/Id.php:117 PhanTypeArraySuspicious Suspicious array access to $this->data of type \The
+php/classes/ImExport.php:69 PhanPluginInconsistentReturnMethod Method \ImExport::export has no return type and will inconsistently return or not return
+php/classes/ImExport.php:102 PhanUndeclaredVariable Variable $json is undeclared
+php/classes/ImExport.php:233 PhanPluginAlwaysReturnMethod Method \ImExport::import has a return type of bool, but may fail to return a value
+php/classes/ImExport.php:276 PhanTypeMismatchArgumentNullable Argument 2 ($codeExport) is $codeExport of type ?string but \ImExport::runSingle() takes string defined at php/classes/ImExport.php:400 (expected type to be non-nullable)
+php/classes/ImExport.php:276 PhanTypeMismatchArgumentNullable Argument 3 ($codeSystem) is $codeSystem of type ?string but \ImExport::runSingle() takes string defined at php/classes/ImExport.php:400 (expected type to be non-nullable)
+php/classes/Inner.php:109 PhanTypeMismatchArgument Argument 2 ($value) is $count of type 0|int but \Template::setContent() takes string defined at php/classes/Template.php:148
+php/classes/Inner.php:141 PhanTypeMismatchArgument Argument 2 ($value) is $count of type 0|int but \Template::setContent() takes string defined at php/classes/Template.php:148
+php/classes/JSONCache.php:124 PhanUndeclaredTypeReturnType Return type of arrayKeyGet() is undeclared type \The
+php/classes/M3U.php:31 PhanTypeMismatchArgument Argument 1 ($id) is $id of type string but \Data::getById() takes int defined at php/classes/Data.php:144
+php/classes/M3U.php:35 PhanTypeMismatchArgument Argument 1 ($id) is $id of type string but \PodcastLoader::getMusicById() takes int defined at php/classes/PodcastLoader.php:205
+php/classes/PodcastLoader.php:67 PhanTypeArraySuspiciousNullable Suspicious array access to $data of nullable type array|bool|float|int|null|string
+php/classes/PodcastLoader.php:120 PhanTypeArraySuspiciousNullable Suspicious array access to $data of nullable type ?array|?array{channel:array{item:array{0:mixed}}}|?bool|?float|?int|?non-empty-array<mixed,mixed>|?string
+php/classes/RadioBrowser.php:148 PhanPossiblyUndeclaredVariable Variable $cacheKey is possibly undeclared
+php/classes/RadioBrowser.php:148 PhanTypeMismatchArgumentNullable Argument 1 ($key) is $cacheKey of type ?string but \Cache::set() takes string defined at php/classes/Cache.php:141 (expected type to be non-nullable)
+php/classes/RadioBrowser.php:234 PhanPossiblyUndeclaredVariable Variable $path is possibly undeclared
+php/classes/RadioBrowser.php:234 PhanTypeMismatchArgumentNullable Argument 1 ($path) is $path of type ?'countries'|?'languages'|?'tags'|?string but \RadioBrowser::run_request() takes string defined at php/classes/RadioBrowser.php:112 (expected type to be non-nullable)
+php/classes/RadioBrowser.php:316 PhanPossiblyUndeclaredVariable Variable $path is possibly undeclared
+php/classes/RadioBrowser.php:397 PhanTypeArraySuspiciousNullable Suspicious array access to $stations of nullable type array|float|int|null|string|true
+php/classes/RadioBrowser.php:443 PhanTypeArraySuspiciousNullable Suspicious array access to $table of nullable type array|bool|float|int|null|string
+php/classes/RadioLogo.php:89 PhanUndeclaredConstant Reference to undeclared constant \FILEINFO_MIME_TYPE. This will cause a thrown Error in php 8.0+.
+php/classes/RadioLogo.php:132 PhanUndeclaredVariable Variable $rs is undeclared
+php/classes/RadioLogo.php:133 PhanUndeclaredVariable Variable $rs is undeclared
+php/classes/RadioLogo.php:137 PhanUndeclaredConstant Reference to undeclared constant \FILEINFO_CONTINUE. This will cause a thrown Error in php 8.0+.
+php/classes/RedisCache.php:59 PhanTypeMismatchDeclaredReturn Doc-block of generateKey contains declared return type \The which is incompatible with the return type string declared in the signature
+php/classes/RedisCache.php:105 PhanTypeMismatchReturn Returning $this->redis->exists($this->generateKey($key)) of type int but keyExists() is declared to return bool
+php/classes/RedisCache.php:140 PhanUndeclaredTypeReturnType Return type of arrayKeyGet() is undeclared type \The
+php/classes/RedisCache.php:141 PhanTypeMismatchReturn Returning json_decode($this->redis->hGet($this->generateKey($key), strval($arrayKey)), true) of type array|bool|float|int|null|string but arrayKeyGet() is declared to return \The
+php/classes/Router.php:52 PhanTypeMismatchArgument Argument 2 ($tid) is $parts[1] of type string but \Router::listPlayItem() takes int defined at php/classes/Router.php:143
+php/classes/Router.php:82 PhanPossiblyUndeclaredVariable Variable $tid is possibly undeclared
+php/classes/Router.php:88 PhanPossiblyUndeclaredVariable Variable $tid is possibly undeclared
+php/classes/Template.php:45 PhanUnextractableAnnotationElementName Saw possibly unextractable annotation for a fragment of comment '* @param lang the lang to use': after lang, did not see an element name (will guess based on comment order)
+php/classes/Template.php:83 PhanUnextractableAnnotationElementName Saw possibly unextractable annotation for a fragment of comment '* @param name The name of the template': after name, did not see an element name (will guess based on comment order)
+php/classes/Template.php:87 PhanUndeclaredTypeParameter Parameter $name has undeclared type \name
+php/classes/Template.php:90 PhanTypeSuspiciousStringExpression Suspicious type \name of a variable or expression $this->filename used to build a string. (Expected type to be able to cast to a string)
+php/classes/Template.php:94 PhanTypeSuspiciousStringExpression Suspicious type \name of a variable or expression $this->filename used to build a string. (Expected type to be able to cast to a string)
+php/classes/UnRead.php:32 PhanUnextractableAnnotationElementName Saw possibly unextractable annotation for a fragment of comment '* @param id the podcast id': after id, did not see an element name (will guess based on comment order)
+php/classes/UnRead.php:54 PhanUnextractableAnnotationElementName Saw possibly unextractable annotation for a fragment of comment '* @param id the podcast id': after id, did not see an element name (will guess based on comment order)
+php/classes/UnRead.php:55 PhanUnextractableAnnotationElementName Saw possibly unextractable annotation for a fragment of comment '* @param url of episode': after url, did not see an element name (will guess based on comment order)
+php/classes/UnRead.php:63 PhanUnextractableAnnotationElementName Saw possibly unextractable annotation for a fragment of comment '* @param id the podcast id': after id, did not see an element name (will guess based on comment order)
+php/classes/UnRead.php:64 PhanUnextractableAnnotationElementName Saw possibly unextractable annotation for a fragment of comment '* @param eid the episode id': after eid, did not see an element name (will guess based on comment order)
+php/classes/UnRead.php:71 PhanTypeMismatchArgument Argument 2 ($value) is $id of type int but \Cache::set() takes string defined at php/classes/Cache.php:141
+php/classes/UnRead.php:92 PhanTypeArraySuspiciousNullable Suspicious array access to $table of nullable type array|bool|float|int|null|string
+php/classes/UnRead.php:137 PhanTypeMismatchArgument Argument 1 ($id) is $parts[1] of type string but \PodcastLoader::getEpisodeData() takes int defined at php/classes/PodcastLoader.php:168
+php/classes/UnRead.php:137 PhanTypeMismatchArgument Argument 2 ($eid) is $parts[2] of type string but \PodcastLoader::getEpisodeData() takes int defined at php/classes/PodcastLoader.php:168
+php/gui/im-export.php:21 PhanTypeMismatchArgumentProbablyReal Argument 1 ($name) is 'main' of type 'main' but \Template::__construct() takes \name (no real type) defined at php/classes/Template.php:87 (the inferred real argument type has nothing in common with the parameter's phpdoc type)
+php/gui/im-export.php:22 PhanTypeMismatchArgumentProbablyReal Argument 1 ($name) is 'imexport' of type 'imexport' but \Template::__construct() takes \name (no real type) defined at php/classes/Template.php:87 (the inferred real argument type has nothing in common with the parameter's phpdoc type)
+php/gui/im-export.php:68 PhanPossiblyUndeclaredGlobalVariable Global variable $msg is possibly undeclared
+php/gui/index.php:23 PhanTypeMismatchArgumentProbablyReal Argument 1 ($name) is 'main' of type 'main' but \Template::__construct() takes \name (no real type) defined at php/classes/Template.php:87 (the inferred real argument type has nothing in common with the parameter's phpdoc type)
+php/gui/index.php:56 PhanTypeMismatchArgumentProbablyReal Argument 1 ($name) is 'list' of type 'list' but \Template::__construct() takes \name (no real type) defined at php/classes/Template.php:87 (the inferred real argument type has nothing in common with the parameter's phpdoc type)
+php/gui/index.php:75 PhanTypeMismatchArgumentProbablyReal Argument 1 ($name) is 'login' of type 'login' but \Template::__construct() takes \name (no real type) defined at php/classes/Template.php:87 (the inferred real argument type has nothing in common with the parameter's phpdoc type)
+php/gui/view.php:23 PhanTypeMismatchArgumentProbablyReal Argument 1 ($name) is 'main' of type 'main' but \Template::__construct() takes \name (no real type) defined at php/classes/Template.php:87 (the inferred real argument type has nothing in common with the parameter's phpdoc type)
+php/gui/view.php:24 PhanTypeMismatchArgumentProbablyReal Argument 1 ($name) is 'view' of type 'view' but \Template::__construct() takes \name (no real type) defined at php/classes/Template.php:87 (the inferred real argument type has nothing in common with the parameter's phpdoc type)
+php/image.php:42 PhanUndeclaredConstant Reference to undeclared constant \FILEINFO_MIME_TYPE. This will cause a thrown Error in php 8.0+.
+php/image.php:48 PhanPossiblyUndeclaredGlobalVariable Global variable $namehash is possibly undeclared
+php/stream.php:38 PhanTypeMismatchArgument Argument 1 ($id) is $id of type string but \Data::getById() takes int defined at php/classes/Data.php:144
+php/stream.php:42 PhanTypeMismatchArgument Argument 1 ($id) is $id of type string but \PodcastLoader::getEpisodeData() takes int defined at php/classes/PodcastLoader.php:168
+php/stream.php:42 PhanTypeMismatchArgument Argument 2 ($eid) is $_GET['eid'] of type string but \PodcastLoader::getEpisodeData() takes int defined at php/classes/PodcastLoader.php:168
+php/stream.php:48 PhanTypeMismatchArgument Argument 1 ($id) is $id of type string but \PodcastLoader::getMusicById() takes int defined at php/classes/PodcastLoader.php:205

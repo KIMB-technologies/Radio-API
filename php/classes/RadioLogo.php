@@ -9,7 +9,7 @@
  * released under the terms of GNU Public License Version 3
  * https://www.gnu.org/licenses/gpl-3.0.txt
  */
-defined('HAMA-Radio') or die('Invalid Endpoint');
+defined('HAMARadio') or die('Invalid Endpoint');
 
 class RadioLogo {
 
@@ -28,7 +28,7 @@ class RadioLogo {
 			$ok = true;
 			foreach(scandir(self::BASE_DIR) as $d){
 				if(preg_match('/^[a-f0-9]{40}\.(image|error)$/', $d) === 1){
-					$ok &= unlink(self::BASE_DIR . '/' . $d);
+					$ok = $ok && unlink(self::BASE_DIR . '/' . $d);
 				}
 			}
 			return $ok;

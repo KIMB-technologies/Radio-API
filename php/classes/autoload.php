@@ -9,7 +9,7 @@
  * released under the terms of GNU Public License Version 3
  * https://www.gnu.org/licenses/gpl-3.0.txt
  */
-defined('HAMA-Radio') or die('Invalid Endpoint');
+defined('HAMARadio') or die('Invalid Endpoint');
 
 spl_autoload_register(function ($class) {
 	if( is_string($class) && preg_match( '/^[A-Za-z0-9]+$/', $class ) === 1 ){
