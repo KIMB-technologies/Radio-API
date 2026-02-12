@@ -6,7 +6,7 @@ services:
     container_name: radio_api
     restart: always
     ports:
-      - "80:80" # make sure, Radio-API is avaliable at port 80
+      - "80:80" # make sure, Radio-API is available at port 80
     volumes:
       - ./data/:/php-code/data/ # directory storing data, cache, and setting od Radio-API
       - ./media/:/php-code/media/ # directory storing images for stations

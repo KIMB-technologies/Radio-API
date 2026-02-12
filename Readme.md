@@ -1,6 +1,3 @@
-> [!IMPORTANT] 
-> Frontier Smart plans to shut down their Nuvola service: [More information](https://github.com/KIMB-technologies/Radio-API/releases/tag/v2.9.2-note).
-
 # Radio-API
 
 > Silicon Frontier, Frontier Silicon, or Frontier Nuvola (Smart) Internet Radio alternative API

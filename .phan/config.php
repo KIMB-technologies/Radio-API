@@ -11,7 +11,7 @@
 	$ phan -o report.txt 
 */
 return [
-	'target_php_version' => '8.0',
+	'target_php_version' => '8.5',
 	'file_list' => [ 
 		'./utils/cron.php',
 		'./utils/startup.php',
