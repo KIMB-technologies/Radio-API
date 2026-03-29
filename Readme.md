@@ -5,6 +5,10 @@
 see https://github.com/kimbtech/WiFi-RadioAPI for information about the API used by the radios  
 see https://hub.docker.com/r/kimbtechnologies/radio_api for the Docker Image
 
+> [!TIP]
+> Currently, Radio-API only supports the XML-based API used by older Radios (roughly the ones supporting the UNDOK app), there is also a newer JSON-based API used by newer Radios (roughly the ones using the OKTIV app).  
+> We are **working on providing support for the JSON-based API within Radio-API**, so one Radio-API installation for both types of radios! See [#71](https://github.com/KIMB-technologies/Radio-API/issues/71).
+
 ## About
 This is an alternative API for Frontier Nuvola (Frontier Silicon) internet radios, it can be placed on a server and will host the list of internet radio stations, podcasts etc. which then can be found in the radio's menu.
 
