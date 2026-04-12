@@ -31,14 +31,15 @@ The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechn
 		- `CONF_STREAM_JSON` Url to a JSON list of streams or `false` to disable (see [Own Streams](#own-streams))
 		- There are some more options, see defaults in [docker-compose.yml](https://github.com/KIMB-technologies/Radio-API/blob/master/docker-compose.yml).
 		- The default setup uses Redis for fast caching of values. Redis may be disable by setting `CONF_USE_JSON_CACHE=true`, which enables an json file based caching as fallback (cached items are then stored in `./data/cache`).
-	- Make sure, that *Radio-API* is available at port `80` for requests with the hostname `*.wifiradiofrontier.com` and `CONF_DOMAIN`.
+	- Make sure, that *Radio-API* is available at port `80` (and `443` for newer JSON-based radios) for requests with the hostname `*.wifiradiofrontier.com` and `CONF_DOMAIN`.
+		- Radio-API Docker will automatically create an self-singed SSL certificate and the container listens at port `443`. The radio does not check the SSL certificate.
 	- There are two ways to store which episodes of podcasts have already been listened to (new ones are marked by `*`)
 		- Create a cron job to `/cron.php`, e.g., `docker exec --user www-data radio_api php /cron.php`. (This will dump the already played episodes to a JSON file in `./data/` and *Radio-API* will load the file into redis on container startup).
 		- Use the data volume of Redis. (Redis will (re-)load its dump files on container startup.)
 3. Done
 	- Start the radio and open `Internet Radio`.
 	- You will see the entries described at [Usage](./#usage).
-	- Use the GUI to define the list of stations and podcasts. It can be accessed with a browser at `CONF_DOMAIN/gui`. 
+	- Use the GUI (web interface) to define the list of stations and podcasts. It can be accessed with a browser at `CONF_DOMAIN/gui`. 
 	- You will need the code shown by the radio to log into the GUI. 
 	- Each connected radio has is own list of user defined radio stations and podcasts, the *own streams* are global.
 
@@ -60,10 +61,11 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 		- The only requirement a current version of PHP (code analysis shows compatibility with PHP > 8.0, code is tested with 8.2 and 8.3).
 		- In most cases the default extensions of PHP are sufficient for Radio-API. Is uses among others `php-mbstring`.
 		- You do not need a cron job, all data is stored in `./data/` and the cache files in `./data/cache/`.
-		- You may change the folder for cache files to, e.g., a ramdisk. If you do so, use the script `./utils/backup-restore.php` to backup data which is only stored by the cache (using Docker this is done by the cron job).
+		- You may change the folder for cache files to, e.g., a ramdisk. If you do so, use the script Im- & Export to transfer data. 
 		- The proxy feature is provided by PHP, but might be less stable than the NGINX proxy.
 		- The EndURL feature uses the cURL extension of PHP (else it will error!).
 		- Assure, that PHP/ the webserver can write to `./data/` (and the folders configured for logs and cache files)! If you use logo caching, also `./media/` needs to be writable.
+		- If you use a newer JSON-based Radio make sure to provide SSL access to Radio-API. You can use any certificate, but request with host `airable.wifiradiofrontier.com` and port `443` need to be routed to Radio-API.
 	- Download the lastest source of the *Radio-API* [here](https://github.com/KIMB-technologies/Radio-API/releases/latest).
 	- Extract the zip and place the folder `php` in the web-root of our server (this is our  `./`, other files are not needed).
 	- Configure *Radio-API* in `./data/env.json` (The config values are the same as for the Docker-based mode, always use strings for the values!):
@@ -85,7 +87,7 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 		- `CONF_LEGACY_NEXTCLOUD` (optional, default `false`) Set to `true` if your are using Nextcloud streams and the Nextcloud server is running a version below 31
 		- **Attention:** Optional parameters have a leading `____` in the default `env.json`, make sure to remove them.
 		- The `CONF_REDIS_*` values are ignored and `CONF_USE_JSON_CACHE` is always `true`.
-	- Make sure, that *Radio-API* is available at port `80` for requests with the hostname `*.wifiradiofrontier.com` and `CONF_DOMAIN`.
+	- Make sure, that *Radio-API* is available at port `80` (and `443` for newer JSON-based radios) for requests with the hostname `*.wifiradiofrontier.com` and `CONF_DOMAIN`.
 	- Block HTTP access to `./data/` (and `./classes/`) for security reasons (might be omitted in a local network installation).
 	- Rewrite requests to PHP:
 		- All requests which do not point to an existing file need to be redirected to `./index.php`.
@@ -94,23 +96,25 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 			If this fails, `$_SERVER['REQUEST_URI']` is checked and the part before the first `?` is taken as path value.
 		- It is important, that the path value starts with `/` and contains the full path, but without get parameters starting at `?`.
 		- See the example for NGINX below. The built in webserver of PHP may be used for development with the `./utils/router.php` in this repository.
+		- Radio-API needs access to HTTP headers, especially `Authorization and `Accept-Language` are used.
 3. Done
 	- Start the radio and open `Internet Radio`.
 	- You will see the entries described above at [Usage](./#usage).
 
 ### Updates
-> This is for manual installs, Docker users must make sure to store the redis volume or to run the cron job. 
-> Then Radio-API can be restarted using a newer version of the Docker Image.
+> Generally, it is good to have backup at hand. So use the *Im- & Export* [&darr;](#im---export) interface and download an export before updates.
 
-> Generally, the *Im- & Export* [&darr;](#im---export) interface may be used for backups and restores after updates!
+- Docker install:
+	- Make sure to store the redis volume or to run the cron job. 
+	- Then Radio-API can be restarted using a newer version of the Docker Image.
+	- It will find the dumps from the cron job and load them into Redis on restart
+- Manual install:
+	- Create a backup/ export via the *Im- & Export* [&darr;](#im---export) interface.
+	- Create a copy of files in the folder `./data` (`./data/cache` can be deleted).
+	- Install the new version of Radio-API (download zip, extract `./php`  folder to webroot).
+	- Copy the previously saved files back to `./data`.
+	- Import the backup/ export (`./data` does not contain RadioBrowser infos and new/ known podcasts)
 
-- Run the `./utils/backup-restore.php` script to export all relevant data from the cache.
-	This will result in two files, which may be stored in `./data` or somewhere else.
-- Create a copy of files in the folder `./data` (`./data/cache` can be deleted).
-- Install the new version of Radio-API (download zip, extract `./php`  folder to webroot).
-- Copy the previously saved files back to `./data`.
-- Run the `./utils/backup-restore.php` script to import all relevant data to the cache.
-	This will read the two files created during the export.
 
 ### Rewrite with NGINX 
 
@@ -143,13 +147,15 @@ location @nofile {
 - If the Radio-API is unable to parse a JSON-file in `./data/`, it will initialize a new one, while the old one is renamed to `*.error.json`.
 - PHP error messages are disabled by default, set `DEV=dev` in the environment to enable them.
 - Restart Radio-API (e.g., the Docker container will reload the radio mac/ id table).
-- Erase the data folder/ volume of redis and restart Radio-API.
+- Erase the data folder/ volume of redis and restart Radio-API. Clear the `CONF_CACHE_DIR` (defaults to `data/cache/`) folder.
 - Check the outputs from the Docker Container `docker-compose logs`
 	- Make sure, that your radio sends the requests to Radio-API (i.e., the DNS setup works)
-- Test the Radio-API with your browser
+- Test the Radio-API with your browser (older radios, XML)
 	1. `http://radio.example.com/setupapp/iden/asp/BrowseXML/loginXML.asp?token=0` (returns `<EncryptedToken>3a3f5ac48a1dab4e</EncryptedToken>`)
 	2. `http://radio.example.com/setupapp/iden/asp/BrowseXML/loginXML.asp?gofile=&mac=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&dlang=eng&fver=4&ven=iden00` (returns `<?xml version="1.0" encoding="UTF-8" standalone="yes"?> <ListOfItems> ... </ListOfItems>`) 
 	3. Get the GUI-Code from the preceding response and try to used it to access the GUI at `http://radio.example.com/gui/`
+- Text the Radio-API in a terminal (newer radios, JSON)
+	1. *TODO*
 
 ### Im- & Export
 There is an Im- & Export web interface at `./gui/im-export.php`.
@@ -187,12 +193,13 @@ server {
 		proxy_set_header X-Forwarded-Proto $scheme;
 	}
 
-	listen 80; # needed by radio
+	listen 80; # needed by radios (older, XML)
 	listen [::]:80;	
 
-	listen [::]:443 ssl; # add for GUI
+	listen [::]:443 ssl; # add for GUI and newer radios (JSON)
 	listen 443 ssl;
 	# more ssl setup ....
+	#	the radios do not check the certificate chain, so a self-singed or a different domain is ok
 }
 ```
 

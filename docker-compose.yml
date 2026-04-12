@@ -7,6 +7,7 @@ services:
     restart: always
     ports:
       - "80:80" # make sure, Radio-API is available at port 80
+      - "443:443" # newer radios with JSON require SSL, so make sure to forward port 443 as well (there is no certificate check by the radios, Radio-API will create a self-signed certificate)
     volumes:
       - ./data/:/php-code/data/ # directory storing data, cache, and setting od Radio-API
       - ./media/:/php-code/media/ # directory storing images for stations

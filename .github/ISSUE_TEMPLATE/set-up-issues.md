@@ -15,6 +15,7 @@ assignees: kimbtech
 - Version of Radio-API:
 - Installation mode: Docker or non-Docker
 - DNS redirect via: Radio-DNS or ...
+- Old(er) or New(er) Radio: XML/old or JSON/new
 - Radio vendor: 
 - Usage of reverse proxy: yes or no
 - Does another radio use your installation of Radio-API: yes or no
