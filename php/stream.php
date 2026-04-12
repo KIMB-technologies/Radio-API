@@ -16,12 +16,12 @@ error_reporting( !empty($_ENV['DEV']) && $_ENV['DEV'] == 'dev' ? E_ALL : 0 );
  * Loading
  */
 require_once( __DIR__ . '/classes/autoload.php' );
-Config::checkAccess( !empty($_GET['mac']) && Helper::checkValue( $_GET['mac'], Id::MAC_PREG ) ? $_GET['mac'] : null );
+Config::checkAccess(Auth::getMacRID());
 
 /**
  * Auth
  */
-$radioid = Auth::authFromMac();
+$radioid = Auth::authFromAny();
 
 $data = new Data($radioid->getId());
 

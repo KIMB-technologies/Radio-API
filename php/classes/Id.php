@@ -26,7 +26,8 @@ class Id {
 
 	// types form
 	public const ID_PREG = '/^[0-9]{1,4}$/',
-		MAC_PREG = '/^[0-9a-f]{28,40}$/',
+		MAC_PREG = '/^[0-9a-f]{28,40}$/', // mac of old radios (XML) 
+		RID_PREG = '/^[0-9A-Z]{10,20}$/', // radio id of new radios (JSON)
 		CODE_PREG = '/^Z[0-9A-Za-z]{4}$/';
 
 	const CACHE_TTL = 60 * 60 * 6; // 6 hours

@@ -58,7 +58,7 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 2. Run the *Radio-API* on your webserver.
 	- Preface:
 		- The manual setup does not rely on *Redis* (which is replaced by a file-based caching).
-		- The only requirement a current version of PHP (code analysis shows compatibility with PHP > 8.0, code is tested with 8.2 and 8.3).
+		- The only requirement a current version of PHP (code analysis shows compatibility with PHP > 8.1, code is tested with 8.5).
 		- In most cases the default extensions of PHP are sufficient for Radio-API. Is uses among others `php-mbstring`.
 		- You do not need a cron job, all data is stored in `./data/` and the cache files in `./data/cache/`.
 		- You may change the folder for cache files to, e.g., a ramdisk. If you do so, use the script Im- & Export to transfer data. 
@@ -155,7 +155,13 @@ location @nofile {
 	2. `http://radio.example.com/setupapp/iden/asp/BrowseXML/loginXML.asp?gofile=&mac=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&dlang=eng&fver=4&ven=iden00` (returns `<?xml version="1.0" encoding="UTF-8" standalone="yes"?> <ListOfItems> ... </ListOfItems>`) 
 	3. Get the GUI-Code from the preceding response and try to used it to access the GUI at `http://radio.example.com/gui/`
 - Text the Radio-API in a terminal (newer radios, JSON)
-	1. *TODO*
+	1. ```bash 
+		curl -k https://radio.example.com \
+		-H "Authorization: $(echo -n "AA00BB11CC22:$(echo -n "something"|md5)" | base64 )" \
+		-H "Accept-Language: de-DE" \
+		-H "Host: airable.wifiradiofrontier.com" 
+	```
+	2. *TODO*
 
 ### Im- & Export
 There is an Im- & Export web interface at `./gui/im-export.php`.

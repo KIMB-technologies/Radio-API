@@ -2,8 +2,6 @@
 # File only for development !!!
 # # # # # 
 
-version: "2"
-
 services:
   radio_api:
     build:
@@ -18,11 +16,10 @@ services:
       - ./php/:/php-code/
       - ./data/:/php-code/data/
       - ./media/:/php-code/media/
-      - ./utils/getr.php:/php-code/getr.php:ro # redis all values listing
     environment:
       - DEV=dev
-      - CONF_DOMAIN=http://localhost:8080/
-      - CONF_RADIO_DOMAIN=http://127.0.0.1/
+      - CONF_DOMAIN=http://localhost/
+      #- CONF_RADIO_DOMAIN=http://127.0.0.1/
       - CONF_ALLOWED_DOMAIN=all
       - CONF_SHUFFLE_MUSIC=true
       - CONF_CACHE_EXPIRE=1200
