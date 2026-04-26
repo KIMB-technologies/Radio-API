@@ -172,12 +172,16 @@ class Id {
 				$rid = Helper::randomCode(20, Helper::BASE36);
 			} while( $redis->arrayKeyExists('rids', $rid) );
 
+			// add to data for local use
+			$data[] = $rid;
+
 			// load file, as file is the primary storage
 			$table = self::getTableData();
 
 			// alter table
 			$table['ids'][$this->id][] = $rid; 
 			$table['rids'][$rid] = $this->id; 
+			
 			// save new table
 			//	File
 			file_put_contents( __DIR__ . '/../data/table.json', json_encode($table, JSON_PRETTY_PRINT), LOCK_EX);
