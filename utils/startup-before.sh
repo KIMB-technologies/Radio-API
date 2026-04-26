@@ -15,7 +15,7 @@ fi;
 
 # assure a self-signed ssl certificate exists for newer JSON radios 
 if [ ! -f /php-code/data/ssl_key.pem ] || [ ! -f /php-code/data/ssl_crt.pem ]; then 
-	# create a cert, we used 100 years and a wildcard for the sf domain
+	# create a cert, we use 100 years and a wildcard for the sf domain
 	openssl req -x509 -newkey rsa:4096 -sha256 -days 36500 -nodes \
 		-subj "/CN=*.wifiradiofrontier.com" \
 		-keyout /php-code/data/ssl_key.pem -out /php-code/data/ssl_crt.pem

@@ -49,6 +49,7 @@ class Login {
 			$_SESSION['login_time'] = time();
 			$_SESSION['db_all'] = array(
 				'mac' => $id->getMac(),
+				'rid' => $id->getRid(),
 				'id' => $id->getId(),
 				'code' => $id->getCode(),
 			);

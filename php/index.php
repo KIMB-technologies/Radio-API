@@ -25,25 +25,26 @@ if($uri === 'none' && isset($_SERVER['REQUEST_URI']) && is_string($_SERVER['REQU
 	$uri = trim(substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')));
 }
 
-// Login (old Radios try a login before accessing the API)
+// Login (old Radios try a 'login' before accessing the API)
 if( preg_match('/^\/setupapp\/[A-Za-z0-9\-\_]+\/asp\/BrowseXML\/loginXML.asp/', $uri) === 1 && !isset( $_GET['mac'] )) {
 	Output::sendAnswer('<EncryptedToken>3a3f5ac48a1dab4e</EncryptedToken>');
 	die(); //will never be reached
 }
 
 /**
- * Check if IP valid
+ * Authenticate the Radio, use mac or radioID of client
+ */
+$auth = new Auth();
+
+/**
+ * Check if IP valid (config based blocking of IPs/ domains)
  */ 
-Config::checkAccess(Auth::getMacRID()); 
+Config::checkAccess($auth->getClientID()); 
 
 /**
- * Auth
+ * Check the authentication and handle the routing
  */
-$radioid = Auth::authFromAny(true);
-
-/**
- * Handle
- */
-$router = new Router($radioid);
+$radioId = $auth->auth(true);
+$router = new Router($radioId);
 $router->handleGet($uri);
 ?>

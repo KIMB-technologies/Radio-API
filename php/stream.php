@@ -16,14 +16,16 @@ error_reporting( !empty($_ENV['DEV']) && $_ENV['DEV'] == 'dev' ? E_ALL : 0 );
  * Loading
  */
 require_once( __DIR__ . '/classes/autoload.php' );
-Config::checkAccess(Auth::getMacRID());
 
 /**
  * Auth
  */
-$radioid = Auth::authFromAny();
+$auth = new Auth();
+Config::checkAccess($auth->getClientID()); 
+$radioId = $auth->auth();
 
-$data = new Data($radioid->getId());
+// get data for radio
+$data = new Data($radioId->getId());
 
 /**
  * Answer Proxy Request

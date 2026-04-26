@@ -41,7 +41,6 @@ else {
 	$filesize = filesize( $file );
 	$finfo = finfo_open(FILEINFO_MIME_TYPE);
 	$mimetype = finfo_file($finfo, $file);
-	finfo_close($finfo);
 
 	//Header
 	header( 'Content-Type: '.$mimetype );

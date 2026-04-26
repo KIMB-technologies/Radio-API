@@ -16,7 +16,7 @@ defined('HAMARadio') or die('Invalid Endpoint');
  */
 class Router {
 
-	private Id $radioid;
+	private Id $radioId;
 	private Output $out;
 	private Data $data;
 	private Unread $unread;
@@ -26,11 +26,11 @@ class Router {
 	 * Generate Objects
 	 */
 	public function __construct( Id $id ){
-		$this->radioid = $id;
+		$this->radioId = $id;
 		$this->out = new Output($this->detectLanguage());
-		$this->data = new Data($this->radioid->getId());
-		$this->unread = new UnRead($this->radioid->getId());
-		$this->radio_browser = new RadioBrowser($this->radioid);
+		$this->data = new Data($this->radioId->getId());
+		$this->unread = new UnRead($this->radioId->getId());
+		$this->radio_browser = new RadioBrowser($this->radioId);
 	}
 
 	private function detectLanguage() : string {
@@ -119,7 +119,7 @@ class Router {
 			$this->out->addDir( 'Radio-Browser', Config::RADIO_DOMAIN . 'radio-browser?by=none&term=none' );
 
 			// add code (for gui)
-			$this->out->addDir( 'GUI-Code: ' . $this->radioid->getCode(), Config::RADIO_DOMAIN . '?go=initial', true );
+			$this->out->addDir( 'GUI-Code: ' . $this->radioId->getCode(), Config::RADIO_DOMAIN . '?go=initial', true );
 
 			// add Favorites category, if exists
 			$allCats = $this->data->getCategories();
@@ -152,7 +152,7 @@ class Router {
 			$this->out->addEpisode(
 				$id, $eid,
 				$ed['title'], $ed['episode']['title'],
-				$this->data->getPodcastURL($id, $eid, $this->radioid->getMac()),
+				$this->data->getPodcastURL($id, $eid, $this->radioId->getMac()),
 				$ed['episode']['desc'],
 				$ed['logo']
 			);
@@ -173,7 +173,7 @@ class Router {
 				$this->out->addStation(
 					$id,
 					$sta['name'],
-					$this->data->getStationURL($id, $this->radioid->getMac()),
+					$this->data->getStationURL($id, $this->radioId->getMac()),
 					false,
 					$sta['desc'] ?? '',
 					$sta['logo'] ?? ''
@@ -183,7 +183,7 @@ class Router {
 				$this->out->addEpisode(
 					$id, null,
 					$sta['name'], $sta['name'],
-					$this->data->getStationURL($id, $this->radioid->getMac()),
+					$this->data->getStationURL($id, $this->radioId->getMac()),
 					$sta['desc']  ?? '',
 					$sta['logo'] ?? ''
 				);
@@ -207,7 +207,7 @@ class Router {
 				$id, $eid,
 				$pd['title'],
 				$this->unread->knownItemMark($id, $e['url']) . $e['title'],
-				$this->data->getPodcastURL($id, $eid, $this->radioid->getMac(), sloppy: true),
+				$this->data->getPodcastURL($id, $eid, $this->radioId->getMac(), sloppy: true),
 				$e['desc'], $pd['logo'],
 				!$this->unread->knownItem($id, $e['url'])
 			);
@@ -232,7 +232,7 @@ class Router {
 				$this->out->addStation(
 					$id,
 					$item['name'],
-					$this->data->getStationURL($id, $this->radioid->getMac()),
+					$this->data->getStationURL($id, $this->radioId->getMac()),
 					true
 				);
 			}
@@ -247,7 +247,7 @@ class Router {
 				$this->out->addEpisode(
 					$id, null,
 					$item['name'], $item['name'],
-					$this->data->getStationURL($id, $this->radioid->getMac())
+					$this->data->getStationURL($id, $this->radioId->getMac())
 				);
 			}
 		}

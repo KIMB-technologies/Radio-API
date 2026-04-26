@@ -22,7 +22,8 @@ class Id {
 	// construct types
 	const ID = 1,
 		MAC = 2,
-		CODE = 3;
+		CODE = 3,
+		RID = 4;
 
 	// types form
 	public const ID_PREG = '/^[0-9]{1,4}$/',
@@ -90,6 +91,10 @@ class Id {
 				$this->id = $this->generateNewId($val, $redis); 
 			}
 		}
+		else if( $type === self::RID && Helper::checkValue( $val, self::RID_PREG ) ){
+			// TODO
+			die("TOOD!!!");
+		}
 		else if( $type === self::ID && Helper::checkValue( $val, self::ID_PREG ) ){
 			$this->id = $val;
 		}
@@ -112,6 +117,10 @@ class Id {
 
 	public function getMac() : string {
 		return $this->data[0];
+	}
+
+	public function getRid() : string {
+		return 'TODO'; // TODO
 	}
 
 	public function getCode() : string {

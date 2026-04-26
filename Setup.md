@@ -157,7 +157,7 @@ location @nofile {
 - Text the Radio-API in a terminal (newer radios, JSON)
 	1. ```bash 
 		curl -k https://radio.example.com \
-		-H "Authorization: $(echo -n "AA00BB11CC22:$(echo -n "something"|md5)" | base64 )" \
+		-H "Authorization: $(echo -n "AA00BB11CC22:$(echo -n "something"|md5)"|base64 )" \
 		-H "Accept-Language: de-DE" \
 		-H "Host: airable.wifiradiofrontier.com" 
 	```
