@@ -45,6 +45,6 @@ Config::checkAccess($auth->getClientID());
  * Check the authentication and handle the routing
  */
 $radioId = $auth->auth(true);
-$router = new Router($radioId);
+$router = new Router($radioId, $auth->getClientType());
 $router->handleGet($uri);
 ?>

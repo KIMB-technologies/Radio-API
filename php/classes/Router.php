@@ -25,31 +25,12 @@ class Router {
 	/**
 	 * Generate Objects
 	 */
-	public function __construct( Id $id ){
+	public function __construct( Id $id, ClientType $type ){
 		$this->radioId = $id;
-		$this->out = new Output($this->detectLanguage());
+		$this->out = $type == ClientType::RadioJSON ? new OutputJSON() : new OutputXML();
 		$this->data = new Data($this->radioId->getId());
 		$this->unread = new UnRead($this->radioId->getId());
 		$this->radio_browser = new RadioBrowser($this->radioId);
-	}
-
-	private function detectLanguage() : string {
-		// old radio
-		if( isset($_GET['dlang']) && is_string($_GET['dlang'])) {
-			return $_GET['dlang']; // 'eng', 'ger', ... (only these two are supported) 
-		}
-		// new radio
-		else if( !empty( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ){
-
-			$langs = array_map( function ($i){
-				return strtolower(substr(trim($i),0,2));
-			}, explode( ',', $_SERVER['HTTP_ACCEPT_LANGUAGE']));
-
-			return in_array('de', $langs) ? 'ger' : 'eng';
-		}
-		else {
-			return 'eng';
-		}	
 	}
 
 	/**

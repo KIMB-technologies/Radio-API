@@ -100,6 +100,13 @@ class Auth {
 	}
 
 	/**
+	 * Get the type of client, old radio, new radio, other (web interface, human, ... etc.)
+	 */
+	public function getClientType() : ClientType {
+		return $this->clientType;
+	}
+
+	/**
 	 * Tries to auth radio request based on Mac or RadioID parameter and returns a RadioID Object
 	 * @param $redirectGui redirect to Gui Login, if not successful
 	 */

@@ -88,7 +88,6 @@ class RadioLogo {
 		// mime
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
 		$mimetype = finfo_file($finfo, $filename);
-		finfo_close($finfo);
 
 		// its not a image file
 		if( substr($mimetype, 0, strlen('image/')) !== 'image/'){
@@ -136,7 +135,6 @@ class RadioLogo {
 	private static function imageDimensions(string $file) : array {
 		$finfo = finfo_open(FILEINFO_CONTINUE);
 		$info = finfo_file($finfo, $file);
-		finfo_close($finfo);
 		
 		// file info (including dimensions as ", 000 x 000,")
 		if(preg_match('/,(\d+)x(\d+),/', str_replace(' ', '', $info), $matches) === 1){
