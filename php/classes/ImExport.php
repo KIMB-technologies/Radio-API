@@ -221,11 +221,22 @@ class ImExport {
 
 			$ids = array_filter(
 				$content["ids"],
-				fn($v, $k) => Id::isIdInteger($k) && is_array($v) && count($v) === 2 &&
-					Helper::checkValue( $v[0], Id::MAC_PREG ) && Helper::checkValue( $v[1], Id::CODE_PREG ),
+				fn($v, $k) => Id::isIdInteger($k) && is_array($v) && (count($v) === 3 || count($v) === 2) &&
+					Helper::checkValue( $v[0], Id::MAC_PREG ) && Helper::checkValue( $v[1], Id::CODE_PREG ) &&
+						(count($v) === 2 || Helper::checkValue( $v[2], Id::RID_PREG ) ), // rid checks
 				ARRAY_FILTER_USE_BOTH
 			);
 			$ok = $ok && count($ids) === count($content["ids"]);
+
+			// rids are only in new exports (ID class works with old and new table format)
+			if(array_key_exists("rids", $content)){
+				$rids = array_filter(
+					$content["rids"],
+					fn($v, $k) => Helper::checkValue( $k, Id::RID_PREG ) && is_integer($v) && Id::isIdInteger($v),
+					ARRAY_FILTER_USE_BOTH
+				);
+				$ok = $ok && count($rids) === count($content["rids"]);
+			}
 		}
 		return $ok;
 	}
@@ -374,8 +385,9 @@ class ImExport {
 					$id = $k + $idShift;
 					$mac = $v[0];
 					$code = $v[1];
+					$rid = isset($v[2]) ? $v[2] : null;
 
-					if(isset($export[$f]["macs"][$mac])){
+					if(isset($export[$f]["macs"][$mac]) || (!is_null($rid) && isset($export[$f]["rids"][$rid])) ){
 						$this->msg .= "<br>" . (Template::getLanguage() == 'de' ? "Radio $code war bereits im System vorhanden, Listen wurden überschrieben!" : "Radio $code was already known to system, list have been overwritten!");
 					}
 
@@ -386,7 +398,10 @@ class ImExport {
 
 					// add to table
 					$export[$f]["macs"][$mac] = $id;
-					$export[$f]["ids"][$id] = array($mac, $code);
+					if(!is_null($rid)){
+						$export[$f]["rids"][$rid] = $id;
+					}
+					$export[$f]["ids"][$id] = is_null($rid) ? array($mac, $code) : array($mac, $code, $rid);
 					$export[$f]["codes"][$code] = $id;
 				}
 			}

@@ -52,8 +52,11 @@ class Helper {
 		return is_string($val) && preg_match( $preg, $val ) === 1;
 	}
 
-	public static function randomCode( int $len ) : string {
-		$chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY';
+	const CHARS = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY';
+	const HEX = '0123456789abcdef';
+	const BASE36 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+	public static function randomCode( int $len, string $chars = self::CHARS ) : string {
 		$r = '';
 		$charAnz = strlen( $chars );
 		for($i = 0; $i < $len; $i++){

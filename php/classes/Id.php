@@ -12,10 +12,13 @@
 defined('HAMARadio') or die('Invalid Endpoint');
 
 /**
- * We use 3 ids per user.
- * 	- mac (radio auth parameter)
+ * We use 4 ids per user.
+ * 	- mac (radio auth parameter, XML API)
+ * 	- rid (radio id for new radios, JSON API)
  * 	- id (internal numeric id for each user)
  * 	- code (gui login code)
+ * The class Id is responsible for managing these ids and their relations. Each radio will have mac
+ * and rid, for older radios a rid is generated on first connect, for newer a mac.
  */
 class Id {
 
@@ -37,7 +40,7 @@ class Id {
 		//id => podcasts files
 		//mac => radio id
 		//code => gui access
-		//data => [mac, code]
+		//data => [mac, code, rid]
 
 	public static function isIdInteger(int $i) : bool {
 		return $i > 0 && $i < 10_000;
@@ -45,20 +48,38 @@ class Id {
 
 	public static function getTableData() : array {
 		$table = null;
-		if( is_file( __DIR__ . '/../data/table.json' ) ){ // load table form disk?
+		$changed = false;
+
+		if( is_file( __DIR__ . '/../data/table.json' ) ){ // load table from disk?
 			$table = json_decode(file_get_contents( __DIR__ . '/../data/table.json' ), true);
 
-			if(is_null($table)){ // on json error, move file and create new
+			if(is_null($table)){ // on json error, move file (as backup) and init new table
 				rename(__DIR__ . '/../data/table.json', __DIR__ . '/../data/table.error.json');
+				$changed = true;
 			}
 		}
-		if ( is_null($table) ) { // init empty table
-			$table = array(
-				'macs' => array(), // mac => id
-				'ids' => array(), // id => [ mac, code ]
-				'codes' => array() // code => id
-			);
-			// save init table
+
+		 // init empty table
+		if(is_null($table)) {
+			$table = array();
+			$changed = true;
+		}
+
+		// assure the required keys 
+		foreach( ['macs', 'rids', 'ids', 'codes'] as $key ){
+			// 'macs': mac => id
+			// 'rids': rid => id
+			// 'ids': id => [ mac, code, rid ]
+			// 'codes': code => id
+
+			if( !isset($table[$key]) || !is_array($table[$key]) ){
+				$table[$key] = array();
+				$changed = true;
+			}
+		}
+
+		if($changed){
+			// save new init table
 			file_put_contents( __DIR__ . '/../data/table.json', json_encode($table, JSON_PRETTY_PRINT), LOCK_EX);
 		}
 
@@ -68,34 +89,36 @@ class Id {
 	public function __construct($val, int $type = self::MAC){
 		// load redis
 		$redis = new Cache('table.json');
+
 		// import table
 		if( !$redis->keyExists('ids') ){
 			$this->loadFileIntoRedis($redis);
 		}
 
-		// get id from given data
-		if( $type === self::CODE && Helper::checkValue( $val, self::CODE_PREG ) ){
-			if( $redis->arrayKeyExists('codes', $val ) ){
-				$this->id = $redis->arrayKeyGet('codes', $val ); // get ID
+		// get the radioId, if not exist create new one (only by mac or rid, code only for existing radios)
+		if(
+			($type === self::CODE && Helper::checkValue($val, self::CODE_PREG)) ||
+			($type === self::MAC && Helper::checkValue($val, self::MAC_PREG)) ||
+			($type === self::RID && Helper::checkValue($val, self::RID_PREG))
+		){
+			$key = match($type){
+				self::CODE => 'codes',
+				self::MAC => 'macs',
+				self::RID => 'rids',
+			};
+			if($redis->arrayKeyExists($key, $val)){
+				$this->id = $redis->arrayKeyGet($key, $val); // get ID
 			}
 			else{
-				throw new Exception('Unknown Code, use Radio Mac to create!');
+				if($type === self::CODE){
+					throw new Exception('Unknown Code, use Radio with Mac/ Rid to create!');
+				}
+				else{
+					$this->id = $this->generateNewId($val, $type, $redis,); 
+				}	
 			}
 		}
-		else if( $type === self::MAC && Helper::checkValue( $val, self::MAC_PREG ) ){
-			//check if new mac
-			if(  $redis->arrayKeyExists('macs', $val ) ){
-				$this->id = $redis->arrayKeyGet('macs', $val ); // get ID
-			}
-			else{
-				$this->id = $this->generateNewId($val, $redis); 
-			}
-		}
-		else if( $type === self::RID && Helper::checkValue( $val, self::RID_PREG ) ){
-			// TODO
-			die("TOOD!!!");
-		}
-		else if( $type === self::ID && Helper::checkValue( $val, self::ID_PREG ) ){
+		else if($type === self::ID && Helper::checkValue($val, self::ID_PREG)){
 			$this->id = $val;
 		}
 		else{
@@ -104,10 +127,15 @@ class Id {
 
 		//load this data by id
 		if( $redis->arrayKeyExists('ids', $this->id ) ){
-			$this->data = $redis->arrayKeyGet('ids', $this->id );
+			// make sure to have a rid and a mac for this radio
+			$this->data = $this->assureMacRid(
+				// get the data (mac, code, rid) for this id
+				$redis->arrayKeyGet('ids', $this->id ),
+				$redis
+			);
 		}
 		else{
-			throw new Exception('Unknown ID, use Radio Mac to create!');
+			throw new Exception('Unknown ID, check input values or use Radio Mac/ Rid to create !');
 		}
 	}
 
@@ -119,12 +147,12 @@ class Id {
 		return $this->data[0];
 	}
 
-	public function getRid() : string {
-		return 'TODO'; // TODO
-	}
-
 	public function getCode() : string {
 		return $this->data[1];
+	}
+
+	public function getRid() : string {
+		return $this->data[2];
 	}
 
 	private function loadFileIntoRedis(Cache $redis) : void {
@@ -132,13 +160,54 @@ class Id {
 
 		// set also in redis
 		$redis->arraySet('macs', $table['macs'], self::CACHE_TTL);
+		$redis->arraySet('rids', $table['rids'], self::CACHE_TTL);
 		$redis->arraySet('ids', $table['ids'], self::CACHE_TTL);
 		$redis->arraySet('codes', $table['codes'], self::CACHE_TTL);
 	}
 
-	private function generateNewId( string $val, Cache $redis ) : int { 
-		//	Load file, as file it the primary storage
+	private function assureMacRid(array $data, Cache $redis) {
+		if(count($data) < 3){
+			// does not have a rid, generate one (mac is old format and always exists)
+			do{
+				$rid = Helper::randomCode(20, Helper::BASE36);
+			} while( $redis->arrayKeyExists('rids', $rid) );
+
+			// load file, as file is the primary storage
+			$table = self::getTableData();
+
+			// alter table
+			$table['ids'][$this->id][] = $rid; 
+			$table['rids'][$rid] = $this->id; 
+			// save new table
+			//	File
+			file_put_contents( __DIR__ . '/../data/table.json', json_encode($table, JSON_PRETTY_PRINT), LOCK_EX);
+			//	Redis
+			$redis->arraySet('rids', $table['rids'], self::CACHE_TTL);
+			$redis->arraySet('ids', $table['ids'], self::CACHE_TTL);
+		}
+		return $data;
+	}
+
+	private function generateNewId(string $val, int $type, Cache $redis) : int {
+		// Load file, as file is the primary storage
 		$table = self::getTableData();
+		
+		// make sure to have a rid and a mac for new radio, depending on the type of input
+		if($type === self::MAC){
+			$mac = $val;
+			do{
+				$rid = Helper::randomCode(20, Helper::BASE36);
+			} while( isset( $table['rids'][$rid] ) );
+		}
+		else if($type === self::RID){
+			$rid = $val;
+			do{
+				$mac = Helper::randomCode(40, Helper::HEX);
+			} while( isset( $table['macs'][$mac] ) );
+		}
+		else{
+			throw new Exception('Can only generate new ID from Mac or Rid!');
+		}
 
 		// new id
 		$id = count( $table['ids'] ) + 1;
@@ -150,10 +219,11 @@ class Id {
 
 		// alter table
 		$table['ids'][$id] = array(
-			// mac, code
-			$val, $code
+			// mac, code, rid
+			$mac, $code, $rid
 		);
-		$table['macs'][$val] = $id;
+		$table['macs'][$mac] = $id;
+		$table['rids'][$rid] = $id;
 		$table['codes'][$code] = $id;
 
 		// save new table
@@ -163,6 +233,7 @@ class Id {
 		$redis->arraySet('macs', $table['macs'], self::CACHE_TTL);
 		$redis->arraySet('ids', $table['ids'], self::CACHE_TTL);
 		$redis->arraySet('codes', $table['codes'], self::CACHE_TTL);
+		$redis->arraySet('rids', $table['rids'], self::CACHE_TTL);
 
 		return $id;
 	}
