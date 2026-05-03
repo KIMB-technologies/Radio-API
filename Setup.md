@@ -217,7 +217,7 @@ server {
 	listen [::]:443 ssl; # add for GUI and newer radios (JSON)
 	listen 443 ssl;
 	# more ssl setup ....
-	#	the radios do not check the certificate chain, so a self-singed or a different domain is ok
+	#	the radios do not check the certificate chain, so a self-signed or a different domain is ok
 }
 ```
 
