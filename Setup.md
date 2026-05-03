@@ -32,7 +32,7 @@ The entire API is bundled in a [Docker Image](https://hub.docker.com/r/kimbtechn
 		- There are some more options, see defaults in [docker-compose.yml](https://github.com/KIMB-technologies/Radio-API/blob/master/docker-compose.yml).
 		- The default setup uses Redis for fast caching of values. Redis may be disable by setting `CONF_USE_JSON_CACHE=true`, which enables an json file based caching as fallback (cached items are then stored in `./data/cache`).
 	- Make sure, that *Radio-API* is available at port `80` (and `443` for newer JSON-based radios) for requests with the hostname `*.wifiradiofrontier.com` and `CONF_DOMAIN`.
-		- Radio-API Docker will automatically create an self-singed SSL certificate and the container listens at port `443`. The radio does not check the SSL certificate.
+		- Radio-API Docker will automatically create an self-signed SSL certificate and the container listens at port `443`. The radio does not check the SSL certificate.
 	- There are two ways to store which episodes of podcasts have already been listened to (new ones are marked by `*`)
 		- Create a cron job to `/cron.php`, e.g., `docker exec --user www-data radio_api php /cron.php`. (This will dump the already played episodes to a JSON file in `./data/` and *Radio-API* will load the file into redis on container startup).
 		- Use the data volume of Redis. (Redis will (re-)load its dump files on container startup.)
@@ -142,7 +142,7 @@ location @nofile {
 
 ## General Information
 
-### Know Issues with newer JSON-based Radios
+### Known Issues with newer JSON-based Radios
 - Creating a radio station by streaming files from Nextcloud shares does not work
 	- It seems that the newer radio does not support M3U & HLS streams (at least not mine) 
 	- So `m3u.php` can not be used for creating these radio stations from Nextcloud shares
@@ -166,7 +166,7 @@ location @nofile {
 	1. `http://radio.example.com/setupapp/iden/asp/BrowseXML/loginXML.asp?token=0` (returns `<EncryptedToken>3a3f5ac48a1dab4e</EncryptedToken>`)
 	2. `http://radio.example.com/setupapp/iden/asp/BrowseXML/loginXML.asp?gofile=&mac=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&dlang=eng&fver=4&ven=iden00` (returns `<?xml version="1.0" encoding="UTF-8" standalone="yes"?> <ListOfItems> ... </ListOfItems>`) 
 	3. Get the GUI-Code from the preceding response and try to used it to access the GUI at `http://radio.example.com/gui/`
-- Text the Radio-API in a terminal (newer radios, JSON)
+- Test the Radio-API in a terminal (newer radios, JSON)
 	1. ```bash 
 		curl -k https://radio.example.com \
 		-H "Authorization: $(echo -n "AA00BB11CC22:$(echo -n "something"|md5)"|base64 )" \
