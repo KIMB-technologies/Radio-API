@@ -141,6 +141,18 @@ location @nofile {
 ```
 
 ## General Information
+
+### Know Issues with newer JSON-based Radios
+- Creating a radio station by streaming files from Nextcloud shares does not work
+	- It seems that the newer radio does not support M3U & HLS streams (at least not mine) 
+	- So `m3u.php` can not be used for creating these radio stations from Nextcloud shares
+	- And also the radio is not able to stream any M3U or HLS radio stations!
+- Own Stream does not always play items correctly (radio requests wrong ID)
+	- Own Streams combine radio stations (live) and podcast episodes (not live)
+	- This combinations seems to be a problem, only having one of *live* or *not live* at a time works
+- Sometimes one has to click twice before the radio reacts
+	- No idea
+
 ### Troubleshooting 
 - A log file of (unknown) request received by the Radio-API is created at `CONF_LOG_DIR/requests.log`. (`CONF_LOG_DIR` defaults to `./data`)  
 - Errors with the RadioBrowser API are logged at `CONF_LOG_DIR/radiobrowser.log`.
@@ -161,7 +173,7 @@ location @nofile {
 		-H "Accept-Language: de-DE" \
 		-H "Host: airable.wifiradiofrontier.com" 
 	```
-	2. *TODO*
+	- TODO -> write things here
 
 ### Im- & Export
 There is an Im- & Export web interface at `./gui/im-export.php`.

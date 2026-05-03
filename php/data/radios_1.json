@@ -1,7 +1,7 @@
 [
     {
         "name": "NDR Info",
-        "url": "http:\/\/www.ndr.de\/resources\/metadaten\/audio\/m3u\/ndrinfo_sh.m3u",
+        "url": "http:\/\/icecast.ndr.de\/ndr\/ndrinfo\/schleswigholstein\/mp3\/128\/stream.mp3",
         "logo": "invalid",
         "desc": "News",
         "proxy": false,

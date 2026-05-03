@@ -50,7 +50,8 @@ class OwnStreams {
 							. (isset( $item['name'] ) && is_string($item['name']) ? $item["name"]  : 'Invalid Name'),
 						"url" =>  $urlOK ? $item['url'] : '',
 						"live" => isset($item['live']) && is_bool($item['live']) ? $item['live'] : true,
-						"proxy" => isset($item['proxy']) && is_bool($item['proxy']) ? $item['proxy'] : false
+						"proxy" => isset($item['proxy']) && is_bool($item['proxy']) ? $item['proxy'] : false,
+						"category" => ''
 					);
 					// add logo if in json
 					if(isset($item['logo']) && filter_var($item['logo'], FILTER_VALIDATE_URL) !== false){
@@ -68,7 +69,8 @@ class OwnStreams {
 				"name" => 'No Stream Items found or error on JSON parse.',
 				"url" => "",
 				"live" => true,
-				"proxy" => false
+				"proxy" => false,
+				"category" => '',
 			);
 		}
 		
