@@ -96,7 +96,7 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 			If this fails, `$_SERVER['REQUEST_URI']` is checked and the part before the first `?` is taken as path value.
 		- It is important, that the path value starts with `/` and contains the full path, but without get parameters starting at `?`.
 		- See the example for NGINX below. The built in webserver of PHP may be used for development with the `./utils/router.php` in this repository.
-		- Radio-API needs access to HTTP headers, especially `Authorization and `Accept-Language` are used.
+		- Radio-API needs access to HTTP headers, especially `Authorization` and `Accept-Language` are used.
 3. Done
 	- Start the radio and open `Internet Radio`.
 	- You will see the entries described above at [Usage](./#usage).
