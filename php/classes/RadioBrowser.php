@@ -176,6 +176,8 @@ class RadioBrowser {
 	public function handleBrowse(Output $out, string $by, string $term, int $offset = 0) : void {
 		$this->before_request($out);
 
+		$out->currentUrl($this->browseUrl($by, $term, $offset), 'Radio-Browser');
+
 		// store last request from user 
 		$keyPrev = 'last_browse.'.$this->radioId->getId();
 		$this->redis->set($keyPrev, $this->browseUrl($by, $term, $offset));		

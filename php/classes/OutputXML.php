@@ -126,12 +126,12 @@ class OutputXML extends Output {
 		);
 
 		// add <- back url
-		if(!empty( $this->prevurl )){
+		if(!empty( $this->prevUrl )){
 			array_unshift( $this->items, 
 				array(
 					'ItemType' => 'Previous',
-					'UrlPrevious' => $this->prevurl,
-					'UrlPreviousBackUp' => $this->prevurl
+					'UrlPrevious' => $this->cleanUrl($this->prevUrl),
+					'UrlPreviousBackUp' => $this->cleanUrl($this->prevUrl)
 				)
 			);
 		}

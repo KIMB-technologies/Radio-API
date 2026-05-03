@@ -34,16 +34,70 @@ class OutputJSON extends Output {
 		int|string $id, string $name, string $url,
 		$light = false, string $desc = '', string $logo = '', int|string $sortKey = ""
 	) : void {
+		$info = array(
+			'id' => [
+				'frontiersmart',
+				'radio',
+				'?sSearchtype=3&Search=' . $id
+			],
+			'title' => $this->cleanText($name, true),
+			'url' => $this->cleanUrl(Config::RADIO_DOMAIN . '?sSearchtype=3&Search=' . $id),
+			'description' => $this->cleanText($desc),
+			'images' => array(array(
+				'url' => $this->cleanUrl($this->logo->logoUrl($logo)),
+				'size' => [150, 150],
+				'type' => 'cover'
+			)),
+			'streams' => array(array(
+				'url' => $this->cleanUrl(Config::RADIO_DOMAIN . '?sSearchtype=3&Search=' . $id . '&play'),
+				'codec' => array(
+					'name' => "MP3",
+					'bitrate' => 64,
+				),
+				'reliability' => 1
+			))
+		);
+		
 		// TODO
-		$this->items[] = array();
+		$play = isset($_GET['play']);
+		
+		if($light){
+			unset($info['description']);
+			unset($info['streams']);
 
-		$id;
-		$this->cleanText($name, true);
+			$this->items[] = array(
+				'type' => 'directory',
+				'id' => null,
+				'key' => ['content', 'entries'],
+				'value' => $info
+			);
+		}
+		else{
+			unset($info['id']);
 
-		if( !$light ){
-			$this->cleanUrl($url);
-			$this->cleanText($desc);
-			$this->cleanUrl($this->logo->logoUrl($logo));
+			if($play){
+				$this->items[] = array(
+					'type' => 'redirect',
+					'id' => $id,
+					'key' => [],
+					'value' => array(
+						'url' => $this->cleanUrl($url, false),
+						'codec' => array(
+							'name' => "MP3",
+							'bitrate' => 64,
+						),
+						'content' => $info
+					)
+				);
+			}
+			else{
+				$this->items[] = array(
+					'type' => 'radio',
+					'id' => $id,
+					'key' => [],
+					'value' => $info
+				);
+			}
 		}
 
 		$this->itemsSortKeys[] = 'ra==' . ($sortKey === "" ? $name : $sortKey);
@@ -51,14 +105,13 @@ class OutputJSON extends Output {
 
 	public function addPodcast(int $podcastid, string $name, string $url, int|string $sortKey = "") : void {
 		// TODO
-		$this->items[] = array();
+		//$this->items[] = array();
 
 		$podcastid;
 		$this->cleanText($name, true);
 		$this->cleanUrl($url);
-		$this->cleanUrl($url);
 
-		$this->itemsSortKeys[] = 'pod==' . ($sortKey === "" ? $name : $sortKey);
+		//$this->itemsSortKeys[] = 'pod==' . ($sortKey === "" ? $name : $sortKey);
 	}
 
 	public function addEpisode(
@@ -66,68 +119,120 @@ class OutputJSON extends Output {
 		string $url, string $desc = '', string $logo = '', bool $top = false
 	) : void {
 		// TODO
-		$this->items[] = array();
+		//$this->items[] = array();
 
 		$podcastid . (!is_null($episodeid) ? 'X' . $episodeid : '');
 		$this->cleanText($podcastname, true);
 		$this->cleanUrl($this->logo->logoUrl($logo));
 		$this->cleanText($episodename, true);
-		$this->cleanUrl($url);
+		$this->cleanUrl($url, false);
 		$this->cleanText($desc);
 
-		$this->itemsSortKeys[] = ($top ? 'epA' : 'epZ' ) . '==' . $podcastid . '==' . $episodeid;
+		//$this->itemsSortKeys[] = ($top ? 'epA' : 'epZ' ) . '==' . $podcastid . '==' . $episodeid;
 	}
 
 	public function addDir(string $name, string $url, bool $isLast = false, int|string $sortKey = "") : void {
-		// TODO
-		$this->items[] = array();
+		$this->items[] = array(
+			'type' => 'directory',
+			'id' => null,
+			'key' => ['content', 'entries'],
+			'value' => array(
+				'id' => [
+					'frontiersmart',
+					'directory',
+					$this->clearId($name)
+				],
+				'title' => $this->cleanText($name, true),
+				'url' => $this->cleanUrl($url)
+			)
+		);
+		$this->itemsSortKeys[] = ($isLast ? 'z' : '') . 'dir==' . ($sortKey === "" ? $name : $sortKey);
+	}
 
-		$this->cleanText($name, true);
-		$this->cleanUrl($url);
-		
-		$this->itemsSortKeys[] = ($isLast ? 'z' : '') . 'dir==' . ($sortKey === "" ? $name : $sortKey);;
+	public function index() : void {
+		$this->currentUrl(Config::RADIO_DOMAIN, 'Index');
+
+		$this->items[] = array(
+			'type' => 'index',
+			'id' => null,
+			'key' => ['content', 'entries'],
+			'value' => array(
+				'id' => [
+					'frontiersmart',
+					'service',
+					'radio'
+				],
+				'title' => 'Radio',
+				'url' => $this->cleanUrl(Config::RADIO_DOMAIN . 'index')
+			)
+		);
+		$this->itemsSortKeys[] = 'dir==Radio';
+
+		$this->items[] = array(
+			'type' => 'index',
+			'id' => null,
+			'key' => ['content', 'entries'],
+			'value' => array(
+				'id' => [
+					'frontiersmart',
+					'service',
+					'feed'
+				],
+				'title' => 'Podcast',
+				'url' => $this->cleanUrl(Config::RADIO_DOMAIN . 'index')
+			)
+		);
+		$this->itemsSortKeys[] = 'dir==Podcast';
 	}
 
 	protected function getItemName(array $item) : string {
-		// TODO
-		return '';
+		return empty($item['value']['title']) ? '' : $item['value']['title'];
+	}
+
+	protected function clearId(string $id) : string {
+		return preg_replace('/[^a-z0-9]/', '', strtolower($id));
 	}
 
 	protected function formatItems(array $items) : string {
-		// TODO
-		return '
-{
-  "id": [
-    "airable",
-    "directory",
-    "index"
-  ],
-  "title": "Index",
-  "url": "'.Config::RADIO_DOMAIN.'",
-  "content": {
-    "entries": [
-      {
-        "id": [
-          "frontiersmart",
-          "service",
-          "radio"
-        ],
-        "title": "Internet Radio",
-        "url": "'.$this->cleanUrl(Config::RADIO_DOMAIN.'?huhu=radio') . '"
-      },
-      {
-        "id": [
-          "frontiersmart",
-          "service",
-          "feed"
-        ],
-        "title": "Podcasts",
-        "url": "'.$this->cleanUrl(Config::RADIO_DOMAIN.'?huhu=podc') . '"
-      }
-    ]
-  }
-}
-		';
+		$json = array(
+			'id' => array(), // prepare empty value
+			'title' => self::cleanText($this->selfTitle, true),
+			'url' => self::cleanUrl($this->selfUrl),
+		);
+
+		$type = 'directory';
+		$id = null;
+		foreach($items as $item){
+
+			// add the values, either to root or to the right place in json
+			if(count($item['key']) == 0){
+				$json = array_merge($json, $item['value']);
+			}
+			else{
+				// move to right place/ key in json 
+				$ji = &$json;
+				foreach($item['key'] as $k){
+					if(!isset($ji[$k])){
+						$ji[$k] = array();
+					}
+					$ji = &$ji[$k];
+				}
+				// and add item
+				$ji[] = $item['value'];
+			}
+
+			// detect type and id for later
+			$type = $item['type'];
+			$id = $item['id'];
+		}
+
+		// add the id chain
+		$json['id'] = $type == 'index' ?
+				['airable', 'directory', 'index' ]
+			:
+				['frontiersmart', $type, is_null($id) ? $this->clearId($this->selfTitle) : $id];
+		
+		return json_encode($json, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
 	}
 
 	protected function contentType() : string {

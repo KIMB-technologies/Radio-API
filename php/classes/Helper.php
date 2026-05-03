@@ -34,9 +34,7 @@ class Helper {
 			} else{
 				$url = $link;
 			}
-			
-			curl_close($ch);
-
+		
 			return $url;
 		}
 		

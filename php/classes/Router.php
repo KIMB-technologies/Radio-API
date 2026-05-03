@@ -39,20 +39,26 @@ class Router {
 	public function handleGet(string $uri) : void {
 		// only one station or episode (play this)
 		if( isset( $_GET['sSearchtype'] ) && ($_GET['sSearchtype'] == 3 || $_GET['sSearchtype'] == 5 ) && !empty($_GET['Search'])){
+			$currentUrl = Config::RADIO_DOMAIN . '?sSearchtype=' . $_GET['sSearchtype'] . '&Search=' . $_GET['Search'];
+
 			// is an ID from Radio-Browser??
 			if( RadioBrowser::matchStationID($_GET['Search']) ){ 
 				$this->radio_browser->handleStationPlay($this->out, $_GET['Search']);
+				$this->out->currentUrl($currentUrl, 'Play Station');
 			}
 			// podcast episode ID? "3000-3999"+"X"+"[0-9]+" 
 			else if( preg_match('/^(3\d\d\d)X(\d+)$/', $_GET['Search'], $parts ) === 1 ){ 
 				$this->listPodcastEpisode(intval($parts[1]), intval($parts[2]));
+				$this->out->currentUrl($currentUrl, 'Play Episode');
 			}
 			// radio or "own stream" ID (Range 1000 - 2999)
 			else if( preg_match('/^(1|2)\d\d\d$/', $_GET['Search'], $parts ) === 1){ 
 				$this->listPlayItem(intval($_GET['Search']), $parts[1]);
+				$this->out->currentUrl($currentUrl, 'Play Stream');
 			}
 			else {
 				$this->out->addDir( 'No item found for this ID!', Config::RADIO_DOMAIN . '?go=initial');
+				$this->out->currentUrl(Config::RADIO_DOMAIN . '?sSearchtype=' . $_GET['sSearchtype'] . '&Search=Error', 'Error');
 			}
 		}
 		// radio browser browsing
@@ -63,6 +69,7 @@ class Router {
 		// (Un)Read for podcast episodes (used in GUI)
 		else if( !empty($_GET['toggleUnRead']) && is_string($_GET['toggleUnRead']) ){
 			$this->out->addDir('TOGGLE-UN-READ-' . $this->unread->toggleById($_GET['toggleUnRead'], $this->data), '');
+			// GUI only, so no current URL needed
 		}
 		// list of stations or podcasts (= the type) and possibly selecting a category
 		else if( $uri == '/list' ){ 
@@ -75,12 +82,16 @@ class Router {
 				$tid = null; 
 			}
 			else{
+				$tid = null; 
+
 				$this->out->addDir( 'No item found for this tID or Category!', Config::RADIO_DOMAIN . '?go=initial');
+				$this->out->currentUrl(Config::RADIO_DOMAIN . 'list?tid=Error&cat=Error', 'Error');
 			}
 			
 			// list items of a podcast
 			if( $tid == 3 && isset($_GET['id']) && preg_match('/^\d+$/', $_GET['id']) === 1 ){
 				$this->listPodcast(intval($_GET['id']));
+				$this->out->currentUrl(Config::RADIO_DOMAIN . 'list?tid=3&id=' . $_GET['id'], 'Episodes');
 			}
 			// list items of type (or all of category), possibly filter by category
 			else{
@@ -90,8 +101,14 @@ class Router {
 				);
 			}
 		}
+		// special case for JSON client: empty URI requires to show "airable index"
+		else if(empty($uri) && $this->out instanceof OutputJSON) {
+			$this->out->index();
+		}
 		// list of types (startpage)
 		else{ 
+			$this->out->currentUrl(Config::RADIO_DOMAIN . '/index?go=initial', 'List');
+
 			// add local types
 			foreach( $this->data->getTypes() as $tid => $name ){
 				$this->out->addDir( $name, Config::RADIO_DOMAIN . 'list?tid=' . $tid );
@@ -112,7 +129,8 @@ class Router {
 			// Log unknown request
 			if(
 				preg_match('/^\/setupapp\/[A-Za-z0-9\-\_]+\/asp\/BrowseXML\/loginXML.asp/i', $uri) === 0 &&
-				(!isset( $_GET['go'] ) || $_GET['go'] != "initial")
+				(!isset( $_GET['go'] ) || $_GET['go'] != "initial") &&
+				$uri != '/index' // JSON radio requests normal index 
 			){
 				file_put_contents(
 					Config::LOG_DIR . '/requests.log',
@@ -197,6 +215,13 @@ class Router {
 	}
 		
 	private function listDirectory(?int $tid = null, ?string $cat = null) : void {
+		$this->out->currentUrl(
+			Config::RADIO_DOMAIN . 'list?' . 
+				(is_null($tid) ? '' : '&tid=' . $tid) .
+				(is_null($cat) ? '' : '&cat=' . rawurlencode($cat)),
+			'Categories'
+		);
+
 		// first add categories if in "root" folder of type
 		if(is_null($cat) && !is_null($tid)){
 			foreach( $this->data->getCategories( $tid ) as $category ){

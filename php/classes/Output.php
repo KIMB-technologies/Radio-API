@@ -17,12 +17,13 @@ defined('HAMARadio') or die('Invalid Endpoint');
 mb_substitute_character("none");
 abstract class Output {
 
-	protected
-		$items = array(),
-		$itemsSortKeys = array(),
-		$prevurl = '',
-		$language,
-		$logo;
+	protected array $items = array();
+	protected array $itemsSortKeys = array();
+	protected string $prevUrl = '';
+	protected string $selfUrl = Config::RADIO_DOMAIN . '?go=initial';
+	protected string $selfTitle = 'Index';
+	protected int $language;
+	protected RadioLogo $logo;
 
 	const MAX_ITEMS = 200; // to many items will cause the radio to crash (one could add paging, but until then, we remove too much items)
 
@@ -31,11 +32,20 @@ abstract class Output {
 		'ger'
 	);
 	const TRANSLATIONS = array(
+		'Index' => ['Index', 'Index'],
 		'Podcast' => ['Podcast', 'Podcast'],
 		'Radio' => ['Radio stations', 'Radiosender'],
 		'Radio-Browser' => ['Radio-Browser', 'Radio-Browser'],
 		'Stream' => ['Stream', 'Stream'],
 		'GUI-Code' => ['GUI-Code', 'GUI-Code'], 
+		//
+		'Play Station' => ['Play Station', 'Sender abspielen'],
+		'Play Episode' => ['Play Episode', 'Episode abspielen'],
+		'Play Stream' => ['Play Stream', 'Stream abspielen'],
+		'Error' => ['Error', 'Fehler'],
+		'Episodes' => ['Episodes', 'Episoden'],
+		'List' => ['List', 'Liste'],
+		'Categories' => ['Categories', 'Kategorien'],
 		//
 		'Countries' => ['Countries', 'Länder'],
 		'All States' => ['All States', 'Alle Bundesländer'],
@@ -94,7 +104,15 @@ abstract class Output {
 	 * Set or override a Previous (<- Back URL)
 	 */
 	public function prevUrl(string $url) : void {
-		$this->prevurl = $this->cleanUrl($url);
+		$this->prevUrl = $url;
+	}
+
+	/**
+	 * Set or override the current URL and title
+	 */
+	public function currentUrl(string $url, string $title) : void {
+		$this->selfUrl = $url;
+		$this->selfTitle = $title;
 	}
 
 	protected function cleanText( string $s, bool $translate = false ): string {
@@ -115,9 +133,11 @@ abstract class Output {
 		return mb_substr( mb_convert_encoding(str_replace( str_split('"&<>/'), '', $s ), 'UTF-8', 'UTF-8'), 0, 100 );
 	}
 
-	protected function cleanUrl( string $s ): string {
+	protected function cleanUrl( string $s, bool $addHttpS = true ): string {
 		$url = mb_convert_encoding(str_replace( str_split('<>'), '', $s ), 'UTF-8', 'UTF-8');
-		return 'http' . ( empty($_SERVER['HTTPS']) ? ':' : 's:' ) . substr( $url, strpos( $url, '//') );
+		return str_starts_with($url, 'http://') && !$addHttpS ?
+			$url : // do not add an S here
+			'http' . ( empty($_SERVER['HTTPS']) ? ':' : 's:' ) . substr( $url, strpos( $url, '//') );
 	}
 
 	abstract protected function getItemName(array $item) : string;
