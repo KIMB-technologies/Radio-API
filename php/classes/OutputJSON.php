@@ -255,8 +255,8 @@ class OutputJSON extends Output {
 	protected function formatItems(array $items) : string {
 		$json = array(
 			'id' => array(), // prepare empty value
-			'title' => self::cleanText($this->selfTitle, true),
-			'url' => self::cleanUrl($this->selfUrl),
+			'title' => $this->cleanText($this->selfTitle, true),
+			'url' => $this->cleanUrl($this->selfUrl),
 		);
 
 		$type = 'directory';
