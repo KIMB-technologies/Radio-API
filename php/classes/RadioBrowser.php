@@ -220,7 +220,9 @@ class RadioBrowser {
 					$now = time();
 					foreach($last as $uuid => $item){
 						$out->addStation(
-							self::stationIDfromUUID($uuid), $item["name"], $item["url"], light: true, sortKey: $now-$item["time"]
+							self::stationIDfromUUID($uuid), $item["name"], $item["url"],
+							status: OutputPlayStatus::Info,
+							sortKey: $now-$item["time"]
 						);
 					}
 					if(empty($last)){
@@ -256,7 +258,7 @@ class RadioBrowser {
 					foreach($list as $i => $item){
 						$out->addStation(
 							self::stationIDfromUUID($item["stationuuid"]), $item["name"],
-							$item["url"], light: true, sortKey: $i+1
+							$item["url"], status: OutputPlayStatus::Info, sortKey: $i+1
 						);
 					}
 					break;
@@ -323,8 +325,10 @@ class RadioBrowser {
 
 			foreach($list as $i => $item){
 				$out->addStation(
-					self::stationIDfromUUID($item["stationuuid"]), $item["name"],
-					$item["url"], light: true, sortKey: $i+1
+					self::stationIDfromUUID($item["stationuuid"]),
+					$item["name"], $item["url"],
+					status: OutputPlayStatus::Info,
+					sortKey: $i+1
 				);
 			}
 
@@ -378,7 +382,7 @@ class RadioBrowser {
 		);
 	}
 	
-	public function handleStationPlay(Output $out, string $id) : void {
+	public function handleStationPlay(Output $out, string $id, bool $play) : void {
 		$this->before_request($out);
 
 		$keyPrev = 'last_browse.'.$this->radioId->getId();
@@ -403,9 +407,9 @@ class RadioBrowser {
 			self::stationIDfromUUID($station["stationuuid"]),
 			$station["name"],
 			$station["url"],
-			false,
-			$station["tags"] . " - " . $station["country"],
-			$station["favicon"]
+			status: $play ? OutputPlayStatus::Play : OutputPlayStatus::Full,
+			desc: $station["tags"] . " - " . $station["country"],
+			logo: $station["favicon"]
 		);
 
 		// send the click to server to maintain "station clicks"

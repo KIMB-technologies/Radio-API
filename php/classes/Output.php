@@ -11,6 +11,12 @@
  */
 defined('HAMARadio') or die('Invalid Endpoint');
 
+enum OutputPlayStatus {
+	case Info;
+	case Full;
+	case Play;
+}
+
 /**
  * Radio-API XML Style Output Class
  */
@@ -73,7 +79,8 @@ abstract class Output {
 	 */
 	abstract public function addStation(
 		int|string $id, string $name, string $url,
-		$light = false, string $desc = '', string $logo = '', int|string $sortKey = ""
+		OutputPlayStatus $status = OutputPlayStatus::Full,
+		string $desc = '', string $logo = '', int|string $sortKey = ""
 	) : void;
 
 	/**
@@ -89,7 +96,8 @@ abstract class Output {
 	 */
 	abstract public function addEpisode(
 		int $podcastid, int|null $episodeid, string $podcastname, string $episodename, string $url,
-		string $desc = '', string $logo = '', bool $top = false
+		string $desc = '', string $logo = '', bool $top = false,
+		OutputPlayStatus $status = OutputPlayStatus::Full
 	) : void;
 
 	/**

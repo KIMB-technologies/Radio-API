@@ -40,20 +40,21 @@ class Router {
 		// only one station or episode (play this)
 		if( isset( $_GET['sSearchtype'] ) && ($_GET['sSearchtype'] == 3 || $_GET['sSearchtype'] == 5 ) && !empty($_GET['Search'])){
 			$currentUrl = Config::RADIO_DOMAIN . '?sSearchtype=' . $_GET['sSearchtype'] . '&Search=' . $_GET['Search'];
+			$play = isset($_GET['play']);
 
 			// is an ID from Radio-Browser??
 			if( RadioBrowser::matchStationID($_GET['Search']) ){ 
-				$this->radio_browser->handleStationPlay($this->out, $_GET['Search']);
+				$this->radio_browser->handleStationPlay($this->out, $_GET['Search'], $play);
 				$this->out->currentUrl($currentUrl, 'Play Station');
 			}
 			// podcast episode ID? "3000-3999"+"X"+"[0-9]+" 
 			else if( preg_match('/^(3\d\d\d)X(\d+)$/', $_GET['Search'], $parts ) === 1 ){ 
-				$this->listPodcastEpisode(intval($parts[1]), intval($parts[2]));
+				$this->listPodcastEpisode(intval($parts[1]), intval($parts[2]), play: $play);
 				$this->out->currentUrl($currentUrl, 'Play Episode');
 			}
 			// radio or "own stream" ID (Range 1000 - 2999)
 			else if( preg_match('/^(1|2)\d\d\d$/', $_GET['Search'], $parts ) === 1){ 
-				$this->listPlayItem(intval($_GET['Search']), $parts[1]);
+				$this->listPlayItem(intval($_GET['Search']), $parts[1], play: $play);
 				$this->out->currentUrl($currentUrl, 'Play Stream');
 			}
 			else {
@@ -91,7 +92,6 @@ class Router {
 			// list items of a podcast
 			if( $tid == 3 && isset($_GET['id']) && preg_match('/^\d+$/', $_GET['id']) === 1 ){
 				$this->listPodcast(intval($_GET['id']));
-				$this->out->currentUrl(Config::RADIO_DOMAIN . 'list?tid=3&id=' . $_GET['id'], 'Episodes');
 			}
 			// list items of type (or all of category), possibly filter by category
 			else{
@@ -141,9 +141,9 @@ class Router {
 		}
 	}
 
-	private function listPodcastEpisode(int $id, int $eid, int $tid = 3) : void {
+	private function listPodcastEpisode(int $id, int $eid, int $tid = 3, bool $play = false) : void {
 		$this->out->prevUrl(Config::RADIO_DOMAIN . 'list?tid='.$tid.'&id='.$id);
-		
+
 		$ed = PodcastLoader::getEpisodeData( $id, $eid, $this->data );
 		if( $ed != array() ){
 			$this->unread->openItem($id, $ed['episode']['url']);
@@ -153,12 +153,13 @@ class Router {
 				$ed['title'], $ed['episode']['title'],
 				$this->data->getPodcastURL($id, $eid, $this->radioId->getMac()),
 				$ed['episode']['desc'],
-				$ed['logo']
+				$ed['logo'],
+				status: $play ? OutputPlayStatus::Play : OutputPlayStatus::Full
 			);
 		}
 	}
 
-	private function listPlayItem(int $id, int $tid = 1) : void {
+	private function listPlayItem(int $id, int $tid = 1, bool $play = false) : void {
 		$sta = $this->data->getById( $id );
 
 		$this->out->prevUrl(
@@ -173,9 +174,9 @@ class Router {
 					$id,
 					$sta['name'],
 					$this->data->getStationURL($id, $this->radioId->getMac()),
-					false,
-					$sta['desc'] ?? '',
-					$sta['logo'] ?? ''
+					status: $play ? OutputPlayStatus::Play : OutputPlayStatus::Full,
+					desc: $sta['desc'] ?? '',
+					logo: $sta['logo'] ?? ''
 				);
 			}
 			else { // "live" == false
@@ -183,8 +184,9 @@ class Router {
 					$id, null,
 					$sta['name'], $sta['name'],
 					$this->data->getStationURL($id, $this->radioId->getMac()),
-					$sta['desc']  ?? '',
-					$sta['logo'] ?? ''
+					$sta['desc'] ?? '',
+					$sta['logo'] ?? '',
+					status: $play ? OutputPlayStatus::Play : OutputPlayStatus::Full
 				);
 			}
 		}
@@ -208,10 +210,12 @@ class Router {
 				$this->unread->knownItemMark($id, $e['url']) . $e['title'],
 				$this->data->getPodcastURL($id, $eid, $this->radioId->getMac(), sloppy: true),
 				$e['desc'], $pd['logo'],
-				!$this->unread->knownItem($id, $e['url'])
+				!$this->unread->knownItem($id, $e['url']),
+				OutputPlayStatus::Info
 			);
 		}
-		
+
+		$this->out->currentUrl(Config::RADIO_DOMAIN . 'list?tid=3&id=' . $id, $pd['title']);
 	}
 		
 	private function listDirectory(?int $tid = null, ?string $cat = null) : void {
@@ -239,7 +243,7 @@ class Router {
 					$id,
 					$item['name'],
 					$this->data->getStationURL($id, $this->radioId->getMac()),
-					true
+					OutputPlayStatus::Info
 				);
 			}
 			else if($item['tid'] == 3){ // podcast
@@ -253,7 +257,8 @@ class Router {
 				$this->out->addEpisode(
 					$id, null,
 					$item['name'], $item['name'],
-					$this->data->getStationURL($id, $this->radioId->getMac())
+					$this->data->getStationURL($id, $this->radioId->getMac()),
+					status: OutputPlayStatus::Info
 				);
 			}
 		}

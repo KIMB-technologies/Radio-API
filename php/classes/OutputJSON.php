@@ -32,7 +32,8 @@ class OutputJSON extends Output {
 
 	public function addStation(
 		int|string $id, string $name, string $url,
-		$light = false, string $desc = '', string $logo = '', int|string $sortKey = ""
+		OutputPlayStatus $status = OutputPlayStatus::Full,
+		string $desc = '', string $logo = '', int|string $sortKey = ""
 	) : void {
 		$info = array(
 			'id' => [
@@ -58,10 +59,7 @@ class OutputJSON extends Output {
 			))
 		);
 		
-		// TODO
-		$play = isset($_GET['play']);
-		
-		if($light){
+		if($status == OutputPlayStatus::Info){
 			unset($info['description']);
 			unset($info['streams']);
 
@@ -75,7 +73,7 @@ class OutputJSON extends Output {
 		else{
 			unset($info['id']);
 
-			if($play){
+			if($status == OutputPlayStatus::Play){
 				$this->items[] = array(
 					'type' => 'redirect',
 					'id' => $id,
@@ -104,31 +102,92 @@ class OutputJSON extends Output {
 	}
 
 	public function addPodcast(int $podcastid, string $name, string $url, int|string $sortKey = "") : void {
-		// TODO
-		//$this->items[] = array();
+		$this->items[] = array(
+			'type' => 'directory',
+			'id' => null,
+			'key' => ['content', 'entries'],
+			'value' => array(
+				'id' => [
+					'frontiersmart',
+					'directory',
+					$podcastid
+				],
+				'title' => $this->cleanText($name, true),
+				'url' => $this->cleanUrl($url)
+			)
+		);
 
-		$podcastid;
-		$this->cleanText($name, true);
-		$this->cleanUrl($url);
-
-		//$this->itemsSortKeys[] = 'pod==' . ($sortKey === "" ? $name : $sortKey);
+		$this->itemsSortKeys[] = 'pod==' . ($sortKey === "" ? $name : $sortKey);
 	}
 
 	public function addEpisode(
 		int $podcastid, int|null $episodeid, string $podcastname, string $episodename,
-		string $url, string $desc = '', string $logo = '', bool $top = false
+		string $url, string $desc = '', string $logo = '', bool $top = false,
+		OutputPlayStatus $status = OutputPlayStatus::Full
 	) : void {
-		// TODO
-		//$this->items[] = array();
+		$fullid = $podcastid . (!is_null($episodeid) ? 'X' . $episodeid : '');
 
-		$podcastid . (!is_null($episodeid) ? 'X' . $episodeid : '');
-		$this->cleanText($podcastname, true);
-		$this->cleanUrl($this->logo->logoUrl($logo));
-		$this->cleanText($episodename, true);
-		$this->cleanUrl($url, false);
-		$this->cleanText($desc);
+		$info = array(
+			'id' => [
+				'frontiersmart',
+				'episode',
+				'?sSearchtype=5&Search=' . $fullid
+			],
+			'title' => $this->cleanText($episodename, true),
+			'url' => $this->cleanUrl(Config::RADIO_DOMAIN . '?sSearchtype=5&Search=' . $fullid),
+			'description' => $this->cleanText($desc),
+			'images' => array(array(
+				'url' => $this->cleanUrl($this->logo->logoUrl($logo)),
+				'size' => [150, 150],
+				'type' => 'cover'
+			)),
+			'streams' => array(array(
+				'url' => $this->cleanUrl(Config::RADIO_DOMAIN . '?sSearchtype=5&Search=' . $fullid . '&play'),
+				'codec' => array(
+					'name' => "MP3",
+					'bitrate' => 64,
+				),
+				'reliability' => 1
+			))
+		);
 
-		//$this->itemsSortKeys[] = ($top ? 'epA' : 'epZ' ) . '==' . $podcastid . '==' . $episodeid;
+		if($status == OutputPlayStatus::Info){
+			$this->items[] = array(
+				'type' => 'feed',
+				'id' => $podcastid,
+				'key' => ['content', 'entries'],
+				'value' => $info
+			);
+		}
+		else{
+			unset($info['id']);
+
+			if($status == OutputPlayStatus::Play){
+				$this->items[] = array(
+					'type' => 'redirect',
+					'id' => $fullid,
+					'key' => [],
+					'value' => array(
+						'url' => $this->cleanUrl($url, false),
+						'codec' => array(
+							'name' => "MP3",
+							'bitrate' => 64,
+						),
+						'content' => $info
+					)
+				);
+			}
+			else{
+				$this->items[] = array(
+					'type' => 'episode',
+					'id' => $fullid,
+					'key' => [],
+					'value' => $info
+				);
+			}
+		}
+		
+		$this->itemsSortKeys[] = ($top ? 'epA' : 'epZ' ) . '==' . $podcastid . '==' . $episodeid;
 	}
 
 	public function addDir(string $name, string $url, bool $isLast = false, int|string $sortKey = "") : void {

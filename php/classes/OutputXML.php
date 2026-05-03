@@ -31,14 +31,15 @@ class OutputXML extends Output {
 	 * Add a station
 	 */
 	public function addStation( int|string $id, string $name, string $url,
-		$light = false, string $desc = '', string $logo = '', int|string $sortKey = ""
+		OutputPlayStatus $status = OutputPlayStatus::Full,
+		string $desc = '', string $logo = '', int|string $sortKey = ""
 	) : void {
 		$a = array(
 			'ItemType' => 'Station',
 			'StationId' => $id,
 			'StationName' => $this->cleanText($name, true),
 		);
-		if( !$light ){
+		if( $status != OutputPlayStatus::Info ){
 			$b = array(
 				'StationUrl' => $this->cleanUrl($url),
 				'StationDesc' => $this->cleanText($desc),
@@ -75,8 +76,10 @@ class OutputXML extends Output {
 	/**
 	 * Add a podcast episode
 	 */
-	public function addEpisode( int $podcastid, int|null $episodeid, string $podcastname, string $episodename,
-		string $url, string $desc = '', string $logo = '', bool $top = false
+	public function addEpisode(
+		int $podcastid, int|null $episodeid, string $podcastname, string $episodename,
+		string $url, string $desc = '', string $logo = '', bool $top = false,
+		OutputPlayStatus $status = OutputPlayStatus::Full
 	) : void {
 		$this->items[] = array(
 			'ItemType' => 'ShowEpisode',
