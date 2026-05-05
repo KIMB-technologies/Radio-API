@@ -3,13 +3,13 @@
  * Radio-API
  * https://github.com/KIMB-technologies/Radio-API
  * 
- * (c) 2019 - 2024 KIMB-technologies 
+ * (c) 2019 - 2026 KIMB-technologies 
  * https://github.com/KIMB-technologies/
  * 
  * released under the terms of GNU Public License Version 3
  * https://www.gnu.org/licenses/gpl-3.0.txt
  */
-define('HAMA-Radio', 'Radio');
+define('HAMARadio', 'Radio');
 error_reporting( !empty($_ENV['DEV']) && $_ENV['DEV'] == 'dev' ? E_ALL : 0 );
 
 /**
@@ -18,32 +18,33 @@ error_reporting( !empty($_ENV['DEV']) && $_ENV['DEV'] == 'dev' ? E_ALL : 0 );
 require_once( __DIR__ . '/classes/autoload.php' );
 
 /**
- * Radio Server Test Requests
+ * Get the URI, may be rewritten or in headers
  */
 $uri = !empty( $_GET['uri'] ) && is_string($_GET['uri']) ? $_GET['uri'] : 'none';
 if($uri === 'none' && isset($_SERVER['REQUEST_URI']) && is_string($_SERVER['REQUEST_URI'])){
 	$uri = trim(substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')));
 }
 
-// Login (Radio tries a login before accessing the api)
+// Login (old Radios try a 'login' before accessing the API)
 if( preg_match('/^\/setupapp\/[A-Za-z0-9\-\_]+\/asp\/BrowseXML\/loginXML.asp/', $uri) === 1 && !isset( $_GET['mac'] )) {
 	Output::sendAnswer('<EncryptedToken>3a3f5ac48a1dab4e</EncryptedToken>');
 	die(); //will never be reached
 }
 
 /**
- * Check if IP valid
+ * Authenticate the Radio, use mac or radioID of client
  */
-Config::checkAccess( !empty($_GET['mac']) && Helper::checkValue( $_GET['mac'], Id::MAC_PREG ) ? $_GET['mac'] : null );
+$auth = new Auth();
 
 /**
- * Auth
- */
-$radioid = Auth::authFromMac(true);
+ * Check if IP valid (config based blocking of IPs/ domains)
+ */ 
+Config::checkAccess($auth->getClientID()); 
 
 /**
- * Handle
+ * Check the authentication and handle the routing
  */
-$router = new Router($radioid);
+$radioId = $auth->auth(true);
+$router = new Router($radioId, $auth->getClientType());
 $router->handleGet($uri);
 ?>

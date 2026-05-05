@@ -3,13 +3,13 @@
  * Radio-API
  * https://github.com/KIMB-technologies/Radio-API
  * 
- * (c) 2019 - 2024 KIMB-technologies 
+ * (c) 2019 - 2026 KIMB-technologies 
  * https://github.com/KIMB-technologies/
  * 
  * released under the terms of GNU Public License Version 3
  * https://www.gnu.org/licenses/gpl-3.0.txt
  */
-defined('HAMA-Radio') or die('Invalid Endpoint');
+defined('HAMARadio') or die('Invalid Endpoint');
 
 /**
  * Implements the Im- & Export feature
@@ -107,21 +107,21 @@ class ImExport {
 		$ok = true;
 		foreach($export as $f => $content){
 			if($this->exportFile($f, "list")){
-				$ok &= $this->validateList($content);
+				$ok = $ok && $this->validateList($content);
 				if(!$ok){
 					$this->msg = (Template::getLanguage() == 'de' ? "Fehlerhafte Liste" : "Error in list") . ": " . $f;
 					break;
 				}
 			}
 			else if($this->exportFile($f, "cache")){
-				$ok &= $this->validateCache($content, $f);
+				$ok = $ok && $this->validateCache($content, $f);
 				if(!$ok){
 					$this->msg = (Template::getLanguage() == 'de' ? "Fehlerhafter Cache" : "Error in cache") . ": " . $f;
 					break;
 				}
 			}
 			else if($this->exportFile($f, "table")){
-				$ok &= $this->validateTable($content);
+				$ok = $ok && $this->validateTable($content);
 				if(!$ok){
 					$this->msg = Template::getLanguage() == 'de' ? "Fehlerhafte Tabelle" : "Error in table";
 					break;
@@ -144,34 +144,34 @@ class ImExport {
 		$ok = true;
 		$cnt = 0;
 		foreach($content as $key => $val){
-			$ok &= $key === $cnt && is_array($val);
+			$ok = $ok && $key === $cnt && is_array($val);
 
 			foreach($val as $k => $v){
 				switch ($k){
 					case "name":
 					case "desc":
-						$ok &= Inner::filterName($v) === $v;
+						$ok = $ok && Inner::filterName($v) === $v;
 						break;
 					case "category":
-						$ok &= ($v === "" || Inner::filterCategory($v) === $v);
+						$ok = $ok && ($v === "" || Inner::filterCategory($v) === $v);
 						break;
 					case "logo":
 					case "url":
-						$ok &= Inner::filterURL($v) === $v;
+						$ok = $ok && Inner::filterURL($v) === $v;
 						break;
 					case "type":
-						$ok &= in_array($v, ["rss", "nc", "radio"]);
+						$ok = $ok && in_array($v, ["rss", "nc", "radio"]);
 						break;
 					case "finalurl":
 					case "proxy":
-						$ok &= is_bool($v);
+						$ok = $ok && is_bool($v);
 						break;
 					default:
 						$ok = false;
 						break;
 				}
 			}
-			$ok &= array_key_exists("name", $val) && array_key_exists("url", $val) && array_key_exists("type", $val);
+			$ok = $ok && array_key_exists("name", $val) && array_key_exists("url", $val) && array_key_exists("type", $val);
 
 			$cnt += 1;
 		}
@@ -181,10 +181,10 @@ class ImExport {
 	private function validateCache(array $content, string $name) : bool {
 		$ok = true;
 		foreach($content as $key => $value){
-			$ok &= Id::isIdInteger($key) && is_array($value);
+			$ok = $ok && Id::isIdInteger($key) && is_array($value);
 
 			if($name == "unread.json"){
-				$ok &= array_reduce(
+				$ok = $ok && array_reduce(
 					$value,
 					fn($c, $i) => $c && Inner::filterURL($i) === $i,
 					true
@@ -192,10 +192,10 @@ class ImExport {
 			}
 			else { // radiobrowser.json
 				foreach($value as $k => $v){
-					$ok &= is_string($k) && RadioBrowser::uuidFromStationID(RadioBrowser::stationIDfromUUID($k)) === $k;
+					$ok = $ok && is_string($k) && RadioBrowser::uuidFromStationID(RadioBrowser::stationIDfromUUID($k)) === $k;
 
-					$ok &= array_key_exists("name", $v) && array_key_exists("url", $v) && array_key_exists("time", $v);
-					$ok &= is_string($v["name"]) && Inner::filterURL($v["url"]) === $v["url"] && is_integer($v["time"]);
+					$ok = $ok && array_key_exists("name", $v) && array_key_exists("url", $v) && array_key_exists("time", $v);
+					$ok = $ok && is_string($v["name"]) && Inner::filterURL($v["url"]) === $v["url"] && is_integer($v["time"]);
 				}
 			}
 		}
@@ -210,22 +210,33 @@ class ImExport {
 				fn($v, $k) => Helper::checkValue( $k, Id::MAC_PREG ) && is_integer($v) && Id::isIdInteger($v),
 				ARRAY_FILTER_USE_BOTH
 			);
-			$ok &= count($macs) === count($content["macs"]);
+			$ok = $ok && count($macs) === count($content["macs"]);
 
 			$codes = array_filter(
 				$content["codes"],
 				fn($v, $k) => Helper::checkValue( $k, Id::CODE_PREG ) && is_integer($v) && Id::isIdInteger($v),
 				ARRAY_FILTER_USE_BOTH
 			);
-			$ok &= count($codes) === count($content["codes"]);
+			$ok = $ok && count($codes) === count($content["codes"]);
 
 			$ids = array_filter(
 				$content["ids"],
-				fn($v, $k) => Id::isIdInteger($k) && is_array($v) && count($v) === 2 &&
-					Helper::checkValue( $v[0], Id::MAC_PREG ) && Helper::checkValue( $v[1], Id::CODE_PREG ),
+				fn($v, $k) => Id::isIdInteger($k) && is_array($v) && (count($v) === 3 || count($v) === 2) &&
+					Helper::checkValue( $v[0], Id::MAC_PREG ) && Helper::checkValue( $v[1], Id::CODE_PREG ) &&
+						(count($v) === 2 || Helper::checkValue( $v[2], Id::RID_PREG ) ), // rid checks
 				ARRAY_FILTER_USE_BOTH
 			);
-			$ok &= count($ids) === count($content["ids"]);
+			$ok = $ok && count($ids) === count($content["ids"]);
+
+			// rids are only in new exports (ID class works with old and new table format)
+			if(array_key_exists("rids", $content)){
+				$rids = array_filter(
+					$content["rids"],
+					fn($v, $k) => Helper::checkValue( $k, Id::RID_PREG ) && is_integer($v) && Id::isIdInteger($v),
+					ARRAY_FILTER_USE_BOTH
+				);
+				$ok = $ok && count($rids) === count($content["rids"]);
+			}
 		}
 		return $ok;
 	}
@@ -287,7 +298,7 @@ class ImExport {
 			// clean up data dir
 			foreach(scandir($dataDir) as $f){
 				if($this->exportFile($f, "table") || $this->exportFile($f, "list") ){
-					$ok &= unlink($dataDir . '/' . $f);
+					$ok = $ok && unlink($dataDir . '/' . $f);
 				}
 			}
 			if(!$ok){
@@ -310,7 +321,7 @@ class ImExport {
 			if(!is_null($file)){
 				if(!file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT), LOCK_EX)){
 					$this->msg .= "<br>" . (Template::getLanguage() == 'de' ? "Konnte Datei nicht schreiben" : "Error writing") . ": " . $f;
-					$ok &= false;
+					$ok = $ok && false;
 				}				
 			}
 		}
@@ -323,13 +334,13 @@ class ImExport {
 		$cok = true;
 		foreach(scandir($tmpDir) as $f){
 			if(is_file($tmpDir . '/' . $f)){
-				$cok &= unlink($tmpDir . '/' . $f);
+				$cok = $cok && unlink($tmpDir . '/' . $f);
 			}
 		}
-		$cok &= rmdir($tmpDir);
+		$cok = $cok && rmdir($tmpDir);
 		if(!$cok){
 			$this->msg .= "<br>" . (Template::getLanguage() == 'de' ? "Aufräumen schlug fehlt!" : "Error during clean up!");
-			$ok &= false;
+			$ok = $ok && false;
 		}
 
 		// invalidate caches
@@ -374,8 +385,9 @@ class ImExport {
 					$id = $k + $idShift;
 					$mac = $v[0];
 					$code = $v[1];
+					$rid = isset($v[2]) ? $v[2] : null;
 
-					if(isset($export[$f]["macs"][$mac])){
+					if(isset($export[$f]["macs"][$mac]) || (!is_null($rid) && isset($export[$f]["rids"][$rid])) ){
 						$this->msg .= "<br>" . (Template::getLanguage() == 'de' ? "Radio $code war bereits im System vorhanden, Listen wurden überschrieben!" : "Radio $code was already known to system, list have been overwritten!");
 					}
 
@@ -386,7 +398,10 @@ class ImExport {
 
 					// add to table
 					$export[$f]["macs"][$mac] = $id;
-					$export[$f]["ids"][$id] = array($mac, $code);
+					if(!is_null($rid)){
+						$export[$f]["rids"][$rid] = $id;
+					}
+					$export[$f]["ids"][$id] = is_null($rid) ? array($mac, $code) : array($mac, $code, $rid);
 					$export[$f]["codes"][$code] = $id;
 				}
 			}

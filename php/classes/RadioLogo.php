@@ -3,13 +3,13 @@
  * Radio-API
  * https://github.com/KIMB-technologies/Radio-API
  * 
- * (c) 2019 - 2024 KIMB-technologies 
+ * (c) 2019 - 2026 KIMB-technologies 
  * https://github.com/KIMB-technologies/
  * 
  * released under the terms of GNU Public License Version 3
  * https://www.gnu.org/licenses/gpl-3.0.txt
  */
-defined('HAMA-Radio') or die('Invalid Endpoint');
+defined('HAMARadio') or die('Invalid Endpoint');
 
 class RadioLogo {
 
@@ -28,7 +28,7 @@ class RadioLogo {
 			$ok = true;
 			foreach(scandir(self::BASE_DIR) as $d){
 				if(preg_match('/^[a-f0-9]{40}\.(image|error)$/', $d) === 1){
-					$ok &= unlink(self::BASE_DIR . '/' . $d);
+					$ok = $ok && unlink(self::BASE_DIR . '/' . $d);
 				}
 			}
 			return $ok;
@@ -88,7 +88,6 @@ class RadioLogo {
 		// mime
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
 		$mimetype = finfo_file($finfo, $filename);
-		finfo_close($finfo);
 
 		// its not a image file
 		if( substr($mimetype, 0, strlen('image/')) !== 'image/'){
@@ -136,7 +135,6 @@ class RadioLogo {
 	private static function imageDimensions(string $file) : array {
 		$finfo = finfo_open(FILEINFO_CONTINUE);
 		$info = finfo_file($finfo, $file);
-		finfo_close($finfo);
 		
 		// file info (including dimensions as ", 000 x 000,")
 		if(preg_match('/,(\d+)x(\d+),/', str_replace(' ', '', $info), $matches) === 1){

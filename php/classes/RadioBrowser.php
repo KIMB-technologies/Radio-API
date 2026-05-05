@@ -3,13 +3,13 @@
  * Radio-API
  * https://github.com/KIMB-technologies/Radio-API
  * 
- * (c) 2019 - 2024 KIMB-technologies 
+ * (c) 2019 - 2026 KIMB-technologies 
  * https://github.com/KIMB-technologies/
  * 
  * released under the terms of GNU Public License Version 3
  * https://www.gnu.org/licenses/gpl-3.0.txt
  */
-defined('HAMA-Radio') or die('Invalid Endpoint');
+defined('HAMARadio') or die('Invalid Endpoint');
 
 
 /**
@@ -24,7 +24,7 @@ class RadioBrowser {
 	private const RADIO_BROWSER_LIMIT = 50;
 	private const RADIO_BROWSER_LAST_MAX = 40;
 
-	private Id $radioid;
+	private Id $radioId;
 	private Cache $redis;
 	private array $api_servers;
 	private string $api_server;
@@ -52,10 +52,10 @@ class RadioBrowser {
 	 */
 	public function __construct( Id|int $id ){
 		if(is_integer($id)){
-			$this->radioid = new Id( strval($id), Id::ID );
+			$this->radioId = new Id( strval($id), Id::ID );
 		}
 		else {
-			$this->radioid = $id;
+			$this->radioId = $id;
 		}
 	}
 
@@ -176,8 +176,10 @@ class RadioBrowser {
 	public function handleBrowse(Output $out, string $by, string $term, int $offset = 0) : void {
 		$this->before_request($out);
 
+		$out->currentUrl($this->browseUrl($by, $term, $offset), 'Radio-Browser');
+
 		// store last request from user 
-		$keyPrev = 'last_browse.'.$this->radioid->getId();
+		$keyPrev = 'last_browse.'.$this->radioId->getId();
 		$this->redis->set($keyPrev, $this->browseUrl($by, $term, $offset));		
 
 		if($by == "none" && $term == "none"){
@@ -218,7 +220,9 @@ class RadioBrowser {
 					$now = time();
 					foreach($last as $uuid => $item){
 						$out->addStation(
-							self::stationIDfromUUID($uuid), $item["name"], $item["url"], light: true, sortKey: $now-$item["time"]
+							self::stationIDfromUUID($uuid), $item["name"], $item["url"],
+							status: OutputPlayStatus::Info,
+							sortKey: $now-$item["time"]
 						);
 					}
 					if(empty($last)){
@@ -254,7 +258,7 @@ class RadioBrowser {
 					foreach($list as $i => $item){
 						$out->addStation(
 							self::stationIDfromUUID($item["stationuuid"]), $item["name"],
-							$item["url"], light: true, sortKey: $i+1
+							$item["url"], status: OutputPlayStatus::Info, sortKey: $i+1
 						);
 					}
 					break;
@@ -321,8 +325,10 @@ class RadioBrowser {
 
 			foreach($list as $i => $item){
 				$out->addStation(
-					self::stationIDfromUUID($item["stationuuid"]), $item["name"],
-					$item["url"], light: true, sortKey: $i+1
+					self::stationIDfromUUID($item["stationuuid"]),
+					$item["name"], $item["url"],
+					status: OutputPlayStatus::Info,
+					sortKey: $i+1
 				);
 			}
 
@@ -346,7 +352,7 @@ class RadioBrowser {
 	public function lastStations() : array {
 		$this->before_request();
 
-		$keyLast = 'last_stations.'.$this->radioid->getId();
+		$keyLast = 'last_stations.'.$this->radioId->getId();
 		return $this->redis->keyExists($keyLast) ? $this->redis->arrayGet($keyLast) : array();
 	}
 
@@ -376,10 +382,10 @@ class RadioBrowser {
 		);
 	}
 	
-	public function handleStationPlay(Output $out, string $id) : void {
+	public function handleStationPlay(Output $out, string $id, bool $play) : void {
 		$this->before_request($out);
 
-		$keyPrev = 'last_browse.'.$this->radioid->getId();
+		$keyPrev = 'last_browse.'.$this->radioId->getId();
 		$out->prevUrl($this->redis->keyExists($keyPrev) ? $this->redis->get($keyPrev) : $this->browseUrl());
 
 		$uuid = self::uuidFromStationID($id);
@@ -401,9 +407,9 @@ class RadioBrowser {
 			self::stationIDfromUUID($station["stationuuid"]),
 			$station["name"],
 			$station["url"],
-			false,
-			$station["tags"] . " - " . $station["country"],
-			$station["favicon"]
+			status: $play ? OutputPlayStatus::Play : OutputPlayStatus::Full,
+			desc: $station["tags"] . " - " . $station["country"],
+			logo: $station["favicon"]
 		);
 
 		// send the click to server to maintain "station clicks"
@@ -427,7 +433,7 @@ class RadioBrowser {
 			$last = array_slice($last, 0, self::RADIO_BROWSER_LAST_MAX);
 		}
 
-		$this->redis->arraySet('last_stations.'.$this->radioid->getId(), $last);
+		$this->redis->arraySet('last_stations.'.$this->radioId->getId(), $last);
 	}
 
 

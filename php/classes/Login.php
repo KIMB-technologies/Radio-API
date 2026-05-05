@@ -3,13 +3,13 @@
  * Radio-API
  * https://github.com/KIMB-technologies/Radio-API
  * 
- * (c) 2019 - 2024 KIMB-technologies 
+ * (c) 2019 - 2026 KIMB-technologies 
  * https://github.com/KIMB-technologies/
  * 
  * released under the terms of GNU Public License Version 3
  * https://www.gnu.org/licenses/gpl-3.0.txt
  */
-defined('HAMA-Radio') or die('Invalid Endpoint');
+defined('HAMARadio') or die('Invalid Endpoint');
 
 /**
  * GUI Login Management
@@ -49,6 +49,7 @@ class Login {
 			$_SESSION['login_time'] = time();
 			$_SESSION['db_all'] = array(
 				'mac' => $id->getMac(),
+				'rid' => $id->getRid(),
 				'id' => $id->getId(),
 				'code' => $id->getCode(),
 			);

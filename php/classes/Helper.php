@@ -3,13 +3,13 @@
  * Radio-API
  * https://github.com/KIMB-technologies/Radio-API
  * 
- * (c) 2019 - 2024 KIMB-technologies 
+ * (c) 2019 - 2026 KIMB-technologies 
  * https://github.com/KIMB-technologies/
  * 
  * released under the terms of GNU Public License Version 3
  * https://www.gnu.org/licenses/gpl-3.0.txt
  */
-defined('HAMA-Radio') or die('Invalid Endpoint');
+defined('HAMARadio') or die('Invalid Endpoint');
 
 /**
  * Helpful functions
@@ -35,8 +35,6 @@ class Helper {
 				$url = $link;
 			}
 			
-			curl_close($ch);
-
 			return $url;
 		}
 		
@@ -52,8 +50,11 @@ class Helper {
 		return is_string($val) && preg_match( $preg, $val ) === 1;
 	}
 
-	public static function randomCode( int $len ) : string {
-		$chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY';
+	const CHARS = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY';
+	const HEX = '0123456789abcdef';
+	const BASE36 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+	public static function randomCode( int $len, string $chars = self::CHARS ) : string {
 		$r = '';
 		$charAnz = strlen( $chars );
 		for($i = 0; $i < $len; $i++){

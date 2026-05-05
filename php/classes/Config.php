@@ -3,13 +3,13 @@
  * Radio-API
  * https://github.com/KIMB-technologies/Radio-API
  * 
- * (c) 2019 - 2024 KIMB-technologies 
+ * (c) 2019 - 2026 KIMB-technologies 
  * https://github.com/KIMB-technologies/
  * 
  * released under the terms of GNU Public License Version 3
  * https://www.gnu.org/licenses/gpl-3.0.txt
  */
-defined('HAMA-Radio') or die('Invalid Endpoint');
+defined('HAMARadio') or die('Invalid Endpoint');
 
 /**
  * Docker or Non-Docker ENV setup
@@ -93,7 +93,7 @@ class Config {
 	/**
 	 * The system's version.
 	 */
-	const VERSION = 'v2.9.4';
+	const VERSION = 'v3.0.0dev';
 
 	/**
 	 * The real domain which should be used.
@@ -170,9 +170,9 @@ class Config {
 	/**
 	 * Checks if access allowed (for this request)
 	 * 	Has to end the script, if not allowed!
-	 * @param $mac give the users mac (we will test his last domain first, to speed up things)
+	 * @param $mac_rid give the users mac/rid (we will test his last domain first, to speed up things)
 	 */
-	public static function checkAccess( ?string $mac = null ) : void {
+	public static function checkAccess( ?string $mac_rid = null ) : void {
 		if( is_null( self::$redisAccessDomains ) ){ // already loaded?
 			if(DOCKER_MODE){ // use the preloaded values from ./startup.php
 				self::setRedisServer();
@@ -194,8 +194,8 @@ class Config {
 			foreach( self::$redisAccessDomains->arrayGet('domains') as $domain ){
 				if( self::$redisAccessDomains->keyExists( 'ip_for_domain.' . $domain ) ){
 					if( self::$redisAccessDomains->get( 'ip_for_domain.' . $domain ) == $ip ){
-						if( !is_null( $mac ) ){ // save this domain for this user
-							self::$redisAccessDomains->set( 'domain_for_user.' . $mac, $domain );
+						if( !is_null( $mac_rid ) ){ // save this domain for this user
+							self::$redisAccessDomains->set( 'domain_for_user.' . $mac_rid, $domain );
 						}
 						return; // access granted
 					}
@@ -204,8 +204,8 @@ class Config {
 			}
 
 			// the last domain for this user should be check first
-			if( !is_null( $mac ) && count( $checklater ) > 1 && self::$redisAccessDomains->keyExists( 'domain_for_user.' . $mac ) ){
-				$pos = array_search( self::$redisAccessDomains->get( 'domain_for_user.' . $mac ), $checklater );
+			if( !is_null( $mac_rid ) && count( $checklater ) > 1 && self::$redisAccessDomains->keyExists( 'domain_for_user.' . $mac_rid ) ){
+				$pos = array_search( self::$redisAccessDomains->get( 'domain_for_user.' . $mac_rid ), $checklater );
 				if( $pos !== false ){
 					$tmp = $checklater[$pos]; // swap positions, so last domain ist first
 					$checklater[$pos] = $checklater[0];

@@ -3,27 +3,29 @@
  * Radio-API
  * https://github.com/KIMB-technologies/Radio-API
  * 
- * (c) 2019 - 2024 KIMB-technologies 
+ * (c) 2019 - 2026 KIMB-technologies 
  * https://github.com/KIMB-technologies/
  * 
  * released under the terms of GNU Public License Version 3
  * https://www.gnu.org/licenses/gpl-3.0.txt
  */
-define('HAMA-Radio', 'Radio');
+define('HAMARadio', 'Radio');
 error_reporting( !empty($_ENV['DEV']) && $_ENV['DEV'] == 'dev' ? E_ALL : 0 );
 
 /**
  * Loading
  */
 require_once( __DIR__ . '/classes/autoload.php' );
-Config::checkAccess( !empty($_GET['mac']) && Helper::checkValue( $_GET['mac'], Id::MAC_PREG ) ? $_GET['mac'] : null );
 
 /**
  * Auth
  */
-$radioid = Auth::authFromMac();
+$auth = new Auth();
+Config::checkAccess($auth->getClientID()); 
+$radioId = $auth->auth();
 
-$data = new Data($radioid->getId());
+// get data for radio
+$data = new Data($radioId->getId());
 
 /**
  * Answer Proxy Request
