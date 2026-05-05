@@ -19,7 +19,7 @@ class Router {
 	private Id $radioId;
 	private Output $out;
 	private Data $data;
-	private Unread $unread;
+	private UnRead $unread;
 	private RadioBrowser $radio_browser;
 
 	/**
