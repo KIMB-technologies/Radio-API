@@ -323,7 +323,7 @@
 
 	<script>
 		$(function (){
-			$("button.del").click( function (){
+			$("button.del").on( "click", function (){
 				var id = $(this).attr("delid");
 				$("input[delid="+ id +"]").val("");
 			});

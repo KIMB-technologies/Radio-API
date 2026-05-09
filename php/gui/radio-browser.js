@@ -1,21 +1,21 @@
 $(function (){
-	$("input#openLast").click(() => {
+	$("input#openLast").on( "click", () => {
 		radioBrowserDo(false);
 	})
-	$("input#openSearch").click(() => {
+	$("input#openSearch").on( "click", () => {
 		radioBrowserDo(true);
 	});
 
-	$("input[name=radioBrowserType]").change( () => {
+	$("input[name=radioBrowserType]").on( "change",  () => {
 		radioBrowserDo( $("input[name=radioBrowserType][value=search]").prop('checked') )
 	});
 
-	$("input#runSearch").click( (e) => {
+	$("input#runSearch").on( "click",  (e) => {
 		e.preventDefault();
 		runSearchRequest();
 	});
 
-	$("input#searchTerm").keypress( (e) => {
+	$("input#searchTerm").on( "keypress", (e) => {
 		if (e.keyCode === 13) {
 			e.preventDefault();
 			runSearchRequest();
@@ -92,7 +92,7 @@ function runRequest(term){
 				}
 			})
 			$("div#results").html(html + "</dl>");
-			$("dt.radioBrowserChoose").click(choseData);
+			$("dt.radioBrowserChoose").on( "click", choseData);
 			currently_shown_data_list = data;
 		}
 	);

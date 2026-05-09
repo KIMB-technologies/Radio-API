@@ -9,7 +9,7 @@ $(() => {
 		'font-weight' : 'normal'
 	};
 
-	$("input[name=kind]").change( () => {
+	$("input[name=kind]").on( "change",  () => {
 		var kind = $("input[name=kind]:checked").val();
 		if (kind == "replace" ){
 			$("tr#replace-confirm-row").css('display', 'table-row');
@@ -27,7 +27,7 @@ $(() => {
 		}
 	});
 
-	$("form#import").submit( () => {
+	$("form#import").on("submit", () => {
 		var kind = $("input[name=kind]:checked").val();
 
 		// checks
@@ -49,7 +49,7 @@ $(() => {
 		return okF && okT && okB && okS && okC;
 	});
 
-	$("form#export").submit( () => {
+	$("form#export").on("submit", () => {
 		var okT = $("tr#export-token-row input[name=token]").val().length >= 15;
 		$("tr#export-token-row").css(okT ? def_format : err_format);
 

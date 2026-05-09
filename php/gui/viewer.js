@@ -42,9 +42,11 @@ function loadPage( url, elem, play ){
 }
 
 function printItem( item, play ){
-	var type = $(item).find('ItemType').text();
-	var playh = '';
-	var markAsKnow = '';
+	let type = $(item).find('ItemType').text();
+	let playh = '';
+	let markAsKnow = '';
+	let url = "";
+	let name = "";
 
 	if( type == "Station" ){
 		if(play){
@@ -52,21 +54,21 @@ function printItem( item, play ){
 			playFile( $(item).find('StationUrl').text(), $(item).find('Logo').text() );
 		}
 		else{
-			var name = $(item).find('StationName').text();
-			var url = $(item).find('StationId').text();
+			name = $(item).find('StationName').text();
+			url = $(item).find('StationId').text();
 		}
 	}
 	else if( type == "Dir" ){
-		var name = $(item).find('Title').text() + ' &rarr;';
-		var url = $(item).find('UrlDir').text();
+		name = $(item).find('Title').text() + ' &rarr;';
+		url = $(item).find('UrlDir').text();
 	}
 	else if( type == "Previous" ){
-		var name = '&larr; ..';
-		var url = $(item).find('UrlPrevious').text();
+		name = '&larr; ..';
+		url = $(item).find('UrlPrevious').text();
 	}
 	else if( type == "ShowOnDemand" ){
-		var name = $(item).find('ShowOnDemandName').text() + ' &rarr;';
-		var url = $(item).find('ShowOnDemandURL').text();
+		name = $(item).find('ShowOnDemandName').text() + ' &rarr;';
+		url = $(item).find('ShowOnDemandURL').text();
 	}
 	else if( type == "ShowEpisode" ){
 		if( play ){
@@ -74,8 +76,8 @@ function printItem( item, play ){
 			playFile( $(item).find('ShowEpisodeURL').text(),  $(item).find('Logo').text() );
 		}
 		else{
-			var name = $(item).find('ShowEpisodeName').text();
-			var url = $(item).find('ShowEpisodeID').text();
+			name = $(item).find('ShowEpisodeName').text();
+			url = $(item).find('ShowEpisodeID').text();
 
 			if( url.match(/^3\d\d\dX\d+$/) ){ // only podcast episodes support UnRead
 				markAsKnow = ' &ndash; ' + (name.substr(0,1) == '*' ?
@@ -85,15 +87,20 @@ function printItem( item, play ){
 		}
 	}
 
-	if( url.startsWith(radiourl)){
+	
+	if( typeof url === 'string' && url.startsWith(radiourl) ){
 		url = serverurl + url.slice(radiourl.length)
 	}
+	else{
+		
+	}
 
-	return playh == '' ? '<a href="'+ url +'" class="openType" opentype="'+ type +'">'+ name +'</a>' + markAsKnow : playh;
+	return playh == '' ?
+		'<a href="'+ url +'" class="openType" opentype="'+ type +'">'+ name +'</a>' + markAsKnow : playh;
 }
 
 function addOpenTypeListener(elem){
-	$("a.openType").click( function (e) {
+	$("a.openType").on( "click", function (e) {
 		e.preventDefault();
 		var url = $(this).attr('href');
 		var type = $(this).attr('opentype');
@@ -108,7 +115,7 @@ function addOpenTypeListener(elem){
 			loadPage( serverurl + '?sSearchtype=5&Search=' + url, elem, true );
 		}
 	});
-	$("span.mark-known").click( function (){
+	$("span.mark-known").on( "click", function (){
 		var url = $(this).parent().children('a').attr('href');
 		$(this).html('&orarr;');
 		$.get(serverurl + "?mac=" + radiomac + "&toggleUnRead=" + url, (d) => {
