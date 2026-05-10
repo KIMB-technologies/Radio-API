@@ -2,7 +2,7 @@
 
 > Silicon Frontier, Frontier Silicon, or Frontier Nuvola (Smart) Internet Radio alternative API
 
-see https://github.com/kimbtech/WiFi-RadioAPI for information about the API used by the radios  
+see https://github.com/kimbtech/WiFi-RadioAPI for information about the (XML) API used by the radios  
 see https://hub.docker.com/r/kimbtechnologies/radio_api for the Docker Image
 
 > [!TIP]
@@ -21,9 +21,16 @@ This redirect is possible by manipulating the DNS queries.
 
 &rarr; [Have a look at **screenshots**](./screenshots/Readme.md)
 
+## Supported Devices
+Radio-API supports the XML-based API used by older Radios (roughly the ones supporting the UNDOK app) **and** the newer JSON-based API used by newer Radios (roughly the ones using the OKTIV app).
+
+Radios used for testing during development:
+- Hama DIR3100MS (older, XML API)
+- Majority Touro (newer, JSON API)
+
 ## Usage
 - First [set up](./Setup.md) *Radio-API* and change the DNS resolver of the radio (e.g., as described there).
-- Afterwards start the radio and open "Internet Radio".
+- Afterwards start the radio and open "Internet Radio" (or "Podcasts").
 - The *Radio-API* should provide a list of:
 	- **Podcast**
 		- This is the user defined list of podcasts.
@@ -53,13 +60,14 @@ This redirect is possible by manipulating the DNS queries.
 		- The Streams are shared across all radios using the same *Radio-API* setup.
 	- **GUI-Code**
 		- This code is like a password to access the GUI for this radio and edit the radio stations and streams.
-- GUI:
+- Some newer radios may have *Internet Radio* and *Podcasts* as different modes, both modes provide the same content with Radio-API and will show podcasts and radio stations together.
+- Webinterface (GUI):
 	- The GUI can be opened via a webbrowser at `radio.example.com/gui/`.
 	- The GUI provides the editable lists of radio stations and podcasts.
 	- A preview of the items shown by the radio is provided by the GUI, too.
 		- The preview is also shown when opening `radio.example.com` in an browser and this browser has already logged into the GUI.
 		- The `*` to mark new episodes can be toggled by the &check;/ &cross; in the preview.
-	- Additional information texts describe the options chooseable for radio stations and podcasts.
+	- Additional information texts describe the options for radio stations and podcasts.
 
 ### Notes
 - This is a private project and has no connections to Frontier Nuvola/ Frontier Silicon.

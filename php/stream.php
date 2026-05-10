@@ -3,27 +3,29 @@
  * Radio-API
  * https://github.com/KIMB-technologies/Radio-API
  * 
- * (c) 2019 - 2024 KIMB-technologies 
+ * (c) 2019 - 2026 KIMB-technologies 
  * https://github.com/KIMB-technologies/
  * 
  * released under the terms of GNU Public License Version 3
  * https://www.gnu.org/licenses/gpl-3.0.txt
  */
-define('HAMA-Radio', 'Radio');
+define('HAMARadio', 'Radio');
 error_reporting( !empty($_ENV['DEV']) && $_ENV['DEV'] == 'dev' ? E_ALL : 0 );
 
 /**
  * Loading
  */
 require_once( __DIR__ . '/classes/autoload.php' );
-Config::checkAccess( !empty($_GET['mac']) && Helper::checkValue( $_GET['mac'], Id::MAC_PREG ) ? $_GET['mac'] : null );
 
 /**
  * Auth
  */
-$radioid = Auth::authFromMac();
+$auth = new Auth();
+Config::checkAccess($auth->getClientID()); 
+$radioId = $auth->auth();
 
-$data = new Data($radioid->getId());
+// get data for radio
+$data = new Data($radioId->getId());
 
 /**
  * Answer Proxy Request
@@ -35,17 +37,17 @@ if( !empty( $_GET['id'] ) ){
 	if( is_numeric( $id ) && preg_replace('/[^0-9]/','', $id ) === $id ){
 		if( !isset($_GET['eid']) && !isset( $_GET['track'] ) ){ // station
 			// get url
-			$station = $data->getById( $id ); 
+			$station = $data->getById( (int)$id ); 
 			$url = !empty($station) ? $station['url'] : '';
 		}
 		else if(isset( $_GET['eid'] ) && is_numeric( $_GET['eid'] ) && preg_replace('/[^0-9]/','', $_GET['eid'] ) === $_GET['eid'] ){ // podcast episode
-			$ed = PodcastLoader::getEpisodeData( $id, $_GET['eid'], $data );
+			$ed = PodcastLoader::getEpisodeData( (int)$id, (int)$_GET['eid'], $data );
 			$url = !empty($ed) ? $ed['episode']['url'] : '';
 		}
 		else if(is_numeric( $_GET['track'] ) && preg_replace('/[^0-9]/','', $_GET['track'] ) === $_GET['track'] ){
 			$track = $_GET['track'];
 
-			$urls = PodcastLoader::getMusicById( $id, $data );
+			$urls = PodcastLoader::getMusicById( (int)$id, $data );
 			$url = empty( $urls[$track] ) ? '' : $urls[$track];
 		}
 		else{

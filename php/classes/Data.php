@@ -3,13 +3,13 @@
  * Radio-API
  * https://github.com/KIMB-technologies/Radio-API
  * 
- * (c) 2019 - 2024 KIMB-technologies 
+ * (c) 2019 - 2026 KIMB-technologies 
  * https://github.com/KIMB-technologies/
  * 
  * released under the terms of GNU Public License Version 3
  * https://www.gnu.org/licenses/gpl-3.0.txt
  */
-defined('HAMA-Radio') or die('Invalid Endpoint');
+defined('HAMARadio') or die('Invalid Endpoint');
 
 /**
  * Main Data Storage, Data means Podcasts, Episodes and Stations
@@ -142,10 +142,10 @@ class Data {
 	 * Get data of one item by its id.
 	 */
 	public function getById( int $id ) : array {
-		if( !$this->redis->arrayKeyExists('items', $id) ){
+		if( !$this->redis->arrayKeyExists('items', strval($id)) ){
 			return array();
 		}
-		return $this->redis->arrayKeyGet('items', $id);
+		return $this->redis->arrayKeyGet('items', strval($id));
 	}
 
 	/**

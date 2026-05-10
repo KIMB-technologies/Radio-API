@@ -3,13 +3,13 @@
  * Radio-API
  * https://github.com/KIMB-technologies/Radio-API
  * 
- * (c) 2019 - 2024 KIMB-technologies 
+ * (c) 2019 - 2026 KIMB-technologies 
  * https://github.com/KIMB-technologies/
  * 
  * released under the terms of GNU Public License Version 3
  * https://www.gnu.org/licenses/gpl-3.0.txt
  */
-defined('HAMA-Radio') or die('Invalid Endpoint');
+defined('HAMARadio') or die('Invalid Endpoint');
 
 /**
  * System Template class
@@ -42,7 +42,7 @@ class Template{
 	/**
 	 * Change the language of the site
 	 * see $allLangs for list
-	 * @param lang the lang to use
+	 * @param string $lang The lang to use
 	 */
 	public static function setLanguage( string $lang ) : void {
 		if( in_array( $lang, self::$allLangs ) ){
@@ -80,11 +80,11 @@ class Template{
 
 	/**
 	 * Create an new Template
-	 * @param name The name of the template
+	 * @param string $name The name of the template
 	 * 		./templates/<name>.json)
 	 * 		./templates/<name>_<lang>.html
 	 */
-	public function __construct( $name ){
+	public function __construct( string $name ){
 		if( Helper::checkFileName( $name ) ) {
 			$this->filename = $name;
 			if( !is_file( __DIR__ . '/templates/' . $this->filename .  '_' . self::$lang . '.html' ) ){

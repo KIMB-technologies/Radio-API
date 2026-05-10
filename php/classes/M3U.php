@@ -3,41 +3,41 @@
  * Radio-API
  * https://github.com/KIMB-technologies/Radio-API
  * 
- * (c) 2019 - 2024 KIMB-technologies 
+ * (c) 2019 - 2026 KIMB-technologies 
  * https://github.com/KIMB-technologies/
  * 
  * released under the terms of GNU Public License Version 3
  * https://www.gnu.org/licenses/gpl-3.0.txt
  */
-defined('HAMA-Radio') or die('Invalid Endpoint');
+defined('HAMARadio') or die('Invalid Endpoint');
 
 /**
  * M3U Generator Class
  */
 class M3U {
 
-	private Id $radioid;
+	private Id $radioId;
 	private Data $data;
 
 	public function __construct(Id $id) {
-		$this->radioid = $id;
-		$this->data = new Data($this->radioid->getId());
+		$this->radioId = $id;
+		$this->data = new Data($this->radioId->getId());
 	}
 
 	public function musicStream( $id ) : void {
 		// id ok?
 		if( is_numeric( $id ) && preg_replace('/[^0-9]/','', $id ) === $id ){
 			// get station
-			$stat = $this->data->getById($id);
+			$stat = $this->data->getById((int)$id);
 			if( !empty($stat) ){ // is a station
 				if( $stat['type'] == 'nc' ){ // nextcloud stattion?
 
-					$urls = PodcastLoader::getMusicById( $id, $this->data );
+					$urls = PodcastLoader::getMusicById( (int)$id, $this->data );
 					if( $stat['proxy'] ){
 						// proxy links
 						$m3uLinks = array();
 						foreach( $urls as $k => $m ){
-							$m3uLinks[] = Config::RADIO_DOMAIN . 'stream.php?id=' . $id . '&track=' . $k . '&mac=' . $this->radioid->getMac();
+							$m3uLinks[] = Config::RADIO_DOMAIN . 'stream.php?id=' . $id . '&track=' . $k . '&mac=' . $this->radioId->getMac();
 						}
 					}
 					else{ // echo links (no proxy)

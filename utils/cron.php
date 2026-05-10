@@ -4,13 +4,13 @@
  * Radio-API
  * https://github.com/KIMB-technologies/Radio-API
  * 
- * (c) 2019 - 2024 KIMB-technologies 
+ * (c) 2019 - 2026 KIMB-technologies 
  * https://github.com/KIMB-technologies/
  * 
  * released under the terms of GNU Public License Version 3
  * https://www.gnu.org/licenses/gpl-3.0.txt
  */
-define('HAMA-Radio', 'Radio');
+define('HAMARadio', 'Radio');
 error_reporting(E_ALL);
 
 require_once( '/php-code/classes/autoload.php' );
@@ -22,7 +22,7 @@ require_once( '/php-code/classes/autoload.php' );
  */
 Config::setRedisServer();
 
-if( trim(shell_exec("whoami")) != "www-data" ){
+if( trim(shell_exec("whoami") ?? '') != "www-data" ){
 	die("Run as user www-data!" . PHP_EOL);
 }
 

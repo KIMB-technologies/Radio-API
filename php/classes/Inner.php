@@ -3,13 +3,13 @@
  * Radio-API
  * https://github.com/KIMB-technologies/Radio-API
  * 
- * (c) 2019 - 2024 KIMB-technologies 
+ * (c) 2019 - 2026 KIMB-technologies 
  * https://github.com/KIMB-technologies/
  * 
  * released under the terms of GNU Public License Version 3
  * https://www.gnu.org/licenses/gpl-3.0.txt
  */
-defined('HAMA-Radio') or die('Invalid Endpoint');
+defined('HAMARadio') or die('Invalid Endpoint');
 
 /**
  * Inner GUI Code/ Handling of Post and Output of tables
@@ -106,7 +106,7 @@ class Inner {
 			$count++;
 		}
 		$this->template->setMultipleContent('RadioStations', $radios);
-		$this->template->setContent('RADIO_COUNT', $count);
+		$this->template->setContent('RADIO_COUNT', (string)$count);
 		$this->template->setContent('RADIO_OPTIONS', array_reduce($categories, fn($c, $i) => $c.'<option value="'.$i.'">'.$i.'</option>', '' ));
 	}
 
@@ -138,7 +138,7 @@ class Inner {
 			$count++;
 		}
 		$this->template->setMultipleContent('Podcasts', $podcasts);
-		$this->template->setContent('PODCAST_COUNT', $count);
+		$this->template->setContent('PODCAST_COUNT', (string)$count);
 		$this->template->setContent('PODCAST_OPTIONS', array_reduce($categories, fn($c, $i) => $c.'<option value="'.$i.'">'.$i.'</option>', '' ));
 	}
 

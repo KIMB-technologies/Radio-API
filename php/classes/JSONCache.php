@@ -3,13 +3,13 @@
  * Radio-API
  * https://github.com/KIMB-technologies/Radio-API
  * 
- * (c) 2019 - 2024 KIMB-technologies 
+ * (c) 2019 - 2026 KIMB-technologies 
  * https://github.com/KIMB-technologies/
  * 
  * released under the terms of GNU Public License Version 3
  * https://www.gnu.org/licenses/gpl-3.0.txt
  */
-defined('HAMA-Radio') or die('Invalid Endpoint');
+defined('HAMARadio') or die('Invalid Endpoint');
 
 /**
  * A class to cache values using json files.
@@ -121,7 +121,7 @@ class JSONCache implements CacheInterface {
 		return $this->keyExists($key) && isset($this->data[$key][0][$arrayKey]);
 	}
 
-	public function arrayKeyGet(string $key, string $arrayKey ) {
+	public function arrayKeyGet(string $key, string $arrayKey ) : mixed {
 		return $this->arrayGet($key)[$arrayKey];
 	}
 

@@ -1,5 +1,5 @@
 $(()=> {
-	$("select.cat_select").change( (e) =>{
+	$("select.cat_select").on( "change",  (e) =>{
 		var option = $(e.target).val();
 		var d_id = $(e.target).attr('delid');
 
