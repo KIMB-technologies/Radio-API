@@ -143,13 +143,10 @@ location @nofile {
 ## General Information
 
 ### Known Issues with newer JSON-based Radios
-- Creating a radio station by streaming files from Nextcloud shares does not work
-	- It seems that the newer radio does not support M3U & HLS streams (at least not mine) 
-	- So `m3u.php` can not be used for creating these radio stations from Nextcloud shares
-	- And also the radio is not able to stream any M3U or HLS radio stations!
+- Creating a radio station by streaming files from Nextcloud shares does not work (see [#78](https://github.com/KIMB-technologies/Radio-API/issues/78))
 - Own Stream does not always play items correctly (radio requests wrong ID)
 	- Own Streams combine radio stations (live) and podcast episodes (not live)
-	- This combinations seems to be a problem, only having one of *live* or *not live* at a time works
+	- This combinations seems to be a problem, only having one of *live* or *not live* in Own Streams at a time works
 - Sometimes one has to click twice before the radio reacts
 	- No idea
 
@@ -167,13 +164,58 @@ location @nofile {
 	2. `http://radio.example.com/setupapp/iden/asp/BrowseXML/loginXML.asp?gofile=&mac=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&dlang=eng&fver=4&ven=iden00` (returns `<?xml version="1.0" encoding="UTF-8" standalone="yes"?> <ListOfItems> ... </ListOfItems>`) 
 	3. Get the GUI-Code from the preceding response and try to used it to access the GUI at `http://radio.example.com/gui/`
 - Test the Radio-API in a terminal (newer radios, JSON)
-	1. ```bash 
-		curl -k https://radio.example.com \
-		-H "Authorization: $(echo -n "AA00BB11CC22:$(echo -n "something"|md5)"|base64 )" \
-		-H "Accept-Language: de-DE" \
-		-H "Host: airable.wifiradiofrontier.com" 
-	```
-	- TODO -> write things here
+	1. Connection command
+		- request
+			```bash 
+				curl -k https://radio.example.com \
+				-H "Authorization: $(echo -n "AA00BB11CC22:$(echo -n "something"|md5)"|base64 )" \
+				-H "Accept-Language: de-DE" \
+				-H "Host: airable.wifiradiofrontier.com" 
+			```
+		- returns 
+			```json
+			{
+				"id": ["airable", "directory", "index"],
+				"title": "Index",
+				...
+				"content": {
+					"entries": [
+						{
+							"id": [...]
+							....
+						},
+					]
+				}
+			}
+			```
+		- make sure this works (the radio checks with such request if server provides a valid API endpoint)
+	2. Get GUI code
+		- request
+			```bash 
+				curl -k https://radio.example.com/index \
+				-H "Authorization: $(echo -n "AA00BB11CC22:$(echo -n "something"|md5)"|base64 )" \
+				-H "Accept-Language: de-DE" \
+				-H "Host: airable.wifiradiofrontier.com" 
+			```
+		- returns 
+			```json
+			{
+				"id": ["frontiersmart", "directory", "list"],
+				"title": "Liste",
+				...
+				"content": {
+					"entries": [
+						...
+						{
+							"id": [ "frontiersmart", "directory", "guicodezxxx" ],
+							"title": "GUI-Code: Zxxx",
+							"url": "https://radio.example.com/?go=initial"
+						}
+					]
+				}
+			}
+			```
+		- look for the GUI code and try to log in with it in web interface
 
 ### Im- & Export
 There is an Im- & Export web interface at `./gui/im-export.php`.
