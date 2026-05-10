@@ -25,6 +25,9 @@ if($uri === 'none' && isset($_SERVER['REQUEST_URI']) && is_string($_SERVER['REQU
 	$pos = strpos($_SERVER['REQUEST_URI'], '?');
 	$uri = trim($pos === false ? $_SERVER['REQUEST_URI'] : substr($_SERVER['REQUEST_URI'], 0, $pos));
 }
+if($uri === '/'){
+	$uri = ''; // for better handling of root, some reverse proxies always add a slash, but we need to handle this as empty URI
+}
 
 // Login (old Radios try a 'login' before accessing the API)
 if( preg_match('/^\/setupapp\/[A-Za-z0-9\-\_]+\/asp\/BrowseXML\/loginXML.asp/', $uri) === 1 && !isset( $_GET['mac'] )) {
