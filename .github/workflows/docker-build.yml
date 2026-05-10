@@ -27,10 +27,11 @@ jobs:
         base-image: "${{env.BASE_IMAGE}}"
         image: "${{env.IMAGE_OWNER}}/${{env.IMAGE_NAME}}:latest"
       if: github.event_name != 'push'
-    
+
     - name: Access repository contents
       uses: actions/checkout@v4
       if: ${{ (github.event_name == 'push') || (steps.check.outputs.needs-updating == 'true') }}
+
     - name: Login to DockerHub
       uses: docker/login-action@v3
       with:
@@ -49,15 +50,18 @@ jobs:
   
     # Multi platform image build and push
 
-    - name: Build and push the latest Docker image
-      run: docker buildx build --platform "$PLATFORMS" . --file "./utils/Dockerfile" --tag "$IMAGE_OWNER/$IMAGE_NAME:latest" --push
+    - name: Get main tag (from VERSION file)
+      run: echo -n "IMAGE_TAG=$(head -n 1 VERSION)" >> $GITHUB_ENV
+
+    - name: Docker build and push the main tag
+      run: docker buildx build --platform "$PLATFORMS" . --file "./utils/Dockerfile" --tag "$IMAGE_OWNER/$IMAGE_NAME:$IMAGE_TAG"
       if: ${{ (github.event_name == 'push') || (steps.check.outputs.needs-updating == 'true') }}
      
     - name: Push more tags
       if: ${{ (github.event_name == 'push') || (steps.check.outputs.needs-updating == 'true') }} 
       run: |
           cat VERSION | while read TAG; do
-            if [[ $TAG =~ ^#.* ]] ; then 
+            if [[ $TAG =~ ^#.* ]] || [[ $TAG == $IMAGE_TAG ]] ; then 
               echo "Skipping $TAG";
             else 
               echo "Tagging image as $TAG and pushing";
