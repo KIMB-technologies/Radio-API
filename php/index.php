@@ -22,7 +22,8 @@ require_once( __DIR__ . '/classes/autoload.php' );
  */
 $uri = !empty( $_GET['uri'] ) && is_string($_GET['uri']) ? $_GET['uri'] : 'none';
 if($uri === 'none' && isset($_SERVER['REQUEST_URI']) && is_string($_SERVER['REQUEST_URI'])){
-	$uri = trim(substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')));
+	$pos = strpos($_SERVER['REQUEST_URI'], '?');
+	$uri = trim($pos === false ? $_SERVER['REQUEST_URI'] : substr($_SERVER['REQUEST_URI'], 0, $pos));
 }
 
 // Login (old Radios try a 'login' before accessing the API)

@@ -107,7 +107,7 @@ class Router {
 		}
 		// list of types (startpage)
 		else{ 
-			$this->out->currentUrl(Config::RADIO_DOMAIN . '/index?go=initial', 'List');
+			$this->out->currentUrl(Config::RADIO_DOMAIN . 'index?go=initial', 'List');
 
 			// add local types
 			foreach( $this->data->getTypes() as $tid => $name ){
