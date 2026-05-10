@@ -22,7 +22,7 @@ jobs:
 
     - name: Check for new baseimage 
       id: check
-      uses: lucacome/docker-image-update-checker@v1
+      uses: lucacome/docker-image-update-checker@v3.1.0
       with:
         base-image: "${{env.BASE_IMAGE}}"
         image: "${{env.IMAGE_OWNER}}/${{env.IMAGE_NAME}}:latest"
