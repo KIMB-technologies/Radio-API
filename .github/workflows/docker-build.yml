@@ -54,7 +54,7 @@ jobs:
       run: echo -n "IMAGE_TAG=$(head -n 1 VERSION)" >> $GITHUB_ENV
 
     - name: Docker build and push the main tag
-      run: docker buildx build --platform "$PLATFORMS" . --file "./utils/Dockerfile" --tag "$IMAGE_OWNER/$IMAGE_NAME:$IMAGE_TAG"
+      run: docker buildx build --platform "$PLATFORMS" . --file "./utils/Dockerfile" --tag "$IMAGE_OWNER/$IMAGE_NAME:$IMAGE_TAG" --push
       if: ${{ (github.event_name == 'push') || (steps.check.outputs.needs-updating == 'true') }}
      
     - name: Push more tags
