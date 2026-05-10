@@ -161,16 +161,17 @@
 	<div class="note">
 		The name of a radio station will be shown in the radios menu.
 		The url a has to be a link to a streamable audiofile (MP3, M3U, etc.).
-		As the radio does not support SSL, thus the links must support <code>http://</code>!
+		Some older radios do not support SSL, for them the link must be accessible via <code>http://</code>!
 		<br />
 		If there is no link without SSL, one can use the proxy to provide a stream without SSL for the radio.
-		Attention, the proxy is not able to open M3U streams.
+		Attention, the proxy is not able to open M3U streams and also not all radios support M3U!
 		<br />
 		You can also give a nextcloud file share.
 		The URL must look like <code>&lt;url&gt;/s/&lt;token&gt;</code> and must not have a password.
 		Each file in the shared folder will be played one after one (in a random order, if enabled for this installation).
 		There is no support for sub folders.
-		If the Nextcloud share is only accessible via SSL, the proxy has to be used.
+		If the Nextcloud share is only accessible via SSL and the radio does not support SSL, the proxy can be used.
+		Nextcloud streams are based on M3U, so radios that do not support M3U cannot play these streams.
 		<br/>
 		While playing a station the radio shows an image, the image can be specified by giving a custom link (also no SSL support).
 		If no image is specified <a href="%%SERVERURL%%media/default.png" target="_blank"><code>%%SERVERURL%%media/default.png</code></a> will be displayed.
@@ -317,7 +318,7 @@
 		Each file in the shared folder will be shown as playable episode.
 		There is no support for sub folders.
 		<br/>
-		If the Nextcloud share or the audiofiles of each episode are only accessible via SSL, the proxy has to be used.
+		If the Nextcloud share or the audiofiles of each episode are only accessible via SSL and the radio does not support SSL, the proxy can be used.
 		It will provide a stream without SSL for the radio.
 		The proxy will always use EndURL.
 		<br />
@@ -353,6 +354,6 @@
 			Attention, the preview is just a preview for the list of stations, podcasts, and streams.
 			If some stream or episode does not start playing in the browser, it may do so using the radio nevertheless.
 			Also if something works using a browser, it may not work with the radio.
-			One possible reason is, that the radio does not support SSL.
+			One possible reason is that not all radios support SSL.
 		</div>
 		<script> var serverurl = "%%SERVERURL%%",  radiourl = "%%RADIO_DOMAIN%%", radiomac = "%%RADIO_MAC%%", radiocount = %%RADIO_COUNT%%, dlang_val = "eng";</script>
