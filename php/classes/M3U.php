@@ -28,11 +28,11 @@ class M3U {
 		// id ok?
 		if( is_numeric( $id ) && preg_replace('/[^0-9]/','', $id ) === $id ){
 			// get station
-			$stat = $this->data->getById($id);
+			$stat = $this->data->getById((int)$id);
 			if( !empty($stat) ){ // is a station
 				if( $stat['type'] == 'nc' ){ // nextcloud stattion?
 
-					$urls = PodcastLoader::getMusicById( $id, $this->data );
+					$urls = PodcastLoader::getMusicById( (int)$id, $this->data );
 					if( $stat['proxy'] ){
 						// proxy links
 						$m3uLinks = array();

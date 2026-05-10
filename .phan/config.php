@@ -1,21 +1,18 @@
 <?php
 /*
-	Run check via Docker-Installes Phan:
+	# Run via PHP Phar
+	#	download it
+	curl -L https://github.com/phan/phan/releases/latest/download/phan.phar -o phan.phar   
 
-	# function defined in shell
-	phan() {
-		docker run -v $PWD:/mnt/src --rm -u "1000:1000" phanphp/phan:latest $@; return $?;
-	} 
+	# run it
+	php phan.phar --allow-polyfill-parser -o report.txt 
 
-	# start in document root of project
-	$ phan -o report.txt 
 */
 return [
 	'target_php_version' => '8.5',
 	'file_list' => [ 
 		'./utils/cron.php',
 		'./utils/startup.php',
-		'./utils/getr.php'
 	],
 	'directory_list' => [
 		'php'

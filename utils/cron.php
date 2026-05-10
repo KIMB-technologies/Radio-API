@@ -22,7 +22,7 @@ require_once( '/php-code/classes/autoload.php' );
  */
 Config::setRedisServer();
 
-if( trim(shell_exec("whoami")) != "www-data" ){
+if( trim(shell_exec("whoami") ?? '') != "www-data" ){
 	die("Run as user www-data!" . PHP_EOL);
 }
 

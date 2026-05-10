@@ -121,7 +121,7 @@ class JSONCache implements CacheInterface {
 		return $this->keyExists($key) && isset($this->data[$key][0][$arrayKey]);
 	}
 
-	public function arrayKeyGet(string $key, string $arrayKey ) {
+	public function arrayKeyGet(string $key, string $arrayKey ) : mixed {
 		return $this->arrayGet($key)[$arrayKey];
 	}
 

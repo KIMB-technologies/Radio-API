@@ -55,8 +55,8 @@ class RedisCache implements CacheInterface {
 
 	/**
 	 * Generate the key for some storage.
-	 * @param $key the key
-	 * @return the full key
+	 * @param string $key the key
+	 * @return string The generated full key
 	 */
 	private function generateKey( string $key ) : string {
 		return $this->prefix . str_replace( ':', '', $key );
@@ -102,7 +102,7 @@ class RedisCache implements CacheInterface {
 	}
 
 	public function keyExists(string $key) : bool {
-		return $this->redis->exists($this->generateKey($key));
+		return (bool)$this->redis->exists($this->generateKey($key));
 	}
 
 	public function remove(string $key) : bool {
@@ -137,7 +137,7 @@ class RedisCache implements CacheInterface {
 		return $this->redis->hExists($this->generateKey($key), strval($arrayKey));
 	}
 
-	public function arrayKeyGet(string $key, string $arrayKey ) {
+	public function arrayKeyGet(string $key, string $arrayKey ) : mixed {
 		return json_decode( $this->redis->hGet($this->generateKey($key), strval($arrayKey)), true);
 	}
 

@@ -142,10 +142,10 @@ class Data {
 	 * Get data of one item by its id.
 	 */
 	public function getById( int $id ) : array {
-		if( !$this->redis->arrayKeyExists('items', $id) ){
+		if( !$this->redis->arrayKeyExists('items', strval($id)) ){
 			return array();
 		}
-		return $this->redis->arrayKeyGet('items', $id);
+		return $this->redis->arrayKeyGet('items', strval($id));
 	}
 
 	/**

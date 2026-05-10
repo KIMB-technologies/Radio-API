@@ -118,9 +118,13 @@ class Auth {
 
 		// use the auth data to init object
 		if($this->clientType === ClientType::RadioXML){
+			// have ClientType::RadioXML and this can only be set if mac !== null!
+			// @phan-suppress-next-line PhanTypeMismatchArgumentNullable
 			$this->radioId = new Id($this->clientMac, Id::MAC);
 		}
 		else if($this->clientType === ClientType::RadioJSON){
+			// have ClientType::RadioJSON and this can only be set if mac !== null!
+			// @phan-suppress-next-line PhanTypeMismatchArgumentNullable
 			$this->radioId = new Id($this->clientRid, Id::RID);
 		}
 		else{

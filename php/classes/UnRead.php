@@ -29,7 +29,7 @@ class UnRead {
 
 	/**
 	 * Tell the system, that a user visits the episode list of this podcast
-	 * @param id the podcast id
+	 * @param int $id The podcast id
 	 */
 	public function searchItem(int $id, string $noturl = '') : void {
 		if( $this->redis->keyExists( $id . '-started' ) ){
@@ -51,8 +51,8 @@ class UnRead {
 
 	/**
 	 * Get the status of one episode (as gui prefix string)
-	 * @param id the podcast id
-	 * @param url of episode
+	 * @param int $id The podcast id
+	 * @param string $url The URL of the episode
 	 */
 	public function knownItemMark(int $id, string $url) : string {
 		return $this->knownItem($id, $url) ? '' : '*';
@@ -60,15 +60,15 @@ class UnRead {
 
 	/**
 	 * Tell the system, that a user started an episode (SearchType=5) 
-	 * @param id the podcast id
-	 * @param eid the episode id
+	 * @param int $id The podcast id
+	 * @param string $url The URL of the episode
 	 */
 	public function openItem(int $id, string $url){
 		$this->searchItem($id, $url);
 		if( !$this->redis->keyExists( $url ) ){
 			$this->redis->set( $url, 'S' ); // Started
 			$this->redis->set( $id . '-started' , $url, 120 );
-			$this->redis->set( 'started' , $id , 115 );
+			$this->redis->set( 'started' , strval($id) , 115 );
 
 			$this->dontRemove = true;
 		}
@@ -87,6 +87,10 @@ class UnRead {
 	public static function dumpToDisk(?string $exportDir = null) : bool {
 		if( is_file( __DIR__ . '/../data/table.json' ) ){
 			$table = json_decode(file_get_contents( __DIR__ . '/../data/table.json' ), true);
+
+			if( !is_array($table) ){
+				return false;
+			}
 
 			$reads = array();
 			foreach( $table['ids'] as $id => $data ){
@@ -134,7 +138,7 @@ class UnRead {
 		$this->dontRemove = true;
 
 		if( preg_match('/^(\d+)X(\d+)$/', $id, $parts ) === 1 ){
-			$ed = PodcastLoader::getEpisodeData( $parts[1], $parts[2], $data );
+			$ed = PodcastLoader::getEpisodeData( intval($parts[1]), intval($parts[2]), $data );
 			if( $ed != array() ){
 				$rkey = $ed['episode']['url'];
 				if( $this->redis->keyExists( $rkey ) ){

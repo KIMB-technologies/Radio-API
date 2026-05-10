@@ -86,7 +86,7 @@ class Id {
 		return $table;
 	}
 
-	public function __construct($val, int $type = self::MAC){
+	public function __construct(string $val, int $type = self::MAC){
 		// load redis
 		$redis = new Cache('table.json');
 
@@ -126,11 +126,11 @@ class Id {
 		}
 
 		//load this data by id
-		if( $redis->arrayKeyExists('ids', $this->id ) ){
+		if( $redis->arrayKeyExists('ids', strval($this->id) ) ){
 			// make sure to have a rid and a mac for this radio
 			$this->data = $this->assureMacRid(
 				// get the data (mac, code, rid) for this id
-				$redis->arrayKeyGet('ids', $this->id ),
+				$redis->arrayKeyGet('ids', strval($this->id) ),
 				$redis
 			);
 		}

@@ -34,6 +34,7 @@ if( Config::IM_EXPORT_TOKEN ){
 
 		// run the im- or export
 		$ie = new ImExport();
+		$msg = '';
 
 		if($_REQUEST['task'] === 'import'){
 			$ok = true;

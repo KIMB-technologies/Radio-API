@@ -54,7 +54,7 @@ class Router {
 			}
 			// radio or "own stream" ID (Range 1000 - 2999)
 			else if( preg_match('/^(1|2)\d\d\d$/', $_GET['Search'], $parts ) === 1){ 
-				$this->listPlayItem(intval($_GET['Search']), $parts[1], play: $play);
+				$this->listPlayItem(intval($_GET['Search']), intval($parts[1]), play: $play);
 				$this->out->currentUrl($currentUrl, 'Play Stream');
 			}
 			else {

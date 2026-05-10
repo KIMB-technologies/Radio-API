@@ -128,6 +128,7 @@ class RadioLogo {
 			'-o', '"'.$outputPNG.'"',
 			'"'.$inputSVG.'"'
 		);
+		$rs = 0;
 		exec(implode(' ', $command), result_code:$rs);
 		return $rs === 0;
 	}

@@ -110,6 +110,7 @@ class RadioBrowser {
 	}
 
 	private function run_request(string $path, array $params = array(), bool $cache = true) {
+		$cacheKey = '';
 		if($cache){
 			$cacheKey = 'api_cache.' . sha1($path . json_encode($params));
 			if($this->redis->keyExists($cacheKey)){
@@ -203,6 +204,7 @@ class RadioBrowser {
 				"hidebroken" => "true",
 				"offset" => $offset
 			);
+			$path = '';
 			switch ($by) {
 				case "languages":
 				case "tags":
@@ -302,6 +304,7 @@ class RadioBrowser {
 				"order" => "clickcount",
 				"reverse" => "true"
 			);
+			$path = '';
 			switch ($by) {
 				case "languages":
 					$path = "stations/bylanguageexact";
@@ -396,7 +399,7 @@ class RadioBrowser {
 
 		// fetch station data
 		$stations = $this->run_request("stations/byuuid", array("uuids" => $uuid));
-		if($stations === false){
+		if($stations === false || !is_array($stations)){
 			$out->addDir("Error fetching data from Radio-Browser API!", Config::RADIO_DOMAIN . "?go=initial");
 			return;
 		}
@@ -443,6 +446,9 @@ class RadioBrowser {
 	public static function dumpToDisk(?string $exportDir = null) : bool {
 		if( is_file( __DIR__ . '/../data/table.json' ) ){
 			$table = json_decode(file_get_contents( __DIR__ . '/../data/table.json' ), true);
+			if( !is_array($table) ){
+				return false;
+			}
 			$redis = new Cache("radio-browser");
 
 			$lasts = array();

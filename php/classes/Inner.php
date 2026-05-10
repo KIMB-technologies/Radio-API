@@ -106,7 +106,7 @@ class Inner {
 			$count++;
 		}
 		$this->template->setMultipleContent('RadioStations', $radios);
-		$this->template->setContent('RADIO_COUNT', $count);
+		$this->template->setContent('RADIO_COUNT', (string)$count);
 		$this->template->setContent('RADIO_OPTIONS', array_reduce($categories, fn($c, $i) => $c.'<option value="'.$i.'">'.$i.'</option>', '' ));
 	}
 
@@ -138,7 +138,7 @@ class Inner {
 			$count++;
 		}
 		$this->template->setMultipleContent('Podcasts', $podcasts);
-		$this->template->setContent('PODCAST_COUNT', $count);
+		$this->template->setContent('PODCAST_COUNT', (string)$count);
 		$this->template->setContent('PODCAST_OPTIONS', array_reduce($categories, fn($c, $i) => $c.'<option value="'.$i.'">'.$i.'</option>', '' ));
 	}
 

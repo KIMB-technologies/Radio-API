@@ -44,6 +44,8 @@ else {
 
 	//Header
 	header( 'Content-Type: '.$mimetype );
+	// is safe, var is set with $file together and if $file not set, we take the other if() branch
+	// @phan-suppress-next-line PhanPossiblyUndeclaredGlobalVariable
 	header( 'Content-Disposition: inline; filename="'.$namehash.'.image"' );
 	header( 'Content-Length: '.$filesize);
 

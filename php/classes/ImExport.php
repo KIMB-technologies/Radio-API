@@ -66,7 +66,7 @@ class ImExport {
 		return $tmpDir;
 	}
 
-	public function export(bool $yield = true) {
+	public function export(bool $yield = true) : ?string {
 		// dump from cache/ redis
 		//	create tmp dir
 		$tmpDir = $this->getTmpDir();
@@ -85,10 +85,10 @@ class ImExport {
 		// remove tmp dir
 		rmdir($tmpDir);
 
-		if($yield){
-			// encode as json
-			$json = json_encode($export, JSON_PRETTY_PRINT);
+		// encode as json
+		$json = json_encode($export, JSON_PRETTY_PRINT);
 
+		if($yield){
 			// yield header
 			header('Content-Type: application/json;charset=UTF-8');
 			header('Content-Disposition: attachment; filename=Radio-API_export_'.date('Y-m-d_H-i-s').'.json' );
@@ -97,6 +97,7 @@ class ImExport {
 			header('Pragma: no-cache');
 			// yield the data
 			echo $json;
+			return null;
 		}
 		else{
 			return $json;
@@ -284,8 +285,9 @@ class ImExport {
 			case "append":
 				return $this->runAppend($export);
 			case "single":
-				return $this->runSingle($export, $codeExport, $codeSystem);
+				return $this->runSingle($export, $codeExport ?? '', $codeSystem ?? '');
 		}
+		return false;
 	}
 
 	private function runReplace(array $export, bool $cleanUp = true) : bool {
@@ -361,7 +363,7 @@ class ImExport {
 			if($this->exportFile($f, "list")){ // increment ids of all list files 
 				$newF = preg_replace_callback(
 					'/^((?:radio|podcast)s_)([0-9]{1,4})(\.json)$/',
-					fn($m) => $m[1] . intval($m[2])+$idShift . $m[3],
+					fn($m) => $m[1] . (intval($m[2])+$idShift) . $m[3],
 					$f
 				);
 
@@ -385,7 +387,7 @@ class ImExport {
 					$id = $k + $idShift;
 					$mac = $v[0];
 					$code = $v[1];
-					$rid = isset($v[2]) ? $v[2] : null;
+					$rid = $v[2] ?? null;
 
 					if(isset($export[$f]["macs"][$mac]) || (!is_null($rid) && isset($export[$f]["rids"][$rid])) ){
 						$this->msg .= "<br>" . (Template::getLanguage() == 'de' ? "Radio $code war bereits im System vorhanden, Listen wurden überschrieben!" : "Radio $code was already known to system, list have been overwritten!");

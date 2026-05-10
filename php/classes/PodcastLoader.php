@@ -63,6 +63,10 @@ class PodcastLoader {
 		);
 		$eid = 1;
 
+		if( !is_array($data) ){
+			return $poddata;
+		}
+
 		// iterate files
 		foreach($data["response"] as $r){
 
@@ -106,10 +110,14 @@ class PodcastLoader {
 		$data = json_decode(json_encode( simplexml_load_string( $rss, 'SimpleXMLElement', LIBXML_NOCDATA ) ), true );
 				
 		$poddata = array(
-			'title' => $data['channel']['title'] ?? '',
-			'logo' => isset( $data['channel']['image'] ) ? $data['channel']['image']['url'] : '',
+			'title' => is_array($data) ? ($data['channel']['title'] ?? '') : '',
+			'logo' => is_array($data) && isset( $data['channel']['image'] ) ? $data['channel']['image']['url'] : '',
 			'episodes' => array()
 		);
+
+		if( !is_array($data) ){
+			return $poddata;
+		}
 
 		$eid = 1;
 
