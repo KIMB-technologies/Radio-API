@@ -53,6 +53,7 @@ jobs:
 
     - name: Get main tag (from VERSION file)
       run: echo -n "IMAGE_TAG=$(head -n 1 VERSION)" >> $GITHUB_ENV
+      if: ${{ (github.event_name == 'push') || (steps.check.outputs.needs-updating == 'true') }}
 
     - name: Docker build and push the main tag
       run: docker buildx build --platform "$PLATFORMS" . --file "$DOCKERFILE_PATH" --tag "$IMAGE_OWNER/$IMAGE_NAME:$IMAGE_TAG" --push
