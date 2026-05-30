@@ -33,7 +33,7 @@ class PodcastLoader {
 	/**
 	 * Nextcloud share loader
 	 */
-	private static function loadFromNextcloud( string $url ) : array {
+	private static function loadFromNextcloud( string $url, bool $sort = true ) : array {
 		// "<server base path> / <possibly index.php> /s/ <token>"
 		if(preg_match('/^(https?\:\/\/.*)(?<!index\.php)(\/index\.php)?\/s\/([0-9A-Za-z]+)/', $url, $matches) !== 1){
 			return array();
@@ -61,7 +61,7 @@ class PodcastLoader {
 			'logo' => '',
 			'episodes' => array()
 		);
-		$eid = 1;
+		$episodes = array();
 
 		if( !is_array($data) ){
 			return $poddata;
@@ -86,18 +86,23 @@ class PodcastLoader {
 
 			// is this an audio file?
 			if( str_starts_with($mime, 'audio/') ){
-				$poddata['episodes'][$eid] = array(
+				$episodes[] = array(
 					'title' => $filename,
 					'desc'  => '',
 					'url' => $streamurl
 				);
-				$eid++;
 			}
 			// it this a logo?
 			else if(str_starts_with($mime, 'image/') && str_starts_with($filename, "logo") ){
 				$poddata['logo'] = $streamurl;
 			}
 		}
+
+		if($sort){
+			usort($episodes, fn($x, $y) => strnatcasecmp($x['title'], $y['title']));
+		}
+		// reindex episodes, starts with 1
+		$poddata['episodes'] = array_combine(range(1, count($episodes)), $episodes);
 
 		return $poddata;
 	}
