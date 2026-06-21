@@ -75,3 +75,7 @@ div.note {
 	margin:auto;
 	max-width: 750px;
 }
+
+summary h2, summary h3 {
+	display: inline-block;
+}

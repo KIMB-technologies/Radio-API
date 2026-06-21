@@ -57,6 +57,8 @@ class Inner {
 				}
 			}
 			$this->data->setRadioList($this->radios);
+
+			$this->template->setContent('OPEN_RADIO', 'open');
 		}
 		else if(isset( $_GET['podcasts'] ) && isset( $_POST['name'] ) ){
 			$this->html[] = '<span style="color:green;">Changed podcasts!</span>';
@@ -75,6 +77,8 @@ class Inner {
 				}
 			}
 			$this->data->setPodcastList($this->podcasts);
+			
+			$this->template->setContent('OPEN_PODCAST', 'open');
 		}
 	}
 

@@ -8,6 +8,9 @@
 	"%%PODCAST_COUNT%%" : "",
 	"%%RADIO_OPTIONS%%" : "",
 	"%%PODCAST_OPTIONS%%" : "",
+	"%%OPEN_RADIO%%" : "",
+	"%%OPEN_PODCAST%%" : "",
+	"%%OPEN_MERGE%%" : "",
 	"multiples" : {
 		"RadioStations" : {
 			"%%ID%%" : "",

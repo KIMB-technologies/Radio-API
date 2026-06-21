@@ -5,7 +5,26 @@
 	<a href="%%SERVERURL%%gui/?login">Logout</a>
 </div>
 
-<h3 id="radio">Radiosender</h3>
+<details %%OPEN_MERGE%%>
+	<summary>
+		<h3>Zusammenlegen</h3>
+	</summary>
+
+	TODO!!
+
+	<div class="note">
+		Radios können <em>zusammengelegt</em> werden, sodass dann zwei Radios die gleiche Senderliste und die gleichen Podcasts anzeigen.
+		Um dieses Radio mit einem anderen Radio zusammenzulegen, muss der Code des anderen bekannt sein. 
+		Dieses Radio wird nach dem Zusammenlegen die Senderliste und Podcasts des anderen Radios anzeigen.
+		<br>
+		Ein Zusammenlegen kann rückgängig gemacht werden, indem man sich mit dem Code dieses Radios erneut einloggt und die Zusammenlegung auflöst.
+	</div>
+</details>
+
+<details name="list" %%OPEN_RADIO%%>
+	<summary>
+		<h3 id="radio">Radiosender</h3>
+	</summary>
 	<form action="%%SERVERURL%%gui/?radios#radio" method="post">
 		<table>
 			<tr>
@@ -182,8 +201,12 @@
 		Es können Elemente (Podcasts oder Radiosender) zu einer Kategorie mit dem Namen <code>Favoriten</code> oder <code>Favorites</code> hinzugefügt werden.
 		Diese Kategorie wird dann als erstes Element auf oberster Ebene im Display des Radios angezeigt, sodass die Favoriten schnell und direkt erreichbar sind.
 	</div>
+</details>
 
-<h3 id="podcast">Podcasts</h3>
+<details name="list" %%OPEN_PODCAST%%>
+	<summary>
+		<h3 id="podcast">Podcasts</h3>
+	</summary>
 	<form action="%%SERVERURL%%gui/?podcasts#podcast" method="post">
 		<table>
 			<tr>
@@ -322,29 +345,37 @@
 		Mit EndURL wird der direkte Link zur Audiodatei an das Radio geschickt.
 		EndURL ist dem Proxy vorzuziehen, da es den Server weniger belastet und schneller ist.
 	</div>
+</details>
 
-	<script>
-		$(function (){
-			$("button.del").on( "click", function (){
-				var id = $(this).attr("delid");
-				$("input[delid="+ id +"]").val("");
-			});
+<script>
+	$(function (){
+		$("button.del").on( "click", function (){
+			var id = $(this).attr("delid");
+			$("input[delid="+ id +"]").val("");
 		});
-	</script>
+	});
+</script>
 
-	<h2>Vorschau</h2>
-		<div style="float:right; %%CLEAR_CACHE%%">
-			<a href="%%SERVERURL%%gui/?clear-logo-cache">Logo-Cache leeren</a>
-		</div>
 
-		<div id="apiviewer">
-		</div>
-		<div id="audiodiv">
-		</div>
+<details>
+	<summary>
+		<h2>Vorschau</h2>
+	</summary>
+	<div style="float:right; %%CLEAR_CACHE%%">
+		<a href="%%SERVERURL%%gui/?clear-logo-cache">Logo-Cache leeren</a>
+	</div>
 
-		<div class="achtung">
-			Achtung, die Vorschau dient in erster Linie dazu die Liste der Radios, Podcast, Episoden und Streams anzuschauen.
-			Das Abspielen von einigen Audioformaten klappt in Browsern nicht, dafür aber auf dem Radio.
-			Weiterhin unterstützen nicht alle Radios SSL, Browser jedoch schon.
-		</div>
-		<script> var serverurl = "%%SERVERURL%%", radiourl = "%%RADIO_DOMAIN%%", radiomac = "%%RADIO_MAC%%", radiocount = %%RADIO_COUNT%%, dlang_val = "ger";</script>
+	<div id="apiviewer">
+	</div>
+	<div id="audiodiv">
+	</div>
+
+	<div class="achtung">
+		Achtung, die Vorschau dient in erster Linie dazu die Liste der Radios, Podcast, Episoden und Streams anzuschauen.
+		Das Abspielen von einigen Audioformaten klappt in Browsern nicht, dafür aber auf dem Radio.
+		Weiterhin unterstützen nicht alle Radios SSL, Browser jedoch schon.
+	</div>
+</details>
+
+<script> var serverurl = "%%SERVERURL%%", radiourl = "%%RADIO_DOMAIN%%", radiomac = "%%RADIO_MAC%%", radiocount = %%RADIO_COUNT%%, dlang_val = "ger";</script>
+

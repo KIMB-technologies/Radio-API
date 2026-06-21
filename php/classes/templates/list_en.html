@@ -5,7 +5,26 @@
 	<a href="%%SERVERURL%%gui/?login">Logout</a>
 </div>
 
-<h3 id="radio">Radio stations</h3>
+<details %%OPEN_MERGE%%>
+	<summary>
+		<h3>Merge Radios</h3>
+	</summary>
+
+	TODO!!
+
+	<div class="note">
+		Radios can be <em>merged</em> so that two radios display the same station list and the same podcasts.
+		To merge this radio with another radio, you must know the other radio's code. 
+		After merging, this radio will display the station list and podcasts of the other radio.
+		<br>
+      	You can undo a merge by logging in again with this radio's code and canceling the merge.
+	</div>
+</details>
+
+<details name="list" %%OPEN_RADIO%%>
+	<summary>
+		<h3 id="radio">Radio Stations</h3>
+	</summary>
 	<form action="%%SERVERURL%%gui/?radios#radio" method="post">
 		<table>
 			<tr>
@@ -183,8 +202,12 @@
 		You may add items (podcasts or radio stations) to a category called <code>Favorites</code> or <code>Favoriten</code>.
 		This category will be shown as first item on the top level of the Radio display, s.t., the items in favorites are easily reachable.
 	</div>
+</details>
 
-<h3 id="podcast">Podcasts</h3>
+<details name="list" %%OPEN_PODCAST%%>
+	<summary>
+		<h3 id="podcast">Podcasts</h3>
+	</summary>
 	<form action="%%SERVERURL%%gui/?podcasts#podcast" method="post">
 		<table>
 			<tr>
@@ -330,30 +353,36 @@
 			The proxy will put more load on the server and will slow down the connection time to streams.
 		</b>
 	</div>
+</details>
 
-	<script>
-		$(function (){
-			$("button.del").on( "click", function (){
-				var id = $(this).attr("delid");
-				$("input[delid="+ id +"]").val("");
-			});
+<script>
+	$(function (){
+		$("button.del").on( "click", function (){
+			var id = $(this).attr("delid");
+			$("input[delid="+ id +"]").val("");
 		});
-	</script>
+	});
+</script>
 
-	<h2>Preview</h2>
-		<div style="float:right; %%CLEAR_CACHE%%">
-			<a href="%%SERVERURL%%gui/?clear-logo-cache" title="">Clear logo cache</a>
-		</div>
+<details>
+	<summary>
+		<h2>Preview</h2>
+	</summary>
+	<div style="float:right; %%CLEAR_CACHE%%">
+		<a href="%%SERVERURL%%gui/?clear-logo-cache" title="">Clear logo cache</a>
+	</div>
 
-		<div id="apiviewer">
-		</div>
-		<div id="audiodiv">
-		</div>
+	<div id="apiviewer">
+	</div>
+	<div id="audiodiv">
+	</div>
 
-		<div class="achtung">
-			Attention, the preview is just a preview for the list of stations, podcasts, and streams.
-			If some stream or episode does not start playing in the browser, it may do so using the radio nevertheless.
-			Also if something works using a browser, it may not work with the radio.
-			One possible reason is that not all radios support SSL.
-		</div>
-		<script> var serverurl = "%%SERVERURL%%",  radiourl = "%%RADIO_DOMAIN%%", radiomac = "%%RADIO_MAC%%", radiocount = %%RADIO_COUNT%%, dlang_val = "eng";</script>
+	<div class="achtung">
+		Attention, the preview is just a preview for the list of stations, podcasts, and streams.
+		If some stream or episode does not start playing in the browser, it may do so using the radio nevertheless.
+		Also if something works using a browser, it may not work with the radio.
+		One possible reason is that not all radios support SSL.
+	</div>
+</details>
+
+<script> var serverurl = "%%SERVERURL%%",  radiourl = "%%RADIO_DOMAIN%%", radiomac = "%%RADIO_MAC%%", radiocount = %%RADIO_COUNT%%, dlang_val = "eng";</script>
