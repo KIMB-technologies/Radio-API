@@ -107,7 +107,7 @@ class Inner {
 					$this->html[] = '<span style="color:red;">Error setting merge!</span>';
 				}
 			}
-			else{ // !$active
+			else if( $_SERVER['REQUEST_METHOD'] == 'POST') { // !$active
 				if(Id::unmerge($this->login->getId())){
 					$this->html[] = '<span style="color:green;">Merge removed!</span>';
 				}
