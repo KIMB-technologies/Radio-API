@@ -60,10 +60,11 @@ if( $login->isLoggedIn() ){
 	
 		$mainTemplate->includeTemplate( $listTemplate );
 	
-		$inner = new Inner($login->getId(), $listTemplate);
+		$inner = new Inner($login, $listTemplate);
 		$inner->checkPost();
 		$inner->clearCache();
-	
+
+		$inner->mergeForm();
 		$inner->radioForm();
 		$inner->podcastForm();
 	

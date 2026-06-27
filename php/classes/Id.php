@@ -79,11 +79,81 @@ class Id {
 		}
 
 		if($changed){
-			// save new init table
-			file_put_contents( __DIR__ . '/../data/table.json', json_encode($table, JSON_PRETTY_PRINT), LOCK_EX);
+			// save changed table
+			self::updateTableData($table);
 		}
 
 		return $table;
+	}
+
+	private static function updateTableData(array $table,
+		array $keys = ['macs', 'ids', 'codes', 'rids'], ?Cache $redis = null
+	){
+		// save  table file
+		file_put_contents( __DIR__ . '/../data/table.json', json_encode($table, JSON_PRETTY_PRINT), LOCK_EX);
+
+		// update redis cache
+		foreach(['macs', 'ids', 'codes', 'rids'] as $key){
+			if(in_array($key, $keys)){ // update each cache if requested
+
+				if(is_null($redis)){ // load redis if not loaded
+					$redis = new Cache('table.json');
+				}
+
+				$redis->arraySet($key, $table[$key], self::CACHE_TTL);
+			}
+		}
+	}
+
+	// merge the radio $id with the radio using $code, s.t., radio $id uses the lists of $code
+	public static function mergeRadios(int $id, string $code) : bool {
+		// merge changes the id in the table.json lookups for 'macs' and 'rids'
+
+		// get table from file, as file is the primary storage
+		$table = self::getTableData();
+
+		if(isset($table['ids'][$id]) && isset($table['codes'][$code]) ){
+			// id of the radio with $code
+			$code_id = $table['codes'][$code];
+
+			// radio infos (mac and rid) to merge to $code
+			$data = $table['ids'][$id];
+
+			// tamper
+			$table['macs'][$data[0]] = $code_id;
+			$table['rids'][$data[2]] = $code_id;
+			//	and save
+			self::updateTableData($table, ['macs', 'rids']);
+
+			return true;
+		}
+		else{
+			return false;
+		}
+
+	}
+
+	// remove any merge for the radio with $id
+	public static function unmerge(int $id) : bool {
+		// merge tampers the lookup of 'macs' and 'rids' in table.json, restore from 'ids'
+
+		// get table from file, as file is the primary storage
+		$table = self::getTableData();
+
+		if(isset($table['ids'][$id])){
+			$data = $table['ids'][$id];
+
+			// restore
+			$table['macs'][$data[0]] = $id;
+			$table['rids'][$data[2]] = $id;
+			//	and save
+			self::updateTableData($table, ['macs', 'rids']);
+
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 
 	public function __construct(string $val, int $type = self::MAC){
@@ -183,11 +253,7 @@ class Id {
 			$table['rids'][$rid] = $this->id; 
 			
 			// save new table
-			//	File
-			file_put_contents( __DIR__ . '/../data/table.json', json_encode($table, JSON_PRETTY_PRINT), LOCK_EX);
-			//	Redis
-			$redis->arraySet('rids', $table['rids'], self::CACHE_TTL);
-			$redis->arraySet('ids', $table['ids'], self::CACHE_TTL);
+			self::updateTableData($table, ['rids', 'ids'], $redis);
 		}
 		return $data;
 	}
@@ -230,14 +296,8 @@ class Id {
 		$table['rids'][$rid] = $id;
 		$table['codes'][$code] = $id;
 
-		// save new table
-		//	File
-		file_put_contents( __DIR__ . '/../data/table.json', json_encode($table, JSON_PRETTY_PRINT), LOCK_EX);
-		//	Redis
-		$redis->arraySet('macs', $table['macs'], self::CACHE_TTL);
-		$redis->arraySet('ids', $table['ids'], self::CACHE_TTL);
-		$redis->arraySet('codes', $table['codes'], self::CACHE_TTL);
-		$redis->arraySet('rids', $table['rids'], self::CACHE_TTL);
+		// save new table and update all redis values
+		self::updateTableData($table, redis:$redis);
 
 		return $id;
 	}
