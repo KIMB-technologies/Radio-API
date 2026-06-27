@@ -11,6 +11,8 @@
 	"%%OPEN_RADIO%%" : "",
 	"%%OPEN_PODCAST%%" : "",
 	"%%OPEN_MERGE%%" : "",
+	"%%MERGED_WITH%%" : "Z",
+	"%%MERGE_ACTIVE%%" : "",
 	"multiples" : {
 		"RadioStations" : {
 			"%%ID%%" : "",

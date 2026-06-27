@@ -17,12 +17,15 @@ defined('HAMARadio') or die('Invalid Endpoint');
 class Inner {
 
 	private $html = array();
-	private $radios, $podcasts, $data, $template;
+	private $login, $data, $radios, $podcasts, $template;
 
-	public function __construct(int $id, Template $template){
-		$this->data = new Data($id);
+	public function __construct(Login $login, Template $template){
+		$this->login = $login;
+		$this->data = new Data($login->getId());
+		
 		$this->radios = $this->data->getRadioList();
 		$this->podcasts = $this->data->getPodcastList();
+
 		$this->template = $template;
 	}
 
@@ -39,47 +42,96 @@ class Inner {
 	}
 
 	public function checkPost() : void {
-		if(isset( $_GET['radios'] ) && isset( $_POST['name'] )){
-			$this->html[] = '<span style="color:green;">Changed Radio stations!</span>';
-		
-			$this->radios = array();
-			foreach( $_POST['name'] as $id => $name ){
-				if( !empty($name) ){
-					$this->radios[] = array(
-						'name' => self::filterName( $name ),
-						'url' => self::filterURL( $_POST['url'][$id] ),
-						'logo' => self::filterURL( $_POST['logo'][$id] ),
-						'desc' => self::filterName( $_POST['desc'][$id] ),
-						'proxy' => isset($_POST['proxy'][$id]) && $_POST['proxy'][$id] == 'yes',
-						'type' => !empty($_POST['type'][$id]) && $_POST['type'][$id] == 'nc' ? 'nc' : 'radio',
-						'category' => $this->getCategory($id)
-					);
-				}
-			}
-			$this->data->setRadioList($this->radios);
-
+		if(isset( $_GET['radios'] )){
 			$this->template->setContent('OPEN_RADIO', 'open');
+
+			if(!empty( $_POST['name'] )){
+				$this->html[] = '<span style="color:green;">Changed Radio stations!</span>';
+			
+				$this->radios = array();
+				foreach( $_POST['name'] as $id => $name ){
+					if( !empty($name) ){
+						$this->radios[] = array(
+							'name' => self::filterName( $name ),
+							'url' => self::filterURL( $_POST['url'][$id] ),
+							'logo' => self::filterURL( $_POST['logo'][$id] ),
+							'desc' => self::filterName( $_POST['desc'][$id] ),
+							'proxy' => isset($_POST['proxy'][$id]) && $_POST['proxy'][$id] == 'yes',
+							'type' => !empty($_POST['type'][$id]) && $_POST['type'][$id] == 'nc' ? 'nc' : 'radio',
+							'category' => $this->getCategory($id)
+						);
+					}
+				}
+				$this->data->setRadioList($this->radios);
+			}
 		}
-		else if(isset( $_GET['podcasts'] ) && isset( $_POST['name'] ) ){
-			$this->html[] = '<span style="color:green;">Changed podcasts!</span>';
-		
-			$this->podcasts = array();
-			foreach( $_POST['name'] as $id => $name ){
-				if( !empty($name) ){
-					$this->podcasts[] = array(
-						'name' => self::filterName( $name ),
-						'url' => self::filterURL( $_POST['url'][$id] ),
-						'finalurl' => isset($_POST['finalurl'][$id]) && $_POST['finalurl'][$id] == 'yes',
-						'proxy' => isset($_POST['proxy'][$id]) && $_POST['proxy'][$id] == 'yes',
-						'type' => isset($_POST['type'][$id]) && $_POST['type'][$id] == 'nc' ? 'nc' : 'rss',
-						'category' => $this->getCategory($id)
-					);
+		else if(isset( $_GET['podcasts'] ) ){
+			$this->template->setContent('OPEN_PODCAST', 'open');
+			
+			if(!empty( $_POST['name'] )){
+				$this->html[] = '<span style="color:green;">Changed podcasts!</span>';
+
+				$this->podcasts = array();
+				foreach( $_POST['name'] as $id => $name ){
+					if( !empty($name) ){
+						$this->podcasts[] = array(
+							'name' => self::filterName( $name ),
+							'url' => self::filterURL( $_POST['url'][$id] ),
+							'finalurl' => isset($_POST['finalurl'][$id]) && $_POST['finalurl'][$id] == 'yes',
+							'proxy' => isset($_POST['proxy'][$id]) && $_POST['proxy'][$id] == 'yes',
+							'type' => isset($_POST['type'][$id]) && $_POST['type'][$id] == 'nc' ? 'nc' : 'rss',
+							'category' => $this->getCategory($id)
+						);
+					}
+				}
+				$this->data->setPodcastList($this->podcasts);
+			}
+		}
+		else if( isset( $_GET['merge'] )){
+			$this->template->setContent('OPEN_MERGE', 'open');
+
+			$active = isset($_POST['active']) && $_POST['active'] === 'yes';	
+			$code = isset($_POST['code']) && Helper::checkValue( $_POST['code'], Id::CODE_PREG ) ? $_POST['code'] : null;
+
+			if(is_null($code) && $active){ // logic check
+				$this->html[] = '<span style="color:red;">Cannot merge without code!</span>';
+				$active = false;
+			}
+
+			// handle and store values
+			if($active){ // we know from before that code is set
+				if(Id::mergeRadios($this->login->getId(), $code)){
+					$this->html[] = '<span style="color:green;">Merge set!</span>';
+				}
+				else{
+					$this->html[] = '<span style="color:red;">Error setting merge!</span>';
 				}
 			}
-			$this->data->setPodcastList($this->podcasts);
-			
-			$this->template->setContent('OPEN_PODCAST', 'open');
+			else{ // !$active
+				if(Id::unmerge($this->login->getId())){
+					$this->html[] = '<span style="color:green;">Merge removed!</span>';
+				}
+				else{
+					$this->html[] = '<span style="color:red;">Error removing merge!</span>';
+				}
+			}
 		}
+	}
+
+	public function mergeForm() : void {
+		// get the ID as if logging in via MAC
+		$macId = new Id($this->login->getAll()['mac']);
+
+		// if the radio is merged, the login via MAC/ RID will end at at different ID than the
+		//	one used for gui/ backend login
+		if($macId->getId() !== $this->login->getId()){
+			$this->template->setContent('MERGE_ACTIVE', 'checked');
+			$this->template->setContent('MERGED_WITH', $macId->getCode());
+
+			// always open collapsible to inform user
+			$this->template->setContent('OPEN_MERGE', 'open');
+		}
+		// else: default values for MERGED_WITH, MERGE_ACTIVE
 	}
 
 	public function radioForm() : void {

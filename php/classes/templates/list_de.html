@@ -10,7 +10,23 @@
 		<h3>Zusammenlegen</h3>
 	</summary>
 
-	TODO!!
+	<form action="%%SERVERURL%%gui/?merge" method="post">
+		<table>
+			<tr>
+				<td>Code des anderen Radios</td>
+				<td><input type="text" name="code" value="%%MERGED_WITH%%" p_attern="^Z(?:[0-9A-Za-z]{4})?$" ></td>
+				<td>(oder leer)</td>
+			</tr>
+			<tr>
+				<td>Zusammenlegung aktiv</td>
+				<td><input type="checkbox" name="active" value="yes" %%MERGE_ACTIVE%%></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="submit" value="Zusammenlegen"></td>
+			</tr>
+		</table>
+	</form>
 
 	<div class="note">
 		Radios können <em>zusammengelegt</em> werden, sodass dann zwei Radios die gleiche Senderliste und die gleichen Podcasts anzeigen.
@@ -357,10 +373,7 @@
 </script>
 
 
-<details>
-	<summary>
-		<h2>Vorschau</h2>
-	</summary>
+<h2>Vorschau</h2>
 	<div style="float:right; %%CLEAR_CACHE%%">
 		<a href="%%SERVERURL%%gui/?clear-logo-cache">Logo-Cache leeren</a>
 	</div>
@@ -375,7 +388,6 @@
 		Das Abspielen von einigen Audioformaten klappt in Browsern nicht, dafür aber auf dem Radio.
 		Weiterhin unterstützen nicht alle Radios SSL, Browser jedoch schon.
 	</div>
-</details>
 
 <script> var serverurl = "%%SERVERURL%%", radiourl = "%%RADIO_DOMAIN%%", radiomac = "%%RADIO_MAC%%", radiocount = %%RADIO_COUNT%%, dlang_val = "ger";</script>
 
