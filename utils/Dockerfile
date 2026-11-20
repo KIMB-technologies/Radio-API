@@ -1,10 +1,10 @@
 FROM kimbtechnologies/php_nginx:latest 
 
 # php redis support
-RUN apk add --update --no-cache $PHPIZE_DEPS \
-	&& pecl install redis \
-	&& docker-php-ext-enable redis
-
+RUN --mount=type=bind,from=ghcr.io/php/pie:bin,source=/pie,target=/usr/local/bin/pie \
+    apk add --update --no-cache $PHPIZE_DEPS \
+    && pie install phpredis/phpredis:dev-develop
+  
 # SVG -> PNG convert
 RUN apk add --update --no-cache rsvg-convert
 

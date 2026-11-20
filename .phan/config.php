@@ -9,7 +9,7 @@
 
 */
 return [
-	'target_php_version' => '8.5',
+	'target_php_version' => '8.6',
 	'file_list' => [ 
 		'./utils/cron.php',
 		'./utils/startup.php',
